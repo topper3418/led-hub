@@ -60,7 +60,6 @@ class LedStrip:
         if self.on:
             for led in self.leds:
                 newValue = tuple(int(rgbval * self.brightness/255) for rgbval in self.color)
-                print(f'setting led to {newValue}')
                 self.strip[led] = newValue
         else:
             for led in self.leds:
@@ -92,33 +91,37 @@ class BrightnessKnob:
         self.changed = False
         self.debug = debug
     
+    def convert(self, pinValue):
+        
+        if pinValue <= self.minimum:
+            return 0
+        if pinValue >= self.maximum:
+            return 255
+        
+        shifted_max = self.maximum - self.minimum
+        shifted_value = pinValue - self.minimum
+        percentage = shifted_value/shifted_max
+        return int(255 * percentage)         
+        
+    
     def read(self):
         value = self.pin.read_u16()
-        previous = self.value
         
-        if value <= self.minimum:
-            newValue = 0
-        elif value >= self.maximum:
-            newValue = 255
-        else:
-            shifted_max = self.maximum - self.minimum
-            shifted_value = value - self.minimum
-            percentage = shifted_value/shifted_max
-            newValue = int(255 * percentage)
+        newValue = self.convert(value)
         
         # to filter out noise, change of 5 needed
-        if abs(newValue-self.value) < 10:
-
+        if abs(newValue-self.value) < 15:
             return self.value
+        
         if self.debug:
-            print(f'setting new knob value {newValue}')
+            print(f'setting new knob value {newValue} from {self.value}')
         self.value = newValue
         self.changed = True
         return self.value
     
 
 # gpio objects
-knob = BrightnessKnob('GP28', debug=False)
+knob = BrightnessKnob('GP28', debug=True)
 ledStrip = LedStrip('GP4', 8)
 boardLed = BoardLed()
 
