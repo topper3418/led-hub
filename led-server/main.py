@@ -41,7 +41,7 @@ class BoardLed:
 class LedStrip:
 
     def __init__(self, pin, num_leds):
-        self.strip = neopixel.NeoPixel(Pin(pin), num_leds)
+        self.strip = neopixel.NeoPixel(Pin(pin, Pin.OUT), num_leds)
         self.leds = list(range(num_leds))
         self.brightness = 255
         self.on = False
@@ -122,7 +122,7 @@ class BrightnessKnob:
 
 # gpio objects
 knob = BrightnessKnob('GP28', debug=True)
-ledStrip = LedStrip('GP4', 8)
+ledStrip = LedStrip(6, 30)
 boardLed = BoardLed()
 
 
@@ -174,6 +174,9 @@ def serve():
         except (IndexError, ValueError):
             cmd = ''
             param = ''
+        
+        response_code, response_content = '', '' 
+        
         if cmd == '/lighton':
             ledStrip.turnOn()
         elif cmd == '/lightoff':
@@ -183,17 +186,23 @@ def serve():
                 brightness = int(param.split('=')[1])
                 ledStrip.setBrightness(brightness)
             except (IndexError, ValueError):
-                client.send('Invalid brightness')
-                return
+                response_code = '400 Bad Request'
+                response_content = 'Invalid brightness'
         elif cmd == '/color':
             try:
                 r, g, b = param.split('=')[1].split(',')
                 ledStrip.setColor((int(r), int(g), int(b)))
             except (IndexError, ValueError):
-                client.send('Invalid color')
-                return
+                response_code = '400 Bad Request'
+                response_content = 'Invalid color'
+        
+        if response_content == response_code == '':
+            response_content = ledStrip.getState()
+            response_code = '200 OK'
+        
         sLock.release()
-        #client.send(ledStrip.getState())
+        http_response = f"HTTP/1.1 {response_code}\r\nContent-Type: text/plain\r\n\r\n{response_content}"
+        client.send(http_response)
         client.close()
 
 
