@@ -64,26 +64,29 @@ def serve():
         response = Response()
         
         
-        if request.route == '/lighton':
-            ledStrip.turnOn()
-            response.content = ledStrip.getState()
-        elif request.route == '/lightoff':
-            ledStrip.turnOff()
-            response.content = ledStrip.getState()
-        elif request.route == '/brightness':
+        print(f'params: {request.params}')
+        
+        response.content = ledStrip.getState()
+        
+        if request.method == 'POST':
             try:
-                brightness = int(request.params.split('=')[1])
-                ledStrip.setBrightness(brightness)
-                response.content = ledStrip.getState()
-            except (IndexError, ValueError):
-                response.ingest_error('400 Bad Request', 'Invalid brightness')
-        elif cmd == '/color':
-            try:
-                r, g, b = request.params.split('=')[1].split(',')
-                ledStrip.setColor((int(r), int(g), int(b)))
-                response.content = ledStrip.getState()
-            except (IndexError, ValueError):
-                response.ingest_error('400 Bad Request', 'Invalid color')
+                if 'brightness' in request.params:
+                    print('setting brightness')
+                    ledStrip.setBrightness(int(request.params['brightness']))
+                if 'state' in request.params:
+                    if request.params['state'] == 'on':
+                        print('turning on')
+                        ledStrip.turnOn()
+                    else:
+                        print('turning off')
+                        ledStrip.turnOff()
+                if 'color' in request.params:
+                    print('setting color')
+                    color_strs = request.params['color'].strip('()').split(',')
+                    color = tuple(int(color_val) for color_val in color_strs)
+                    ledStrip.setColor(color)
+            except Exception as e:
+                response.ingest_error('400 Bad Request', str(e))
         
         client.send(response.render())
         client.close()
