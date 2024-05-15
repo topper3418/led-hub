@@ -1,3 +1,4 @@
+from machine import Pin
 
 # board LED api
 class BoardLed:

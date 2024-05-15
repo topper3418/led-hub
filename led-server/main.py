@@ -1,9 +1,13 @@
-from machine import ADC, Pin
+# module imports
 from time import sleep
-import neopixel
 import network
 import socket
-import _thread
+
+# custom module imports
+from boardLed import BoardLed
+from ledStrip import LedStrip
+from request import Request
+from response import Response
 
 # config variables
 debugKnob = False
@@ -12,119 +16,12 @@ debugKnob = False
 # networking variables
 ssid = 'the way of the wamel'
 password = 'Maisie129'
-led = Pin('LED', Pin.OUT)
 last_command = '/lightoff?'
 
 
-# board LED api
-class BoardLed:
-    
-    def __init__(self):
-        self.pin = Pin('LED', Pin.OUT)
-        self.on = False
-        self.pin.value(self.on)
-    
-    def toggle(self):
-        newStatus = not self.on
-        self.pin.value(newStatus)
-        self.on = newStatus
-    
-    def turnOn(self):
-        self.on = True
-        self.pin.value(1)
-    
-    def turnOff(self):
-        self.on = False
-        self.pin.value(0)
-
-
-class LedStrip:
-
-    def __init__(self, pin, num_leds):
-        self.strip = neopixel.NeoPixel(Pin(pin, Pin.OUT), num_leds)
-        self.leds = list(range(num_leds))
-        self.brightness = 255
-        self.on = False
-        self.color = (255, 255, 255)
-        self.write()
-    
-    def setColor(self, color):
-        self.color = color
-        self.write()
-
-    def setBrightness(self, brightness):
-        self.brightness = brightness
-        self.write()
-    
-    def write(self):
-        if self.on:
-            for led in self.leds:
-                newValue = tuple(int(rgbval * self.brightness/255) for rgbval in self.color)
-                self.strip[led] = newValue
-        else:
-            for led in self.leds:
-                self.strip[led] = (0, 0, 0)
-    
-    def turnOff(self):
-        self.on = False
-        self.write()
-    
-    def turnOn(self):
-        self.on = True
-        self.write()
-    
-    def getState(self):
-        return {
-            'color': self.color,
-            'brightness': self.brightness,
-            'on': self.on
-        }
-
-
-class BrightnessKnob:
-
-    def __init__(self, pin, debug=False):
-        self.pin = ADC(Pin(pin))
-        self.minimum = 30000
-        self.maximum = 65535
-        self.value = 0
-        self.changed = False
-        self.debug = debug
-    
-    def convert(self, pinValue):
-        
-        if pinValue <= self.minimum:
-            return 0
-        if pinValue >= self.maximum:
-            return 255
-        
-        shifted_max = self.maximum - self.minimum
-        shifted_value = pinValue - self.minimum
-        percentage = shifted_value/shifted_max
-        return int(255 * percentage)         
-        
-    
-    def read(self):
-        value = self.pin.read_u16()
-        
-        newValue = self.convert(value)
-        
-        # to filter out noise, change of 5 needed
-        if abs(newValue-self.value) < 15:
-            return self.value
-        
-        if self.debug:
-            print(f'setting new knob value {newValue} from {self.value}')
-        self.value = newValue
-        self.changed = True
-        return self.value
-    
-
 # gpio objects
-knob = BrightnessKnob('GP28', debug=True)
-ledStrip = LedStrip(6, 30)
+ledStrip = LedStrip(4, 30)
 boardLed = BoardLed()
-
 
 
 def connect():
@@ -147,78 +44,52 @@ def open_socket(ip):
     connection.bind(address)
     connection.listen(1)
     return connection
-            
 
-sLock = _thread.allocate_lock()
-        
+
+def accept_request(client):
+    return Request(client.recv(1024))
+
 
 def serve():
     """serves the connection for the webpage"""
     ip = connect()
     connection = open_socket(ip)
-    state = ''
     while True:
         # get connection/request
         client = connection.accept()[0]
-        request = client.recv(1024)
-        request = str(request)
-        print(request)
-        sLock.acquire()
-
-        # get command
-        try:
-            path = request.split(' ')[1]
-            cmd, params = request.split('?') if '?' in path else (path, '')
-            print(f'cmd: {cmd}, params: {params}')
-            param = params.split('&')[0] if params else ''
-        except (IndexError, ValueError):
-            cmd = ''
-            param = ''
+        request = accept_request(client)
+        print(f'uri: {request.uri}')
         
-        response_code, response_content = '', '' 
+            
+        response = Response()
         
-        if cmd == '/lighton':
+        
+        if request.route == '/lighton':
             ledStrip.turnOn()
-        elif cmd == '/lightoff':
+            response.content = ledStrip.getState()
+        elif request.route == '/lightoff':
             ledStrip.turnOff()
-        elif cmd == '/brightness':
+            response.content = ledStrip.getState()
+        elif request.route == '/brightness':
             try:
-                brightness = int(param.split('=')[1])
+                brightness = int(request.params.split('=')[1])
                 ledStrip.setBrightness(brightness)
+                response.content = ledStrip.getState()
             except (IndexError, ValueError):
-                response_code = '400 Bad Request'
-                response_content = 'Invalid brightness'
+                response.ingest_error('400 Bad Request', 'Invalid brightness')
         elif cmd == '/color':
             try:
-                r, g, b = param.split('=')[1].split(',')
+                r, g, b = request.params.split('=')[1].split(',')
                 ledStrip.setColor((int(r), int(g), int(b)))
+                response.content = ledStrip.getState()
             except (IndexError, ValueError):
-                response_code = '400 Bad Request'
-                response_content = 'Invalid color'
+                response.ingest_error('400 Bad Request', 'Invalid color')
         
-        if response_content == response_code == '':
-            response_content = ledStrip.getState()
-            response_code = '200 OK'
-        
-        sLock.release()
-        http_response = f"HTTP/1.1 {response_code}\r\nContent-Type: text/plain\r\n\r\n{response_content}"
-        client.send(http_response)
+        client.send(response.render())
         client.close()
 
 
-def run_gpio():
-    while True:
-        sLock.acquire()
-        brightness = knob.read()
-        if knob.changed:
-            ledStrip.setBrightness(brightness)
-            knob.changed = False
-        ledStrip.write()
-        sLock.release()
-
-
 try:
-    _thread.start_new_thread(run_gpio, ())
     serve()
 except KeyboardInterrupt:
     machine.reset()
