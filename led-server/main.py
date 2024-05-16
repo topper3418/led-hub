@@ -1,13 +1,11 @@
 # module imports
-from time import sleep
-import network
-import socket
+import machine
 
 # custom module imports
-from boardLed import BoardLed
 from ledStrip import LedStrip
 from request import Request
 from response import Response
+from server import Server
 
 # config variables
 debugKnob = False
@@ -16,84 +14,52 @@ debugKnob = False
 # networking variables
 ssid = 'the way of the wamel'
 password = 'Maisie129'
-last_command = '/lightoff?'
+
+static_ip = '192.168.68.69'
+subnet_mask = '255.255.255.0'
+gateway = '192.168.68.1'
+dns_server = '8.8.8.8'
+static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
 
 
 # gpio objects
 ledStrip = LedStrip(4, 30)
-boardLed = BoardLed()
+server = Server(ssid, password, static_ip_config)
+
+def log_request(req: Request, _):
+    print(f'New {req.method} request on route {req.route}')
+    
+server.use(log_request)
+
+@server.route('GET', '/')
+def get_data(_, res: Response):
+    """returns the state of the LED strip"""
+    res.content = ledStrip.getState()
 
 
-def connect():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(ssid, password)
-    while wlan.isconnected() == False:
-        print('Waiting for connection...')
-        boardLed.toggle()
-        sleep(1)
-    ip = wlan.ifconfig()[0]
-    print(f'Connected on {ip}')
-    boardLed.turnOn()
-    return ip
-
-
-def open_socket(ip):
-    address = (ip, 80)
-    connection = socket.socket()
-    connection.bind(address)
-    connection.listen(1)
-    return connection
-
-
-def accept_request(client):
-    return Request(client.recv(1024))
-
-
-def serve():
-    """serves the connection for the webpage"""
-    ip = connect()
-    connection = open_socket(ip)
-    while True:
-        # get connection/request
-        client = connection.accept()[0]
-        request = accept_request(client)
-        print(f'uri: {request.uri}')
-        
-            
-        response = Response()
-        
-        
-        print(f'params: {request.params}')
-        
-        response.content = ledStrip.getState()
-        
-        if request.method == 'POST':
-            try:
-                if 'brightness' in request.params:
-                    print('setting brightness')
-                    ledStrip.setBrightness(int(request.params['brightness']))
-                if 'state' in request.params:
-                    if request.params['state'] == 'on':
-                        print('turning on')
-                        ledStrip.turnOn()
-                    else:
-                        print('turning off')
-                        ledStrip.turnOff()
-                if 'color' in request.params:
-                    print('setting color')
-                    color_strs = request.params['color'].strip('()').split(',')
-                    color = tuple(int(color_val) for color_val in color_strs)
-                    ledStrip.setColor(color)
-            except Exception as e:
-                response.ingest_error('400 Bad Request', str(e))
-        
-        client.send(response.render())
-        client.close()
-
+@server.route('POST', '/')
+def set_strip(req: Request, res: Response):
+    """depending on params, changes the state of the LED strip and returns 
+    the state"""
+    if 'brightness' in req.params:
+        print('setting brightness')
+        ledStrip.setBrightness(int(req.params['brightness']))
+    if 'state' in req.params:
+        if req.params['state'] == 'on':
+            print('turning on')
+            ledStrip.turnOn()
+        else:
+            print('turning off')
+            ledStrip.turnOff()
+    if 'color' in req.params:
+        print('setting color')
+        color_strs = req.params['color'].strip('()').split(',')
+        color = tuple(int(color_val) for color_val in color_strs)
+        ledStrip.setColor(color)   
+    res.content = ledStrip.getState()
 
 try:
-    serve()
+    server.run()
 except KeyboardInterrupt:
     machine.reset()
 

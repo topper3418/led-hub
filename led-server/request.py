@@ -9,5 +9,4 @@ class Request:
         self.route, param_str = self.uri.split('?') if '?' in self.uri else [self.uri, '']
         # convert the params into a dict
         param_list = [param.split('=') for param in param_str.split('&')] if param_str else []
-        print(param_list)
         self.params = {key: value for key, value in param_list}
