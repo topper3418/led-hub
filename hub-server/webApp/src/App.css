@@ -19,6 +19,11 @@ p, h1, h2 {
   background-color: transparent;
   margin-top: 0;
   margin-bottom: 0;
+  color: white;
+}
+
+h1, h2, h3 {
+  text-align: center;
 }
 
 .row {
@@ -36,12 +41,35 @@ p, h1, h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   box-sizing: border-box;
-  border-color: purple;
   overflow: hidden;
   margin: 0;
   padding: 0;
   flex-grow: 1;
+}
+
+.fill {
+  flex-grow: 1;
+}
+
+.view {
+  width: 90%;
+  height: 90%;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 10px 20px;
 }

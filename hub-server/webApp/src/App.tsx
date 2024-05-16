@@ -24,17 +24,34 @@ function App() {
     setOn(!on);
     console.log('on', on)
   }
+
+  const customStyles = {
+    default: {
+      picker: {
+        backgroundColor: 'transparent', // Dark background
+        border: '1px solid white', // white border
+        boxShadow: 'none',
+        width: '90%',
+        margin: '0',
+        left: '0',
+      }
+    },
+  };
   
   return (
     <div className="wrapper column">
-      <header className="App-header">
-        <div className="column">
+        <div className="view column">
           <h1>LED control</h1>
-            <SketchPicker color={color} onChange={handleColorChange} />
+            <div className='center'>
+              <SketchPicker 
+                color={color} 
+                onChange={handleColorChange}
+                disableAlpha={true}
+                styles={customStyles} />
+            </div>
           <input type="range" min="0" max="255" value={brightness} onChange={handleBrightnessChange} />
           <button onClick={handleOnOff}>{on ? 'Off' : 'On'}</button>
         </div>
-      </header>
     </div>
   )
 }
