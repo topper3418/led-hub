@@ -1,6 +1,7 @@
 const {getLogger, LoggerApp, loggingEngine} = require('@topper3418/logger-server')
 const express = require('express')
 const path = require('path')
+const { getStripData, setStrip } = require('./routes')
 
 // constant for now, will be configurable later
 const stripIP = '192.168.68.69';
@@ -36,6 +37,9 @@ class HubApp extends express {
         this.get("/stripInfo", (_, res) => {
             res.json({ ip: stripIP, port: stripPort });
         });
+
+        this.get("/stripData/:stripname", getStripData);
+        this.post("/stripData/:stripname", setStrip);
     }
 
     applyMiddleware = () => {

@@ -24,6 +24,7 @@
   "homepage": "https://github.com/topper3418/led-hub#readme",
   "dependencies": {
     "@topper3418/logger-server": "^0.3.0",
+    "ajax": "^0.0.4",
     "express": "^4.19.2"
   },
   "devDependencies": {

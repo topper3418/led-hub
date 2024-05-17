@@ -3,12 +3,17 @@
 body, p, div, h1, h2, a {
   margin: 0;
   padding: 0;
+  color: white;
 }
 
-body, div {
-  background-color: black;
+body {
   overflow-x: hidden;
+  background-color: black;
   color-scheme: dark;
+}
+
+div {
+  background-color: transparent;
 }
 
 body {
@@ -58,7 +63,7 @@ h1, h2, h3 {
   width: 90%;
   height: 90%;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: start;
 }
 
 .center {
@@ -72,4 +77,8 @@ button {
   border: 1px solid white;
   color: white;
   padding: 10px 20px;
+}
+
+.spaced > * {
+  margin-bottom: 20px;
 }
