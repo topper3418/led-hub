@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 // import { SketchPicker } from 'react-color';
-import ColorWheel from './colorwheel';
+import ColorWheel, { RGB } from './colorwheel';
 import './App.css'
 // simple webpage
 // has a simple button for on/off
@@ -15,18 +15,24 @@ function App() {
   const [color, setColor] = useState({ r: 171, g: 37, b: 103 });
   const [on, setOn] = useState(false);
   const [brightness, setBrightness] = useState(255);
+  const [write, setWrite] = useState(false);
 
   const url = 'http://DESKTOP-KTV4KV6.local:2000/stripData/' + stripName
 
+  // get and post requests return the same data, so lets process them the same
+  const processResponse = async (res: Response, write=false) => {
+    const data = await res.json();
+    console.log('data returned from request', data);
+    const [r, g, b] = data.color;
+    setWrite(write)
+    setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
+    setOn(data.on);
+    setBrightness(data.brightness);
+  }
+
   useEffect(() => {
     setLoading(true);
-    fetch(url).then(res => res.json()).then(data => {
-      console.log('data', data)
-      const [r, g, b] = data.color;
-      console.log('parsedColor', r, g, b)
-      setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
-      setOn(data.on);
-    }).catch(err => {
+    fetch(url).then(processResponse).catch(err => {
       setError(true);
       console.error(err);
     }).finally(() => {
@@ -34,31 +40,47 @@ function App() {
     });
   }, []);
 
+  const togglePressed = () => {
+    setWrite(true);
+    setOn(!on)
+  }
+
+  const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWrite(true);
+    setBrightness(parseInt(e.target.value));
+  }
+
+  const colorChanged = (color: RGB) => {
+    setWrite(true);
+    setColor(color);
+  }
+
   useEffect(() => {
-    sendChange();
+    if (write) sendChange();
   }, [color, on, brightness]);
 
-  const sendChange = () => {
-    console.log('sending change', color, on, brightness)
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        color: [color.r, color.g, color.b],
-        on,
-        brightness
-      })
-    }).then(res => {
-      console.log('res', res)
-    }).catch(err => {
+  const sendChange = async () => {
+    console.log('sending change', {color, on, brightness})
+    try {
+      const postData = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          color,
+          on,
+          brightness
+        })
+      });
+      processResponse(postData);
+    } catch (err) {
       console.error(err);
-    });
+    }
   }
 
   const coloredBackground = {
-    backgroundColor: on ? `rgb(${color.r}, ${color.g}, ${color.b})` : 'black',
+    backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness})` : 'black',
   }
 
   if (loading) {
@@ -76,15 +98,15 @@ function App() {
           <div className='center'>
             <ColorWheel 
               color={color} 
-              setColor={setColor} />
+              onChange={colorChanged} />
           </div>
           <input 
             type="range" 
             min="0" 
             max="255" 
             value={brightness} 
-            onChange={(e) => setBrightness(parseInt(e.target.value))} />
-          <button onClick={() => setOn(!on)}>{on ? 'Off' : 'On'}</button>
+            onChange={brightnessChanged} />
+          <button onClick={togglePressed}>{on ? 'Off' : 'On'}</button>
         </div>
     </div>
   )

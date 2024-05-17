@@ -2,6 +2,17 @@ const { json } = require('express');
 const strips = require('../../strips.json');
 const axios = require('axios');
 
+// holy shit I need to fix this on the pico
+const compensateForPicoFuckery = (data) => {
+    const properlyformatteddatastring = data
+        .replace(/'/g, '"')
+        .replace(/True/g, 'true')
+        .replace(/False/g, 'false')
+        .replace(/\(([^)]+)\)/g, '[$1]');
+    const dataOut = JSON.parse(properlyformatteddatastring)
+    return dataOut
+}
+
 const getStripData = async (req, res) => {
     const stripName = req.params.stripname;
     let ipAddress;
@@ -12,19 +23,16 @@ const getStripData = async (req, res) => {
         console.log('no ip')
         return;
     }
-
-    const stripData = await axios.get(`http://${ipAddress}/`);
-
-    const datastring = stripData.data;
-    // holy shit I need to fix this on the pico
-    const properlyformatteddatastring = datastring
-        .replace(/'/g, '"')
-        .replace(/True/g, 'true')
-        .replace(/False/g, 'false')
-        .replace(/\(([^)]+)\)/g, '[$1]');
-    console.log(properlyformatteddatastring)
-    const dataOut = JSON.parse(properlyformatteddatastring)
-    res.json(dataOut);
+    try {
+        const stripData = await axios.get(`http://${ipAddress}/`);
+    
+        const data = compensateForPicoFuckery(stripData.data)
+        console.log('got data from strip:', data)
+        res.json(data);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: error.stack, message: 'error fetching from strip'});
+    }
 };
 
 const setStrip = async (req, res) => {
@@ -36,16 +44,22 @@ const setStrip = async (req, res) => {
         return;
     }
 
-    const {color, status} = req.body;
-    const url = `http://${ipAddress}/?color=${color}&status=${status}`;
+    const {color, on, brightness} = req.body;
+    const onStatus = on ? 'on' : 'off';
+    console.log('color', color)
+    const rgb = `(${color.r},${color.g},${color.b})`
+    const url = `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`;
+    console.log('url', `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`)
+    console.log('betterurl', "192.168.68.69:80/?state=off&color=(127,0,255)&brightness=255")
 
     try {
         const stripData = await axios.post(url);
-        console.log(stripData.data)
-        res.json(stripData.data);
+        const data = compensateForPicoFuckery(stripData.data)
+
+        res.json(data);
     } catch (error) {
         console.log(error)
-        res.status(500).json({error: error.message});
+        res.status(500).json({error: error.stack, message: 'error posting to strip'});
     }
 
 }

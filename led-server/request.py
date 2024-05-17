@@ -10,3 +10,6 @@ class Request:
         # convert the params into a dict
         param_list = [param.split('=') for param in param_str.split('&')] if param_str else []
         self.params = {key: value for key, value in param_list}
+    
+    def __repr__(self):
+        return f'{self.method} on {self.route}; {self.params}'

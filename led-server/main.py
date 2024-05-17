@@ -27,7 +27,7 @@ ledStrip = LedStrip(4, 30)
 server = Server(ssid, password, static_ip_config)
 
 def log_request(req: Request, _):
-    print(f'New {req.method} request on route {req.route}')
+    print(req)
     
 server.use(log_request)
 

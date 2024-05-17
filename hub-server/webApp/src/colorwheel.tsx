@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 
-interface RGB {
+export interface RGB {
   r: number;
   g: number;
   b: number;
@@ -9,10 +9,10 @@ interface RGB {
 
 interface ColorWheelProps {
     color: RGB;
-    setColor: (color: RGB) => void;
+    onChange: (color: RGB) => void;
   }
 
-const ColorWheel: React.FC<ColorWheelProps> = ({color, setColor }) => {
+const ColorWheel: React.FC<ColorWheelProps> = ({color, onChange: setColor }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
