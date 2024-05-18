@@ -2,17 +2,6 @@ const { json } = require('express');
 const strips = require('../../strips.json');
 const axios = require('axios');
 
-// holy shit I need to fix this on the pico
-const compensateForPicoFuckery = (data) => {
-    const properlyformatteddatastring = data
-        .replace(/'/g, '"')
-        .replace(/True/g, 'true')
-        .replace(/False/g, 'false')
-        .replace(/\(([^)]+)\)/g, '[$1]');
-    const dataOut = JSON.parse(properlyformatteddatastring)
-    return dataOut
-}
-
 const getStripData = async (req, res) => {
     const stripName = req.params.stripname;
     let ipAddress;
@@ -26,8 +15,10 @@ const getStripData = async (req, res) => {
     try {
         const stripData = await axios.get(`http://${ipAddress}/`);
     
-        const data = compensateForPicoFuckery(stripData.data)
+        // const data = compensateForPicoFuckery(stripData.data)
+        const data = stripData.data
         console.log('got data from strip:', data)
+        console.log('type of data: ', typeof data)
         res.json(data);
     } catch (error) {
         console.log(error)
@@ -54,7 +45,8 @@ const setStrip = async (req, res) => {
 
     try {
         const stripData = await axios.post(url);
-        const data = compensateForPicoFuckery(stripData.data)
+        // const data = compensateForPicoFuckery(stripData.data)
+        const data = stripData.data
 
         res.json(data);
     } catch (error) {

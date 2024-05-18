@@ -1,3 +1,4 @@
+import json
 class Response:
     
     def __init__(self):
@@ -11,4 +12,10 @@ class Response:
         self.content_type = 'plain/text'
     
     def render(self):
-        return f"HTTP/1.1 {self.code}\r\nContent-Type: {self.content_type}\r\n\r\n{self.content}"
+        if self.content_type == 'application/json':
+            content = json.dumps(self.content)
+        else:
+            content = self.content
+        rendered_return = f"HTTP/1.1 {self.code}\r\nContent-Type: {self.content_type}\r\n\r\n{content}"
+        print(f'returning {rendered_return}')
+        return rendered_return

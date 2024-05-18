@@ -40,7 +40,7 @@ class LedStrip:
     
     def getState(self):
         return {
-            'color': self.color,
+            'color': list(self.color),
             'brightness': self.brightness,
             'on': self.on
         }
