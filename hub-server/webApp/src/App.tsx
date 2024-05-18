@@ -80,8 +80,10 @@ function App() {
   }
 
   const coloredBackground = {
-    backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness})` : 'black',
+    backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` : 'black',
   }
+
+  console.log('colored background', coloredBackground)
 
   if (loading) {
     return <div>Loading...</div>
@@ -92,8 +94,8 @@ function App() {
   }
   
   return (
-    <div className="wrapper column" style={coloredBackground}>
-        <div className="view spaced column" style={coloredBackground}>
+    <div className="wrapper column bottom" style={coloredBackground}>
+        <div className="view spaced column">
           <h1>LED control</h1>
           <div className='center'>
             <ColorWheel 
@@ -103,7 +105,7 @@ function App() {
           <input 
             type="range" 
             min="0" 
-            max="255" 
+            max="10" 
             value={brightness} 
             onChange={brightnessChanged} />
           <button onClick={togglePressed}>{on ? 'Off' : 'On'}</button>
