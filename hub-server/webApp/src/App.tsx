@@ -83,6 +83,10 @@ function App() {
     backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` : 'black',
   }
 
+  const coloredButton= {
+    backgroundColor: on ? 'black' : `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})`,
+  }
+
   console.log('colored background', coloredBackground)
 
   if (loading) {
@@ -108,7 +112,9 @@ function App() {
             max="10" 
             value={brightness} 
             onChange={brightnessChanged} />
-          <button onClick={togglePressed}>{on ? 'Off' : 'On'}</button>
+          <button onClick={togglePressed} style={coloredButton}>
+            {on ? 'Off' : 'On'}
+            </button>
         </div>
     </div>
   )
