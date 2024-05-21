@@ -1,6 +1,7 @@
 import network
 import socket
 import time
+import select
 
 from boardLed import BoardLed
 from request import Request
@@ -38,7 +39,8 @@ class Server:
         address = (self.ip, 80)
         connection = socket.socket()
         connection.bind(address)
-        connection.listen(1)
+        connection.listen(9)
+        connection.setblocking(False)
         self.connection = connection
 
     def use(self, func):
@@ -80,6 +82,8 @@ class Server:
         client.close()
     
     def run(self):
+        if self.connection is None:
+            raise Exception('Server attempted to start while not connected')
         self.connect()
         self.open_socket()
         while True:

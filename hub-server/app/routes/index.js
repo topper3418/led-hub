@@ -1,4 +1,3 @@
-const { json } = require('express');
 const strips = require('../../strips.json');
 const axios = require('axios');
 
@@ -15,7 +14,6 @@ const getStripData = async (req, res) => {
     try {
         const stripData = await axios.get(`http://${ipAddress}/`);
     
-        // const data = compensateForPicoFuckery(stripData.data)
         const data = stripData.data
         console.log('got data from strip:', data)
         console.log('type of data: ', typeof data)
@@ -37,16 +35,14 @@ const setStrip = async (req, res) => {
 
     const {color, on, brightness} = req.body;
     const onStatus = on ? 'on' : 'off';
-    console.log('color', color)
     const rgb = `(${color.r},${color.g},${color.b})`
     const url = `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`;
-    console.log('url', `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`)
-    console.log('betterurl', "192.168.68.69:80/?state=off&color=(127,0,255)&brightness=255")
 
     try {
+        console.log('setting strip:', {color, on, brightness})
         const stripData = await axios.post(url);
-        // const data = compensateForPicoFuckery(stripData.data)
         const data = stripData.data
+        console.log('got data from strip:', data)
 
         res.json(data);
     } catch (error) {

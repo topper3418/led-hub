@@ -1,5 +1,6 @@
 # module imports
 import machine
+import configparser
 
 # custom module imports
 from ledStrip import LedStrip
@@ -8,17 +9,20 @@ from response import Response
 from server import Server
 
 # config variables
-debugKnob = False
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 
 
 # networking variables
-ssid = 'the way of the wamel'
-password = 'Maisie129'
+wlanConfig = config['WLAN']
+ssid = wlanConfig['ssid']
+password = wlanConfig['password']
 
-static_ip = '192.168.68.69'
-subnet_mask = '255.255.255.0'
-gateway = '192.168.68.1'
-dns_server = '8.8.8.8'
+static_ip = wlanConfig['static_ip']
+subnet_mask = wlanConfig['subnet_mask']
+gateway = wlanConfig['gateway']
+dns_server = wlanConfig['dns_server']
 static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
 
 
