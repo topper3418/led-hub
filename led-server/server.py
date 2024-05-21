@@ -35,11 +35,15 @@ class Server:
         self.ip = ip
     
     def open_socket(self):
-        address = (self.ip, 80)
-        connection = socket.socket()
-        connection.bind(address)
-        connection.listen(1)
-        self.connection = connection
+        try:
+            address = (self.ip, 80)
+            connection = socket.socket()
+            connection.bind(address)
+            connection.listen(1)
+            self.connection = connection
+            print(f'Socket opened on {self.ip}:80')
+        except Exception as e:
+            print(f'Failed to open socket: {e}')
 
     def use(self, func):
         """Adds a middleware function to be executed for every request"""

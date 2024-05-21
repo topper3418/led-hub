@@ -7,7 +7,7 @@ import './App.css'
 // has a slider for brightness
 // has a color picker for color
 
-const stripName = 'devstrip';
+const stripName = 'kitchen';
 
 function App() {
   const [loading, setLoading] = useState(true);

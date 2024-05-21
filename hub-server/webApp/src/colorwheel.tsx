@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 
 export interface RGB {
@@ -14,7 +14,7 @@ interface ColorWheelProps {
 
 const ColorWheel: React.FC<ColorWheelProps> = ({color, onChange: setColor }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
+  console.warn('need to use the color value', color);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
