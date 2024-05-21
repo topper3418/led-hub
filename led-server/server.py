@@ -82,11 +82,25 @@ class Server:
         client.close()
     
     def run(self):
-        if self.connection is None:
-            raise Exception('Server attempted to start while not connected')
         self.connect()
         self.open_socket()
+        sockets_list = [self.connection]
+        clients = {}
+
+        print(f'Server running on {self.ip}:80')
+
         while True:
-            client = self.connection.accept()[0]
-            self.handle_request(client)
+            readable, _, _ = select.select(sockets_list, [], [])
+
+            for notified_socket in readable:
+                if notified_socket == self.connection:
+                    client_socket, client_address = self.connection.accept()
+                    client_socket.setblocking(False)
+                    sockets_list.append(client_socket)
+                    clients[client_socket] = client_address
+                    print(f"Accepted new connection from {client_address}")
+                else:
+                    self.handle_request(notified_socket)
+                    sockets_list.remove(notified_socket)
+                    del clients[notified_socket]
         
