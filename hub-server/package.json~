@@ -1,0 +1,33 @@
+{
+  "name": "hub-server",
+  "version": "0.1.0",
+  "description": "hub server for running IOT devices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topper3418/led-hub.git"
+  },
+  "keywords": [
+    "neopixel",
+    "led"
+  ],
+  "author": "Travis Opperud",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/topper3418/led-hub/issues"
+  },
+  "homepage": "https://github.com/topper3418/led-hub#readme",
+  "dependencies": {
+    "axios": "^1.7.1",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "nodemon": "^3.1.0"
+  }
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
 import ColorWheel, { RGB } from './colorwheel';
 import './App.css'
@@ -7,7 +8,7 @@ import './App.css'
 // has a slider for brightness
 // has a color picker for color
 
-const stripName = 'kitchen';
+const stripName = 'devstrip';
 
 function App() {
   const [loading, setLoading] = useState(true);

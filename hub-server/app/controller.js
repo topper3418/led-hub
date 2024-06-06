@@ -1,6 +1,6 @@
 const { json } = require('express');
-const strips = require('../../strips.json');
 const axios = require('axios');
+const strips = require('../strips.json');
 
 const getStripData = async (req, res) => {
     const stripName = req.params.stripname;

@@ -39,7 +39,8 @@ class Server:
             address = (self.ip, 80)
             connection = socket.socket()
             connection.bind(address)
-            connection.listen(1)
+            connection.listen(9)
+            connection.setblocking(False)
             self.connection = connection
             print(f'Socket opened on {self.ip}:80')
         except Exception as e:
