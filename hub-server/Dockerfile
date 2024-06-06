@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:14
+FROM node:20
 
 # Set the working directory
 WORKDIR /hub-server
@@ -19,6 +19,9 @@ COPY . .
 # Set the working directory to the webapp folder
 WORKDIR /hub-server/webApp
 
+# install the web application dependencies
+RUN npm install
+
 # Build the web application
 RUN npm run build
 
@@ -26,7 +29,7 @@ RUN npm run build
 WORKDIR /hub-server
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 2000
 
 # Start the application
 CMD ["npm", "start"]
