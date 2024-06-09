@@ -1,6 +1,5 @@
 # module imports
 import machine
-import configparser
 
 # custom module imports
 from ledStrip import LedStrip
@@ -8,21 +7,17 @@ from request import Request
 from response import Response
 from server import Server
 
-# config variables
-config = configparser.ConfigParser()
-config.read('config.ini')
+# from config import (ssid, 
+#                     password, 
+#                     static_ip_config)
 
+ssid = "the way of the wamel"
+password = 'Maisie129'
+static_ip = '192.168.68.69'
+subnet_mask = '255.255.255.0'
+gateway = '192.168.68.1'
+dns_server = '8.8.8.8'
 
-
-# networking variables
-wlanConfig = config['WLAN']
-ssid = wlanConfig['ssid']
-password = wlanConfig['password']
-
-static_ip = wlanConfig['static_ip']
-subnet_mask = wlanConfig['subnet_mask']
-gateway = wlanConfig['gateway']
-dns_server = wlanConfig['dns_server']
 static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
 
 
@@ -45,19 +40,19 @@ def get_data(_, res: Response):
 def set_strip(req: Request, res: Response):
     """depending on params, changes the state of the LED strip and returns 
     the state"""
-    if 'brightness' in req.params:
+    if 'brightness' in req.body:
         print('setting brightness')
-        ledStrip.setBrightness(int(req.params['brightness']))
-    if 'state' in req.params:
-        if req.params['state'] == 'on':
+        ledStrip.setBrightness(int(req.body['brightness']))
+    if 'state' in req.body:
+        if req.body['state'] == 'on':
             print('turning on')
             ledStrip.turnOn()
         else:
             print('turning off')
             ledStrip.turnOff()
-    if 'color' in req.params:
+    if 'color' in req.body:
         print('setting color')
-        color_strs = req.params['color'].strip('()').split(',')
+        color_strs = req.body['color']
         color = tuple(int(color_val) for color_val in color_strs)
         ledStrip.setColor(color)   
     res.content = ledStrip.getState()

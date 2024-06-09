@@ -42,6 +42,6 @@ class LedStrip:
         return {
             'color': list(self.color),
             'brightness': self.brightness,
-            'on': self.on
+            'state': 'on' if self.on else 'off'
         }
    

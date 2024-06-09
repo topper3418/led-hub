@@ -1,13 +1,9 @@
-const {getLogger, LoggerApp, loggingEngine} = require('@topper3418/logger-server')
 const express = require('express')
+const { getLogger, loggerRouter, loggingEngine } = require('@topper3418/logger-server')
 const path = require('path')
-const { getStripData, setStrip } = require('./routes')
+const router = require('./router')
 
-// constant for now, will be configurable later
-const stripIP = '192.168.68.69';
-const stripPort = '80';
-
-logger = getLogger("appHubServer", "INFO");
+const logger = getLogger('hub-server')
 
 class HubApp extends express {
     constructor(prodMode = true, port = 4000) {
@@ -15,17 +11,14 @@ class HubApp extends express {
         this.port = port || 4000;
         this.prodMode = prodMode;
         this.applyMiddleware();
-        
-        const loggerApp = new LoggerApp();
-        this.use('/log', loggerApp);
+        this.loggingEngine = loggingEngine;
         
         if (this.prodMode){
-            this.use(express.static(path.join(__dirname, "../webClient/dist")));
+            this.use(express.static(path.join(__dirname, "../webApp/dist")));
             this.get("/", (_, res) => {
-                logger.info("serving client app");
                 console.log("serving client app");
                 res.sendFile(
-                    path.join(__dirname, "../webClient/dist", "index.html")
+                    path.join(__dirname, "../webApp/dist", "index.html")
                 );
             });
         } else {
@@ -34,34 +27,31 @@ class HubApp extends express {
             });
         }
 
+        this.use("/logs", loggerRouter);
+
         this.get("/stripInfo", (_, res) => {
             res.json({ ip: stripIP, port: stripPort });
         });
 
-        this.get("/stripData/:stripname", getStripData);
-        this.post("/stripData/:stripname", setStrip);
+        this.use("/stripData/", router);
     }
 
     applyMiddleware = () => {
         this.use(express.json());
+        const cors = require("cors");
+        this.use(cors());
         if (!this.prodMode) {
-            const cors = require("cors");
-            this.use(cors());
         } 
     };
 
     start = async () => {
         await loggingEngine.sync();
         this.listen(this.port, () => {
+            const mode = this.prodMode ? "prod mode" : "dev mode"
             console.log(
-                `log server is running on port ${this.port} in ${
-                    this.prodMode ? "prod mode" : "dev mode"
-                }`
+                `log server is running on port ${this.port} in ${mode}`
             );
-            logger.info("Log server started", {
-                port: this.port,
-                mode: this.prodMode ? "prod" : "dev",
-            });
+            logger.info(`log server is running on port ${this.port} in ${mode}`)
         });
     };
 }

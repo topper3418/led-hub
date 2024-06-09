@@ -1,10 +1,12 @@
-const strips = require('../../strips.json');
+const { json } = require('express');
 const axios = require('axios');
+const strips = require('../strips.json');
 
 const getStripData = async (req, res) => {
     const stripName = req.params.stripname;
     let ipAddress;
     ipAddress = strips[stripName];
+    console.log('received request for strip:', stripName, 'with ip:', ipAddress)
 
     if (!ipAddress) {
         res.status(404).send("Strip not found");
@@ -35,14 +37,18 @@ const setStrip = async (req, res) => {
 
     const {color, on, brightness} = req.body;
     const onStatus = on ? 'on' : 'off';
-    const rgb = `(${color.r},${color.g},${color.b})`
-    const url = `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`;
+    console.log('color', color)
+    const url = `http://${ipAddress}/`;
+    const body = {
+        color,
+        state: onStatus,
+        brightness
+    }
 
     try {
-        console.log('setting strip:', {color, on, brightness})
-        const stripData = await axios.post(url);
-        const data = stripData.data
-        console.log('got data from strip:', data)
+        const stripData = await axios.post(url, body);
+        // const data = compensateForPicoFuckery(stripData.data)
+        const data = stripData.data;
 
         res.json(data);
     } catch (error) {

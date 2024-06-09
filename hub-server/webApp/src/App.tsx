@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
 import ColorWheel, { RGB } from './colorwheel';
 import './App.css'
@@ -17,7 +18,7 @@ function App() {
   const [brightness, setBrightness] = useState(255);
   const [write, setWrite] = useState(false);
 
-  const url = 'http://DESKTOP-KTV4KV6.local:2000/stripData/' + stripName
+  const url = 'http://localhost:2000/stripData/' + stripName
 
   // get and post requests return the same data, so lets process them the same
   const processResponse = async (res: Response, write=false) => {

@@ -2,6 +2,7 @@ import network
 import socket
 import time
 import select
+import select
 
 from boardLed import BoardLed
 from request import Request
@@ -36,12 +37,16 @@ class Server:
         self.ip = ip
     
     def open_socket(self):
-        address = (self.ip, 80)
-        connection = socket.socket()
-        connection.bind(address)
-        connection.listen(9)
-        connection.setblocking(False)
-        self.connection = connection
+        try:
+            address = (self.ip, 80)
+            connection = socket.socket()
+            connection.bind(address)
+            connection.listen(9)
+            connection.setblocking(False)
+            self.connection = connection
+            print(f'Socket opened on {self.ip}:80')
+        except Exception as e:
+            print(f'Failed to open socket: {e}')
 
     def use(self, func):
         """Adds a middleware function to be executed for every request"""
@@ -82,11 +87,22 @@ class Server:
         client.close()
     
     def run(self):
-        if self.connection is None:
-            raise Exception('Server attempted to start while not connected')
         self.connect()
         self.open_socket()
+        inputs = [self.connection]
         while True:
-            client = self.connection.accept()[0]
-            self.handle_request(client)
+            readable, _, _ = select.select(inputs, [], [])
+            for s in readable:
+                if s is self.connection:
+                    client, _ = self.connection.accept()
+                    client.setblocking(False)
+                    inputs.append(client)
+                else:
+                    try:
+                        self.handle_request(s)
+                    except Exception as e:
+                        print(f'Error handling request: {e}')
+                    finally:
+                        inputs.remove(s)
+                        s.close()
         
