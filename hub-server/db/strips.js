@@ -26,6 +26,20 @@ const find = async (mac) => {
     });
 }
 
+const list = async () => {
+    return await useConnection((connection) => {
+        query = 'SELECT * FROM devices';
+        connection.query(query, (err, results) => {
+            if (err) {
+                console.error('Error querying the database:', err.stack);
+                return;
+            }
+            console.log('results:', results);
+            return results;
+        });
+    });
+}
+
 const create = async (mac, name, current_ip) => {
     return await useConnection((connection) => {
         query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
@@ -54,7 +68,7 @@ const update = async (strip) => {
     });
 }
 
-const deleteStrip = async (mac) => {
+const destroy = async (mac) => {
     return await useConnection((connection) => {
         query = 'DELETE FROM devices WHERE mac = ?';
         connection.query(query, [mac], (err, results) => {
@@ -71,7 +85,8 @@ const deleteStrip = async (mac) => {
 module.exports = {
     Strip,
     find,
+    list,
     create,
     update,
-    deleteStrip
+    delete: destroy
 }

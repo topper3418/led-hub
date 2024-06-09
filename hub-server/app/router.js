@@ -1,9 +1,15 @@
 const router = require('express').Router();
-const { read, write } = require('./controller')
+const controller = require('./controller')
+const errors = require('./errors')
 
-router.route('/:stripMac')
-    .get(read)
-    .post(write)
 
+router.route('/:mac')
+    .get(controller.read)
+    .post(controller.write);
+router.route('/')
+    .get(controller.list)
+    .post(controller.handshake);
+router.use(errors.notFound);
+router.use(errors.handler);
 
 module.exports = router;
