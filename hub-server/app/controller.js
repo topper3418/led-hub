@@ -2,7 +2,7 @@ const { json } = require('express');
 const axios = require('axios');
 const strips = require('../strips.json');
 
-const getStripData = async (req, res) => {
+const read = async (req, res) => {
     const stripName = req.params.stripname;
     let ipAddress;
     ipAddress = strips[stripName];
@@ -26,7 +26,7 @@ const getStripData = async (req, res) => {
     }
 };
 
-const setStrip = async (req, res) => {
+const write = async (req, res) => {
     const stripName = req.params.stripname;
     const ipAddress = strips[stripName];
 
@@ -58,4 +58,7 @@ const setStrip = async (req, res) => {
 
 }
 
-module.exports = {getStripData, setStrip};
+module.exports = {
+    read, 
+    write
+};

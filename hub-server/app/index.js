@@ -1,17 +1,15 @@
 const express = require('express')
-const { getLogger, loggerRouter, loggingEngine } = require('@topper3418/logger-server')
 const path = require('path')
 const router = require('./router')
-
-const logger = getLogger('hub-server')
+const { init: initDb } = require('../db')
 
 class HubApp extends express {
     constructor(prodMode = true, port = 4000) {
         super();
+        initDb();
         this.port = port || 4000;
         this.prodMode = prodMode;
         this.applyMiddleware();
-        this.loggingEngine = loggingEngine;
         
         if (this.prodMode){
             this.use(express.static(path.join(__dirname, "../webApp/dist")));
@@ -26,8 +24,6 @@ class HubApp extends express {
                 res.send("Hello from Hub Server");
             });
         }
-
-        this.use("/logs", loggerRouter);
 
         this.get("/stripInfo", (_, res) => {
             res.json({ ip: stripIP, port: stripPort });
@@ -45,13 +41,11 @@ class HubApp extends express {
     };
 
     start = async () => {
-        await loggingEngine.sync();
         this.listen(this.port, () => {
             const mode = this.prodMode ? "prod mode" : "dev mode"
             console.log(
                 `log server is running on port ${this.port} in ${mode}`
             );
-            logger.info(`log server is running on port ${this.port} in ${mode}`)
         });
     };
 }
