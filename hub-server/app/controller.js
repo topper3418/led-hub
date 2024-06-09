@@ -2,8 +2,10 @@ const { json } = require('express');
 const axios = require('axios');
 const strips = require('../strips.json');
 
+const db = require('../db');
+
 const read = async (req, res) => {
-    const stripName = req.params.stripname;
+    const stripName = req.params.stripMac;
     let ipAddress;
     ipAddress = strips[stripName];
     console.log('received request for strip:', stripName, 'with ip:', ipAddress)
@@ -27,7 +29,7 @@ const read = async (req, res) => {
 };
 
 const write = async (req, res) => {
-    const stripName = req.params.stripname;
+    const stripName = req.params.stripMac;
     const ipAddress = strips[stripName];
 
     if (!ipAddress) {
@@ -60,5 +62,5 @@ const write = async (req, res) => {
 
 module.exports = {
     read, 
-    write
+    write 
 };

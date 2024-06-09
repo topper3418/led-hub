@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { read, write } = require('./controller')
 
-router.route('/:stripname')
+router.route('/:stripMac')
     .get(read)
     .post(write)
 
