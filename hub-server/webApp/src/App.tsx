@@ -28,7 +28,7 @@ function App() {
     setWrite(write)
     setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
     setOn(data.on);
-    setBrightness(data.brightness);
+    setBrightness(Math.round(data.brightness * 10 / 255));  // convert 0-255 to 0-10 and round to the nearest integer
   }
 
   useEffect(() => {
@@ -71,7 +71,7 @@ function App() {
         body: JSON.stringify({
           color,
           on,
-          brightness
+          brightness: Math.round(brightness * 255 / 10)  // convert 0-10 to 0-255
         })
       });
       processResponse(postData);

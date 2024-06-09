@@ -16,7 +16,6 @@ const getStripData = async (req, res) => {
     try {
         const stripData = await axios.get(`http://${ipAddress}/`);
     
-        // const data = compensateForPicoFuckery(stripData.data)
         const data = stripData.data
         console.log('got data from strip:', data)
         console.log('type of data: ', typeof data)
