@@ -18,7 +18,7 @@ function App() {
   const [brightness, setBrightness] = useState(255);
   const [write, setWrite] = useState(false);
 
-  const url = '/stripData/' + stripName
+  const url = 'http://localhost:2000/stripData/' + stripName
 
   // get and post requests return the same data, so lets process them the same
   const processResponse = async (res: Response, write=false) => {

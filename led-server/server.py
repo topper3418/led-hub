@@ -1,6 +1,7 @@
 import network
 import socket
 import time
+import select
 
 from boardLed import BoardLed
 from request import Request
@@ -87,7 +88,20 @@ class Server:
     def run(self):
         self.connect()
         self.open_socket()
+        inputs = [self.connection]
         while True:
-            client = self.connection.accept()[0]
-            self.handle_request(client)
+            readable, _, _ = select.select(inputs, [], [])
+            for s in readable:
+                if s is self.connection:
+                    client, _ = self.connection.accept()
+                    client.setblocking(False)
+                    inputs.append(client)
+                else:
+                    try:
+                        self.handle_request(s)
+                    except Exception as e:
+                        print(f'Error handling request: {e}')
+                    finally:
+                        inputs.remove(s)
+                        s.close()
         

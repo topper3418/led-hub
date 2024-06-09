@@ -14,7 +14,7 @@ interface ColorWheelProps {
 
 const ColorWheel: React.FC<ColorWheelProps> = ({color, onChange: setColor }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  console.warn('need to use the color value', color);
+  console.warn('need to use the color value. in the future we should have a cursor on the wheel representing last click. ', color);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {

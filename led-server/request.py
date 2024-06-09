@@ -1,3 +1,5 @@
+import json
+
 class Request:
     """parses the request for cleaning up code"""
     def __init__(self, request_bytes):
@@ -5,7 +7,10 @@ class Request:
         self.str = request_bytes.decode('utf-8')
         request_line, rest = self.str.split('\r\n', 1)
         self.method, self.uri, self.http_version = request_line.split(' ')
-        self.headers, self.body = rest.split('\r\n\r\n')
+        headers, body = rest.split('\r\n\r\n')
+        headerslist = headers.split('\r\n')
+        self.headers = {key: value for key, value in [header.split(': ') for header in headerslist]}
+        self.body = json.loads(body) if body else {}
         self.route, param_str = self.uri.split('?') if '?' in self.uri else [self.uri, '']
         # convert the params into a dict
         param_list = [param.split('=') for param in param_str.split('&')] if param_str else []

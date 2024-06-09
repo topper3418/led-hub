@@ -6,6 +6,7 @@ const getStripData = async (req, res) => {
     const stripName = req.params.stripname;
     let ipAddress;
     ipAddress = strips[stripName];
+    console.log('received request for strip:', stripName, 'with ip:', ipAddress)
 
     if (!ipAddress) {
         res.status(404).send("Strip not found");
@@ -38,15 +39,17 @@ const setStrip = async (req, res) => {
     const {color, on, brightness} = req.body;
     const onStatus = on ? 'on' : 'off';
     console.log('color', color)
-    const rgb = `(${color.r},${color.g},${color.b})`
-    const url = `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`;
-    console.log('url', `http://${ipAddress}/?color=${rgb}&state=${onStatus}&brightness=${brightness}`)
-    console.log('betterurl', "192.168.68.69:80/?state=off&color=(127,0,255)&brightness=255")
+    const url = `http://${ipAddress}/`;
+    const body = {
+        color,
+        state: onStatus,
+        brightness
+    }
 
     try {
-        const stripData = await axios.post(url);
+        const stripData = await axios.post(url, body);
         // const data = compensateForPicoFuckery(stripData.data)
-        const data = stripData.data
+        const data = stripData.data;
 
         res.json(data);
     } catch (error) {

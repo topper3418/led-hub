@@ -41,19 +41,19 @@ def get_data(_, res: Response):
 def set_strip(req: Request, res: Response):
     """depending on params, changes the state of the LED strip and returns 
     the state"""
-    if 'brightness' in req.params:
+    if 'brightness' in req.body:
         print('setting brightness')
-        ledStrip.setBrightness(int(req.params['brightness']))
-    if 'state' in req.params:
-        if req.params['state'] == 'on':
+        ledStrip.setBrightness(int(req.body['brightness']))
+    if 'state' in req.body:
+        if req.body['state'] == 'on':
             print('turning on')
             ledStrip.turnOn()
         else:
             print('turning off')
             ledStrip.turnOff()
-    if 'color' in req.params:
+    if 'color' in req.body:
         print('setting color')
-        color_strs = req.params['color'].strip('()').split(',')
+        color_strs = req.body['color']
         color = tuple(int(color_val) for color_val in color_strs)
         ledStrip.setColor(color)   
     res.content = ledStrip.getState()
