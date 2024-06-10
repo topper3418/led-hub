@@ -55,9 +55,10 @@ const dataHas = (items) => {
 }
 
 // Middleware:
-// - dataHas(['mac', 'ip', 'type'])
+// - dataHas(['mac', 'type'])
 const handshake = async (req, res, next) => {
-    const { mac, ip, type } = res.locals;
+    const { mac, type } = res.locals;
+    const ip = req.originalIp;
     console.log('looking for strip:', mac)
     let foundStrip = await findDevice(mac);
     console.log('found strip:', foundStrip)
@@ -168,7 +169,7 @@ const write = async (req, res) => {
 module.exports = {
     handshake: [
         bodyHasData,
-        dataHas(['mac', 'ip', 'type']), 
+        dataHas(['mac', 'type']), 
         handshake],
     read: [getDevice, read], 
     write: [getDevice, write],
