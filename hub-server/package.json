@@ -4,9 +4,9 @@
   "description": "hub server for running IOT devices",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "node runTests.js"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,9 @@
     "mysql2": "^3.10.0"
   },
   "devDependencies": {
+    "chai": "^5.1.1",
     "cors": "^2.8.5",
+    "mocha": "^10.4.0",
     "nodemon": "^3.1.0"
   }
 }

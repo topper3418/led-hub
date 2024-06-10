@@ -1,24 +1,24 @@
 const { tableExists, createDevicesTable, createHandshakesTable } = require('./init');
 const { useConnection, connectionObj } = require('./util');
 const {
-    Strip,
-    ...stripApi  // so I can pass the 'delete' method safely
-} = require('./strips');
+    Device,
+    ...deviceApi  // so I can pass the 'delete' method safely
+} = require('./devices');
 const {
     HandShake,
     ...handshakeApi
 } = require('./handshakes');
 
 module.exports = {
-    init: () => {
-        createDevicesTable();
-        createHandshakesTable();
+    init: async () => {
+        await createDevicesTable();
+        await createHandshakesTable();
     },
     tableExists,
     connectionObj,
     useConnection,
-    Strip,
-    strips: stripApi,
+    Device,
+    devices: deviceApi,
     HandShake,
     handshakes: handshakeApi
 }

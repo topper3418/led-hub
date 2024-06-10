@@ -21,8 +21,6 @@ const notFound = (req, res, next) => {
     })
   };
   
-  module.exports = notFoundHandler;
-  
   
   module.exports = {
     handler: generic,

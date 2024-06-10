@@ -1,4 +1,4 @@
-CREATE TABLE `led-hub`.`devices` (
+CREATE TABLE IF NOT EXISTS `led-hub`.`devices` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `mac` VARCHAR(17) NOT NULL,
   `name` VARCHAR(45) NULL,

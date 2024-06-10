@@ -8,7 +8,7 @@ const connectionObj = {
     database: process.env.DB_NAME
   }
 
-const useConnection = async (callback) => {
+const useConnection = (callback) => {
     const connection = mysql.createConnection(connectionObj);
 
     connection.connect((err) => {
@@ -19,12 +19,13 @@ const useConnection = async (callback) => {
       console.log('Connected to the database as id ' + connection.threadId);
     });
     try {
-        results = await callback(connection)
+        results = callback(connection)
         connection.end();
         return results
     } catch (error) {
         console.error('Error using the connection:', error.stack);
         connection.end();
+        throw error;
     }
 }
 

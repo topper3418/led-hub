@@ -3,12 +3,12 @@ const fs = require('fs/promises');
 const path = require('path');
 
 
-const tableExists = async (tableName) => {
-    results = await useConnection(connection => {
+const tableExists = (tableName) => {
+    results = useConnection(connection => {
         connection.query('SHOW TABLES LIKE ?', [tableName], (err, results) => {
             if (err) {
                 console.error('Error querying the database:', err.stack);
-                return;
+                throw err;
             }
             console.log(`results looking for ${tableName} table:`, results);
             return results.length > 0;
@@ -28,11 +28,6 @@ const findSql = async (sqlPath) => {
   };
 
 const createDevicesTable = async () => {
-    const tableName = 'devices';
-    if (await tableExists(tableName)) {
-        console.log('Devices table already exists');
-        return;
-    }
     const sqlPath = await findSql('create-devices-table.sql');
 
     if (!sqlPath) {
@@ -40,25 +35,19 @@ const createDevicesTable = async () => {
         return;
     } else console.log('sql file exists:', sqlPath);
     const sql = await fs.readFile(sqlPath, 'utf8');
-    console.log('running sql:', sql)
+    console.log('ensuring devices table')
     results = useConnection(connection => {
         connection.query(sql, (err, results) => {
             if (err) {
                 console.error('Error creating devices table:', err.stack);
                 return;
             }
-            console.log('results:', results);
             return results;
         });
     });
 }
 
 const createHandshakesTable = async () => {
-    const tableName = 'handshakes';
-    if (await tableExists(tableName)) {
-        console.log('Handshakes table already exists');
-        return;
-    }
     const sqlPath = await findSql('create-handshakes-table.sql');
 
     if (!sqlPath) {
@@ -66,14 +55,13 @@ const createHandshakesTable = async () => {
         return;
     } else console.log('sql file exists:', sqlPath);
     const sql = await fs.readFile(sqlPath, 'utf8');
-    console.log('running sql:', sql)
-    results = useConnection(connection => {
+    console.log('ensuring handshake table')
+    results = useConnection((connection) => {
         connection.query(sql, (err, results) => {
             if (err) {
                 console.error('Error creating handshakes table:', err.stack);
                 return;
             }
-            console.log('results:', results);
             return results;
         });
     });

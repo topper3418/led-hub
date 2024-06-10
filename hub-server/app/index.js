@@ -25,10 +25,6 @@ class HubApp extends express {
             });
         }
 
-        this.get("/stripInfo", (_, res) => {
-            res.json({ ip: stripIP, port: stripPort });
-        });
-
         this.use("/stripData/", router);
     }
 
