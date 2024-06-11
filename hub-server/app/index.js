@@ -29,6 +29,10 @@ class HubApp extends express {
     }
 
     applyMiddleware = () => {
+        // this.use((req, res, next) => {
+        //     console.log(new Date().toISOString(), req.method, req.url, req.body);
+        //     next();
+        // });
         this.use(express.json());
         const cors = require("cors");
         this.use(cors());

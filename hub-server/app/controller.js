@@ -4,6 +4,7 @@ const axios = require('axios');
 const db = require('../db');
 
 const findDevice = async (mac) => {
+    if (!mac) throw new Error('No mac provided');
     try {
         return await db.devices.find({ mac });
     } catch (error) {
@@ -12,12 +13,12 @@ const findDevice = async (mac) => {
 }
 
 // gets the device object and attaches it to locals
-const getDevice = (req, res, next) => {
+const getDevice = async (req, res, next) => {
     const { mac } = req.params;
     console.log('received request for strip:', mac)
     let strip;
     try {
-        strip = findDevice({ mac });
+        strip = await findDevice(mac);
     } catch (error) {
         console.log('error finding strip:', error)
     }
@@ -26,7 +27,7 @@ const getDevice = (req, res, next) => {
         res.status(404).send("Strip not found");
         return;
     } else {
-        console.log('attaching strip')
+        console.log('attaching strip', strip)
         res.locals.strip = strip;
     }
     next();
@@ -55,40 +56,40 @@ const dataHas = (items) => {
 }
 
 // Middleware:
-// - dataHas(['mac', 'type'])
+// - dataHas(['mac', 'ip', 'type'])
 const handshake = async (req, res, next) => {
-    const { mac, type } = res.locals;
-    const ip = req.originalIp;
-    console.log('looking for strip:', mac)
-    let foundStrip = await findDevice(mac);
-    console.log('found strip:', foundStrip)
+    const { mac, ip, type } = res.locals;
     const handshake = new db.HandShake(null, null, mac, ip, type);
+    console.log("handshake request:", {mac, ip, type})
+    console.log('looking for device:', mac)
+    let foundDevice = await findDevice(mac);
+    if (foundDevice) console.log('found device:', foundDevice);
     // ensure the strip exists
     try {
-        if (!foundStrip) {
-            console.log('creating strip')
+        if (!foundDevice) {
+            console.log('creating device')
+            const device = new db.Device(mac, req.body.name, ip);
             handshake.type = 'init';
-            await db.devices.create(mac, req.body.name, ip);
-            foundStrip = await db.devices.find(req.body.mac);
+            await db.devices.create(device);
+            foundDevice = await db.devices.find(device.mac);
         }
     } catch (error) {
-        console.log('error creating strip:', error)
+        console.log('error creating device:', error)
         next({
             status: 500,
-            message: 'error creating strip,' + error
+            message: 'error creating device,' + error
         });
         return;
     }
-    console.log('got this far')
     // ensure the strip is updated
     try {
-        foundStrip.current_ip = ip;
-        await db.strips.update(foundStrip); 
+        foundDevice.current_ip = ip;
+        await db.devices.update(foundDevice); 
     } catch (error) {
-        console.log('error updating strip:', error)
+        console.log('error updating device:', error)
         next({
             status: 500,
-            message: 'error updating strip', error
+            message: 'error updating device', error
         });
         return;
     }
@@ -103,17 +104,19 @@ const handshake = async (req, res, next) => {
         });
         return;
     }
-    res.status(200).json(foundStrip);
+    res.status(200).json(foundDevice);
 }
 
 
 // Middleware:
-// - getStrip
+// - getDevice
 const read = async (req, res, next) => {
     const { strip } = res.locals;
 
     try {
-        const stripData = await axios.get(`http://${strip.current_ip}/`);
+        const url = `http://${strip.current_ip}:80/`
+        console.log('fetching from strip:', url)
+        const stripData = await axios.get(url);
     
         const { data } = stripData;
         console.log('got data from strip:', data)
@@ -128,16 +131,16 @@ const read = async (req, res, next) => {
 // no Middleware
 const list = async (req, res, next) => {
     try {
-        const strips = await db.devices.list();
-        res.json(strips);
+        const devices = await db.devices.list();
+        res.json(devices);
     } catch (error) {
-        res.status(500).json({error: error.stack, message: 'error fetching strips'});
+        res.status(500).json({error: error.stack, message: 'error fetching devices'});
     }
 }
 
 
 // Middleware:
-// - getStrip
+// - getDevice
 const write = async (req, res) => {
     const { strip } = res.locals;
 
@@ -169,7 +172,7 @@ const write = async (req, res) => {
 module.exports = {
     handshake: [
         bodyHasData,
-        dataHas(['mac', 'type']), 
+        dataHas(['mac', 'ip', 'type']), 
         handshake],
     read: [getDevice, read], 
     write: [getDevice, write],

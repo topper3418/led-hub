@@ -33,10 +33,10 @@ class Device {
 }
 
 const find = ({ mac, name, ip }) => {
+    console.log('finding device:', mac, name, ip)
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
-            console.log('mac:', mac, 'name:', name, 'ip:', ip);
             let criteria;
             if (mac) {
                 criteria = mac;
@@ -50,7 +50,9 @@ const find = ({ mac, name, ip }) => {
             } else {
                 reject(new Error('No valid search criteria provided'))
             }
-            return connection.query(query, [criteria], (err, results) => {
+            console.log('query:', query)
+            console.log('criteria:', criteria)
+            connection.query(query, [criteria], (err, results) => {
                 if (err) {
                     console.error('Error finding record:', err.stack);
                     return reject(err);
@@ -85,6 +87,7 @@ const list = () => {
 }
 
 const create = ({ mac, name, current_ip }) => {
+    console.log('creating device:', mac, name, current_ip)
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
