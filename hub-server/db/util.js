@@ -1,5 +1,6 @@
 require('dotenv').config();
 const mysql = require('mysql2');
+const { search } = require('../app/router');
 
 const connectionObj = {
     host: process.env.DB_HOST,
@@ -28,6 +29,7 @@ const useConnection = (callback) => {
         throw error;
     }
 }
+
 
 module.exports = {
     connectionObj,

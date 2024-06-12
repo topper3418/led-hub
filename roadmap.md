@@ -23,11 +23,12 @@
         * configure name on the pico
         * make a tile for each LED. then you can click into it and control it like before
         * fix white control while you're at it. 
-    6) add logging throughout, properly. 
+    6) add logging throughout, properly.  TODO
         * get splunk instance up and working, and start logging to it
+        * FAILED THE ABOVE, just make the logger spit out to the database. 
         * build a logger API like with my own logger, could probably copy and paste it and adapt queries. 
         * convert all those pesky console logs into splunk logs. 
-    7) finally get environment variables right
+    7) finally get environment variables right TODO
         * this will allow you to point things at the right databases and such safely when switching from dev to prod
         * also allows configuring stuff in docker easier. 
 
