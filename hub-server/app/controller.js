@@ -51,8 +51,10 @@ const dataHas = (items) => {
 // Middleware:
 // - dataHas(['mac', 'ip', 'type'])
 const handshake = async (req, res, next) => {
+    logger.info('got here')
     const { mac, ip, type } = res.locals;
     const handshake = new db.HandShake(null, null, mac, ip);
+
     logger.info(`handshake request from ${mac}`, {mac, ip, type})
     let foundDevice = await db.devices.find({ mac });
     if (foundDevice) console.log('found device:', foundDevice);

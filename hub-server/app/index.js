@@ -2,6 +2,18 @@ const express = require('express')
 const path = require('path')
 const router = require('./router')
 const { init: initDb } = require('../db')
+const getLogger = require('../db/logging')
+
+const loggerPromise = getLogger('hub-server');
+let logger;
+
+loggerPromise.then((resolvedLogger) => {
+    logger = resolvedLogger;
+}).catch((error) => {
+    console.error('Error initializing logger:', error);
+});
+
+// Use logger after it has been resolved
 
 class HubApp extends express {
     constructor(prodMode = true, port = 4000) {
@@ -24,7 +36,7 @@ class HubApp extends express {
         if (this.prodMode){
             this.use(express.static(path.join(__dirname, "../webApp/dist")));
             this.get("/", (_, res) => {
-                console.log("serving client app");
+                logger.info("serving client app");
                 res.sendFile(
                     path.join(__dirname, "../webApp/dist", "index.html")
                 );
@@ -41,7 +53,7 @@ class HubApp extends express {
     start = async () => {
         this.listen(this.port, () => {
             const mode = this.prodMode ? "prod mode" : "dev mode"
-            console.log(
+            logger.info(
                 `hub server is running on port ${this.port} in ${mode}`
             );
         });

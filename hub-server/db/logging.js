@@ -113,13 +113,31 @@ const createLogger = ({ name, level, printtoconsole }) => {
     });
 };
 
-const getLogger = async (name) => {
-    let logger = await findLogger({ name });
+
+
+const getLoggerAsync = async (name) => {
+    const logger = findLogger({ name });
     if (!logger) {
+        console.log("no logger, creating one")
         await createLogger({ name, level: "info", printtoconsole: true });
-        logger = await findLogger({ name });
+        const foundLogger = await findLogger({ name });
+        return foundLogger;
+    } else {
+        console.log("found logger", logger)
+        return logger;
     }
+}
+
+const getLogger = (name) => {
+    const loggerPromise = getLoggerAsync(name);
+    let logger;
+
+    loggerPromise.then((resolvedLogger) => {
+        logger = resolvedLogger;
+    }).catch((error) => {
+        console.error('Error initializing logger:', error);
+    });
     return logger;
-};
+}
 
 module.exports = getLogger;
