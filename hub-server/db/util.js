@@ -1,6 +1,5 @@
 require('dotenv').config();
 const mysql = require('mysql2');
-const { search } = require('../app/router');
 
 const connectionObj = {
     host: process.env.DB_HOST,

@@ -6,10 +6,20 @@ const { init: initDb } = require('../db')
 class HubApp extends express {
     constructor(prodMode = true, port = 4000) {
         super();
-        initDb();
+        //initDb(); // deprecate this, run the sql some other way. 
         this.port = port || 4000;
         this.prodMode = prodMode;
         this.applyMiddleware();
+    }
+
+    applyMiddleware = () => {
+        // this.use((req, res, next) => {
+        //     console.log(new Date().toISOString(), req.method, req.url, req.body);
+        //     next();
+        // });
+        this.use(express.json());
+        const cors = require("cors");
+        this.use(cors());
         
         if (this.prodMode){
             this.use(express.static(path.join(__dirname, "../webApp/dist")));
@@ -25,26 +35,14 @@ class HubApp extends express {
             });
         }
 
-        this.use("/stripData/", router);
-    }
-
-    applyMiddleware = () => {
-        // this.use((req, res, next) => {
-        //     console.log(new Date().toISOString(), req.method, req.url, req.body);
-        //     next();
-        // });
-        this.use(express.json());
-        const cors = require("cors");
-        this.use(cors());
-        if (!this.prodMode) {
-        } 
+        this.use("/devices/", router);
     };
 
     start = async () => {
         this.listen(this.port, () => {
             const mode = this.prodMode ? "prod mode" : "dev mode"
             console.log(
-                `log server is running on port ${this.port} in ${mode}`
+                `hub server is running on port ${this.port} in ${mode}`
             );
         });
     };

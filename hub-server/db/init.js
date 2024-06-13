@@ -1,3 +1,5 @@
+// deprecate this. I will create a custom docker image built on the mysql image. 
+
 const { useConnection } = require('./util');
 const fs = require('fs/promises');
 const path = require('path');
@@ -67,9 +69,30 @@ const createHandshakesTable = async () => {
     });
 }
 
+const createLoggingTables = async () => {
+    const sqlPath = await findSql('create-logging-tables.sql');
+
+    if (!sqlPath) {
+        console.error('sql file does not exist: create-logging-tables.sql');
+        return;
+    } else console.log('sql file exists:', sqlPath);
+    const sql = await fs.readFile(sqlPath, 'utf8');
+    console.log('ensuring logging tables')
+    results = useConnection((connection) => {
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.error('Error creating logging tables:', err.stack);
+                return;
+            }
+            return results;
+        });
+    });
+}
+
 
 module.exports = {
     tableExists,
     createDevicesTable,
-    createHandshakesTable
+    createHandshakesTable,
+    createLoggingTables,
 }

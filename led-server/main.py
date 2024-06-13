@@ -60,8 +60,9 @@ def handshake(connection):
     
     handshake_data = {
         'mac': mac,
-        'type': 'restart',
-        'ip': connection.ip
+        'type': 'LedStrip',
+        'ip': connection.ip,
+        'name': 'DevPi'
     }
     
     try:

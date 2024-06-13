@@ -1,5 +1,5 @@
 -- Create logger table
-CREATE TABLE if not exists `loggers` (
+CREATE TABLE IF NOT EXISTS `loggers` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(255) NOT NULL,
     `level` ENUM("trace", "debug", "info", "warn", "error", "critical") NOT NULL,
@@ -9,11 +9,16 @@ CREATE TABLE if not exists `loggers` (
 );
 
 -- Create logs table
-CREATE TABLE `logs` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `logger_id` INT,
-    `message` TEXT,
-    `data` JSON,
-    `FOREIGN` KEY (logger_id) REFERENCES logger(id)
-);
+CREATE TABLE IF NOT EXISTS `appLogs` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `timestamp` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `logger_id` INT NOT NULL,
+  `message` TEXT NULL,
+  `data` JSON NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_logger_id_idx` (`logger_id` ASC) VISIBLE,
+  CONSTRAINT `fk_logger_id`
+    FOREIGN KEY (`logger_id`)
+    REFERENCES `loggers` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
