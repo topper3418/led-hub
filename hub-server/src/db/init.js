@@ -3,7 +3,9 @@
 const { useConnection } = require('./util');
 const fs = require('fs/promises');
 const path = require('path');
+const getLogger = require('../logging');
 
+const logger = getLogger('db/init');
 
 const tableExists = (tableName) => {
     results = useConnection(connection => {
@@ -30,60 +32,63 @@ const findSql = async (sqlPath) => {
   };
 
 const createDevicesTable = async () => {
-    const sqlPath = await findSql('create-devices-table.sql');
+    const sqlPath = await findSql('create/devices-table.sql');
 
     if (!sqlPath) {
-        console.error('sql file does not exist: create-devices-table.sql');
+        logger.error('sql file does not exist: create-devices-table.sql');
         return;
-    } else console.log('sql file exists:', sqlPath);
+    }
     const sql = await fs.readFile(sqlPath, 'utf8');
-    console.log('ensuring devices table')
+    logger.debug('ensuring devices table')
     results = useConnection(connection => {
         connection.query(sql, (err, results) => {
             if (err) {
-                console.error('Error creating devices table:', err.stack);
+                logger.error('Error creating devices table:', err.stack);
                 return;
             }
+            logger.info('devices table ensured');
             return results;
         });
     });
 }
 
 const createHandshakesTable = async () => {
-    const sqlPath = await findSql('create-handshakes-table.sql');
+    const sqlPath = await findSql('create/handshakes-table.sql');
 
     if (!sqlPath) {
-        console.error('sql file does not exist: create-handshakes-table.sql');
+        logger.error('sql file does not exist: create-handshakes-table.sql');
         return;
-    } else console.log('sql file exists:', sqlPath);
+    }
     const sql = await fs.readFile(sqlPath, 'utf8');
-    console.log('ensuring handshake table')
+    logger.debug('ensuring handshake table')
     results = useConnection((connection) => {
         connection.query(sql, (err, results) => {
             if (err) {
-                console.error('Error creating handshakes table:', err.stack);
+                logger.error('Error creating handshakes table:', err.stack);
                 return;
             }
+            logger.info('handshakes table ensured');
             return results;
         });
     });
 }
 
-const createLoggingTables = async () => {
-    const sqlPath = await findSql('create-logging-tables.sql');
+const createLoggingTable = async () => {
+    const sqlPath = await findSql('create/logging-table.sql');
 
     if (!sqlPath) {
-        console.error('sql file does not exist: create-logging-tables.sql');
+        logger.error('sql file does not exist: create-logging-tables.sql');
         return;
-    } else console.log('sql file exists:', sqlPath);
+    };
     const sql = await fs.readFile(sqlPath, 'utf8');
-    console.log('ensuring logging tables')
+    logger.debug('ensuring logging tables')
     results = useConnection((connection) => {
         connection.query(sql, (err, results) => {
             if (err) {
                 console.error('Error creating logging tables:', err.stack);
                 return;
             }
+            logger.info('logging tables ensured');
             return results;
         });
     });
@@ -94,5 +99,5 @@ module.exports = {
     tableExists,
     createDevicesTable,
     createHandshakesTable,
-    createLoggingTables,
+    createLoggingTable,
 }

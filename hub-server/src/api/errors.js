@@ -1,6 +1,7 @@
 const db = require('../db');
+const getLogger = require('../logging');
 
-const logger = db.getLogger('http-errors');
+const logger = getLogger('api/errors');
 
 const generic = (err, req, res, next) => {
   logger.trace(`${err.status} - ${err.message}`)

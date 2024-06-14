@@ -2,33 +2,27 @@ const express = require('express')
 const path = require('path')
 const router = require('./router')
 const { init: initDb } = require('../db')
-const getLogger = require('../db/logging')
+const getLogger = require('../logging')
 
-const loggerPromise = getLogger('hub-server');
-let logger;
-
-loggerPromise.then((resolvedLogger) => {
-    logger = resolvedLogger;
-}).catch((error) => {
-    console.error('Error initializing logger:', error);
-});
+const logger = getLogger('api/index');
 
 // Use logger after it has been resolved
 
 class HubApp extends express {
     constructor(prodMode = true, port = 4000) {
         super();
-        //initDb(); // deprecate this, run the sql some other way. 
+        initDb();
         this.port = port || 4000;
         this.prodMode = prodMode;
         this.applyMiddleware();
     }
 
     applyMiddleware = () => {
-        // this.use((req, res, next) => {
-        //     console.log(new Date().toISOString(), req.method, req.url, req.body);
-        //     next();
-        // });
+        this.use((req, res, next) => {
+            const { method, url, body } = req;
+            logger.debug(`request receieved from ${req.originalUrl}`, { method, url, body });
+            next();
+        });
         this.use(express.json());
         const cors = require("cors");
         this.use(cors());

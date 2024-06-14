@@ -2,8 +2,9 @@ const { json } = require('express');
 const axios = require('axios');
 
 const db = require('../db');
+const getLogger = require('../logging');
 
-const logger = db.getLogger('devices-controller');
+const logger = getLogger('api/controller');
 
 // gets the device object and attaches it to locals
 const getDevice = async (req, res, next) => {
@@ -13,7 +14,7 @@ const getDevice = async (req, res, next) => {
     try {
         strip = await db.devices.find({ mac });
     } catch (error) {
-        logger.error(`${error.name} finding device: ${error.message}`, error)
+        logger.error(`${error.name} finding device: ${error.message}`, { error, mac })
     }
     // only send 404 if the strip is mandatory
     if (!strip) {

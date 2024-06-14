@@ -1,4 +1,6 @@
 const { useConnection } = require('./util');
+const getLogger = require('../logging');
+const logger = getLogger('db/handshakes');
 
 class HandShake {
     constructor(id, timestamp, mac, ip, type) {
@@ -10,15 +12,18 @@ class HandShake {
 }
 
 const create = (mac, ip) => {
+    logger.info('creating handshake:', { mac, ip });
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            query = 'INSERT INTO handshakes (mac, ip) VALUES (?, ?)';
-            connection.query(query, [mac, ip], (err, results) => {
+            const query = 'INSERT INTO handshakes (mac, ip) VALUES (?, ?)';
+            const params = [ mac, ip ];
+            logger.debug('running query:', { query, params });
+            connection.query(query, params, (err, results) => {
                 if (err) {
-                    console.error('Error querying the database:', err.stack);
+                    logger.error('Error querying the database:', { error: err.stack });
                     reject(err);
                 }
-                console.log('results:', results);
+                logger.info('results:', results);
                 resolve(results);
             });
         });

@@ -2,7 +2,7 @@ const {
     tableExists, 
     createDevicesTable, 
     createHandshakesTable,
-    createLoggingTables
+    createLoggingTable
 } = require('./init');
 const { useConnection, connectionObj } = require('./util');
 const {
@@ -13,14 +13,14 @@ const {
     HandShake,
     ...handshakeApi
 } = require('./handshakes');
-const getLogger = require('./logging');
+//const getLogger = require('./logging');
 
 module.exports = {
     // deprecate init
     init: async () => {
         await createDevicesTable();
         await createHandshakesTable();
-        await createLoggingTables();
+        await createLoggingTable();
     },
     tableExists,
     connectionObj,
@@ -29,5 +29,5 @@ module.exports = {
     devices: deviceApi,
     HandShake,
     handshakes: handshakeApi,
-    getLogger,
+//    getLogger,
 }

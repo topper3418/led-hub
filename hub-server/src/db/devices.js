@@ -1,4 +1,7 @@
 const { useConnection } = require('./util');
+const getLogger = require('../logging');
+
+const logger = getLogger('db/devices');
 
 class Device {
     constructor(mac, name, current_ip) {
@@ -33,7 +36,7 @@ class Device {
 }
 
 const find = ({ mac, name, ip }) => {
-    console.log('finding device:', mac, name, ip)
+    logger.info('finding device:', { mac, name, ip })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
@@ -50,19 +53,17 @@ const find = ({ mac, name, ip }) => {
             } else {
                 reject(new Error('No valid search criteria provided'))
             }
-            console.log('query:', query)
-            console.log('criteria:', criteria)
+            logger.debug('running query:', { criteria })
             connection.query(query, [criteria], (err, results) => {
                 if (err) {
-                    console.error('Error finding record:', err.stack);
+                    logger.error('Error finding record:', err.stack);
                     return reject(err);
                 }
-                console.log('results: ', results)
+                logger.info('results: ', { results })
                 if (results.length === 0) {
                     resolve(null);
                 } else {
                     firstResult = results[0];
-                    console.log('result:', firstResult);
                     resolve(new Device(firstResult.mac, firstResult.name, firstResult.current_ip))
                 }
             });
@@ -72,12 +73,13 @@ const find = ({ mac, name, ip }) => {
 }
 
 const list = () => {
+    logger.info('listing devices')
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             query = 'SELECT * FROM devices';
             connection.query(query, (err, results) => {
                 if (err) {
-                    console.error('Error retrieving devices:', err.stack);
+                    logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
                 resolve(results);
@@ -87,16 +89,17 @@ const list = () => {
 }
 
 const create = ({ mac, name, current_ip }) => {
-    console.log('creating device:', mac, name, current_ip)
+    logger.info('creating device:', { mac, name, current_ip })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
+            logger.debug('running query:', { query, mac, name, current_ip })
             connection.query(query, [mac, name, current_ip], (err, results) => {
                 if (err) {
-                    console.error('Error creating device:', err.stack);
+                    logger.error('Error creating device:', err.stack);
                     reject(err);
                 }
-                console.log('results:', results);
+                logger.info('results:', results);
                 resolve(results);
             });
         });
@@ -104,15 +107,17 @@ const create = ({ mac, name, current_ip }) => {
 }
 
 const update = (strip) => {
+    logger.info('updating device:', { strip })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             query = 'UPDATE devices SET name = ?, current_ip = ? WHERE mac = ?';
+            logger.debug('running query:', { query, strip })
             connection.query(query, [strip.name, strip.current_ip, strip.mac], (err, results) => {
                 if (err) {
-                    console.error('Error updating the device:', err.stack);
+                    logger.error('Error updating the device:', { error: err.stack });
                     reject(err);
                 }
-                console.log('results:', results);
+                logger.info('results:', { results });
                 resolve(results);
             });
         });
@@ -120,15 +125,17 @@ const update = (strip) => {
 }
 
 const destroy = (mac) => {
+    logger.info('deleting device:', { mac })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             query = 'DELETE FROM devices WHERE mac = ?';
+            logger.debug('running query:', { query, mac })
             connection.query(query, [mac], (err, results) => {
                 if (err) {
-                    console.error('Error deleting device:', err.stack);
+                    logger.error('Error deleting device:', err.stack);
                     reject(err);
                 }
-                console.log('results:', results);
+                logger.info('results:', { results });
                 resolve(results);
             });
         });
