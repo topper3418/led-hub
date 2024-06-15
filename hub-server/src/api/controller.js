@@ -9,7 +9,7 @@ const logger = getLogger('api/controller');
 // gets the device object and attaches it to locals
 const getDevice = async (req, res, next) => {
     const { mac } = req.params;
-    logger.trace('getting device:', mac);
+    logger.debug('getting device:', mac);
     let strip;
     try {
         strip = await db.devices.find({ mac });
@@ -52,13 +52,12 @@ const dataHas = (items) => {
 // Middleware:
 // - dataHas(['mac', 'ip', 'type'])
 const handshake = async (req, res, next) => {
-    logger.info('got here')
     const { mac, ip, type } = res.locals;
     const handshake = new db.HandShake(null, null, mac, ip);
 
     logger.info(`handshake request from ${mac}`, {mac, ip, type})
     let foundDevice = await db.devices.find({ mac });
-    if (foundDevice) console.log('found device:', foundDevice);
+    if (foundDevice) logger.info('found device', { foundDevice });
     // ensure the strip exists
     try {
         if (!foundDevice) {
@@ -80,6 +79,7 @@ const handshake = async (req, res, next) => {
     // ensure the strip is updated
     try {
         foundDevice.current_ip = ip;
+        logger.info(`updating device ${foundDevice.name} with ip ${ip}`)
         await db.devices.update(foundDevice); 
     } catch (error) {
         logger.error(`${error.name} updating device: ${error.message}`, error)

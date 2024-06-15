@@ -4,7 +4,7 @@ const getLogger = require('../logging');
 const logger = getLogger('api/errors');
 
 const generic = (err, req, res, next) => {
-  logger.trace(`${err.status} - ${err.message}`)
+  logger.info(`${err.status} - ${err.message}`)
   
     const status = err.status || 500;
     const message = err.message || 'Internal Server Error';
@@ -18,7 +18,7 @@ const generic = (err, req, res, next) => {
   // notFoundHandler.js
 
 const notFound = (req, res, next) => {
-    logger.trace(`404 - ${req.originalUrl}`)
+    logger.info(`404 - ${req.originalUrl}`)
     next({
         status: 404,
         message: `route not found: ${req.originalUrl}`

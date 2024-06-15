@@ -1,11 +1,13 @@
 const { useConnection } = require('./util');
 const getLogger = require('../logging');
+const { query } = require('express');
 
 const logger = getLogger('db/devices');
 
 class Device {
-    constructor(mac, name, current_ip) {
+    constructor(mac, name, type, current_ip) {
         this.mac = mac;
+        this.type = type;
         this.name = name;
         this.current_ip = current_ip;
     }
@@ -15,6 +17,9 @@ class Device {
             return false;
         }
         if (!this.mac === other.mac) {
+            return false;
+        }
+        if (!this.type === other.type) {
             return false;
         }
         if (!this.name === other.name) {
@@ -29,6 +34,7 @@ class Device {
     toJSON() {
         return {
             mac: this.mac,
+            type: this.type,
             name: this.name,
             current_ip: this.current_ip
         }
@@ -53,8 +59,9 @@ const find = ({ mac, name, ip }) => {
             } else {
                 reject(new Error('No valid search criteria provided'))
             }
-            logger.debug('running query:', { criteria })
-            connection.query(query, [criteria], (err, results) => {
+            params = [criteria];
+            logger.debug('running query:', { query, params })
+            connection.query(query, params, (err, results) => {
                 if (err) {
                     logger.error('Error finding record:', err.stack);
                     return reject(err);
@@ -70,6 +77,45 @@ const find = ({ mac, name, ip }) => {
         });
 
     });
+}
+
+const search = ({ searchTerm, type }) => {
+    logger.info('searching for device:', { searchTerm, type })
+    return new Promise((resolve, reject) => {
+        useConnection((connection) => {
+            let query;
+            if (type) {
+                query = `SELECT * FROM devices WHERE AND type = ?`;
+                params = [type];
+            } else if (searchTerm) {
+                query = `SELECT * FROM devices WHERE mac LIKE ? OR name LIKE ? OR current_ip LIKE ?`;
+                params = [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`];
+            } else {
+                reject(new Error('No valid search criteria provided'));
+            }
+            logger.debug('running query:', { query, params })
+            connection.query(query  , params, (err, results) => {
+                if (err) {
+                    logger.error('Error searching for devices:', err.stack);
+                    return reject(err);
+                }
+                resolve(results);
+            });
+        });
+
+    });
+}
+
+const generateDeviceName = (device) => {
+    const allDevices = list();
+    const takenNames = allDevices.map(device => device.name).filter(name => name.startsWith(device.type));
+    let name = `${device.type}1`;
+    let i = 1;
+    while (takenNames.includes(name)) {
+        i++;
+        name = `${device.type}${i}`;
+    }
+    return name;
 }
 
 const list = () => {
@@ -92,7 +138,7 @@ const create = ({ mac, name, current_ip }) => {
     logger.info('creating device:', { mac, name, current_ip })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
+            const query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
             logger.debug('running query:', { query, mac, name, current_ip })
             connection.query(query, [mac, name, current_ip], (err, results) => {
                 if (err) {
@@ -110,7 +156,7 @@ const update = (strip) => {
     logger.info('updating device:', { strip })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            query = 'UPDATE devices SET name = ?, current_ip = ? WHERE mac = ?';
+            const query = 'UPDATE devices SET name = ?, current_ip = ? WHERE mac = ?';
             logger.debug('running query:', { query, strip })
             connection.query(query, [strip.name, strip.current_ip, strip.mac], (err, results) => {
                 if (err) {
@@ -145,8 +191,10 @@ const destroy = (mac) => {
 module.exports = {
     Device,
     find,
+    search,
     list,
+    generateDeviceName,
     create,
     update,
-    delete: destroy
+    delete: destroy, 
 }

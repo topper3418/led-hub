@@ -36,9 +36,9 @@ const getLogger = (loggerName, level='info') => {
     format: format.combine(
       format.label({ label: path.basename(__filename) }),
       format.timestamp(),
-      format.printf(({ timestamp, level, message, label }) => {
-        return `${timestamp} [${loggerName}] ${level}: ${message}`;
-      }),
+      // format.printf(({ timestamp, level, message, label }) => {
+      //   return `${timestamp} [${loggerName}] ${level}: ${message}`;
+      // }),
       format.json()
     ),
     transports: [
