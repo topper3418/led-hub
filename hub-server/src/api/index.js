@@ -9,7 +9,7 @@ const logger = getLogger('api/index');
 // Use logger after it has been resolved
 
 class HubApp extends express {
-    constructor(prodMode = true, port = 4000) {
+    constructor(port = 4000) {
         super();
         initDb();
         this.port = port || 4000;
@@ -26,22 +26,7 @@ class HubApp extends express {
         this.use(express.json());
         const cors = require("cors");
         this.use(cors());
-        
-        if (this.prodMode){
-            this.use(express.static(path.join(__dirname, "../webApp/dist")));
-            this.get("/", (_, res) => {
-                logger.info("serving client app");
-                res.sendFile(
-                    path.join(__dirname, "../webApp/dist", "index.html")
-                );
-            });
-        } else {
-            this.get("/", (_, res) => {
-                res.send("Hello from Hub Server");
-            });
-        }
-
-        this.use("/devices/", router);
+        this.use("/", router);
     };
 
     start = async () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Router } from 'react-router-dom'
+// import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
 import ColorWheel, { RGB } from './colorwheel';
 import './App.css'
