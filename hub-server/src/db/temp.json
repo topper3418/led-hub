@@ -1,0 +1,37 @@
+{
+    "error": {
+        "code": "ERR_BAD_RESPONSE",
+        "name": "AxiosError",
+        "stack": "AxiosError: Request failed with status code 500\n    at settle (C:\\Users\\travi\\Code\\led-hub\\hub-server\\node_modules\\axios\\dist\\node\\axios.cjs:1983:12)\n    at IncomingMessage.handleStreamEnd (C:\\Users\\travi\\Code\\led-hub\\hub-server\\node_modules\\axios\\dist\\node\\axios.cjs:3085:11)\n    at IncomingMessage.emit (node:events:526:35)\n    at endReadableNT (node:internal/streams/readable:1589:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)\n    at Axios.request (C:\\Users\\travi\\Code\\led-hub\\hub-server\\node_modules\\axios\\dist\\node\\axios.cjs:4224:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async write (C:\\Users\\travi\\Code\\led-hub\\hub-server\\src\\api\\controller.js:162:27)",
+        "config": {
+            "env": {},
+            "url": "http://192.168.68.68/",
+            "data": "{\"color\":{\"r\":255,\"g\":255,\"b\":255},\"state\":\"off\",\"brightness\":255}",
+            "method": "post",
+            "adapter": ["xhr", "http", "fetch"],
+            "headers": {
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": "axios/1.7.1",
+                "Content-Type": "application/json",
+                "Content-Length": "66",
+                "Accept-Encoding": "gzip, compress, deflate, br"
+            },
+            "timeout": 0,
+            "transitional": {
+                "forcedJSONParsing": true,
+                "silentJSONParsing": true,
+                "clarifyTimeoutError": false
+            },
+            "maxBodyLength": -1,
+            "xsrfCookieName": "XSRF-TOKEN",
+            "xsrfHeaderName": "X-XSRF-TOKEN",
+            "maxContentLength": -1,
+            "transformRequest": [null],
+            "transformResponse": [null]
+        },
+        "status": 500,
+        "message": "Request failed with status code 500"
+    },
+    "label": "logging.js",
+    "timestamp": "2024-06-16T03:37:52.237Z"
+}

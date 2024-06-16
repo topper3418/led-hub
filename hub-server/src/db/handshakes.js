@@ -23,7 +23,7 @@ const create = (mac, ip) => {
                     logger.error('Error querying the database:', { error: err.stack });
                     reject(err);
                 }
-                logger.info('results:', results);
+                logger.info('results', {results});
                 resolve(results);
             });
         });

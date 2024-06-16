@@ -2,7 +2,7 @@ const { useConnection } = require('./util');
 const getLogger = require('../logging');
 const { query } = require('express');
 
-const logger = getLogger('db/devices');
+const logger = getLogger('db/devices', 'debug');
 
 class Device {
     constructor(mac, name, type, current_ip) {
@@ -43,7 +43,7 @@ class Device {
 
 const find = ({ mac, name, ip }) => {
     logger.info('finding device:', { mac, name, ip })
-    return new Promise((resolve, reject) => {
+     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
             let criteria;
@@ -57,21 +57,22 @@ const find = ({ mac, name, ip }) => {
                 criteria = ip;
                 query += 'current_ip = ?';
             } else {
-                reject(new Error('No valid search criteria provided'))
+                return reject(new Error('No valid search criteria provided'))
             }
             params = [criteria];
             logger.debug('running query:', { query, params })
             connection.query(query, params, (err, results) => {
                 if (err) {
-                    logger.error('Error finding record:', err.stack);
+                    logger.error('Error finding device:', {error: err.stack});
                     return reject(err);
                 }
-                logger.info('results: ', { results })
                 if (results.length === 0) {
                     resolve(null);
+                    logger.info('no results found')
                 } else {
                     firstResult = results[0];
-                    resolve(new Device(firstResult.mac, firstResult.name, firstResult.current_ip))
+                    logger.info('results: ', { firstResult })
+                    resolve(new Device(firstResult.mac, firstResult.name, firstResult.type, firstResult.current_ip))
                 }
             });
         });
@@ -96,7 +97,7 @@ const search = ({ searchTerm, type }) => {
             logger.debug('running query:', { query, params })
             connection.query(query  , params, (err, results) => {
                 if (err) {
-                    logger.error('Error searching for devices:', err.stack);
+                    logger.error('Error searching for devices:', {error: err.stack});
                     return reject(err);
                 }
                 resolve(results);
@@ -122,7 +123,7 @@ const list = () => {
     logger.info('listing devices')
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            query = 'SELECT * FROM devices';
+            let query = 'SELECT * FROM devices';
             connection.query(query, (err, results) => {
                 if (err) {
                     logger.error('Error retrieving devices:', { error: err.stack });
@@ -137,15 +138,18 @@ const list = () => {
 const create = ({ mac, name, current_ip }) => {
     logger.info('creating device:', { mac, name, current_ip })
     return new Promise((resolve, reject) => {
+        if (!name) {
+            name = generateDeviceName({ type: 'device' });
+        }
         useConnection((connection) => {
             const query = 'INSERT INTO devices (mac, name, current_ip) VALUES (?, ?, ?)';
             logger.debug('running query:', { query, mac, name, current_ip })
             connection.query(query, [mac, name, current_ip], (err, results) => {
                 if (err) {
-                    logger.error('Error creating device:', err.stack);
+                    logger.error('Error creating device:', {error: err.stack});
                     reject(err);
                 }
-                logger.info('results:', results);
+                logger.info('results', {results});
                 resolve(results);
             });
         });
@@ -174,11 +178,11 @@ const destroy = (mac) => {
     logger.info('deleting device:', { mac })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            query = 'DELETE FROM devices WHERE mac = ?';
+            let query = 'DELETE FROM devices WHERE mac = ?';
             logger.debug('running query:', { query, mac })
             connection.query(query, [mac], (err, results) => {
                 if (err) {
-                    logger.error('Error deleting device:', err.stack);
+                    logger.error('Error deleting device', {error: err.stack});
                     reject(err);
                 }
                 logger.info('results:', { results });

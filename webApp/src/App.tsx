@@ -1,8 +1,8 @@
-import LedController from "./ledController";
+ import LedController from "./ledController";
 
 function App() {
 
-  const stripName = 'DevStrip';
+  const stripName = 'DevPi';
   return (
     <LedController stripName={stripName} />
   )

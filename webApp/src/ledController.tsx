@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 // import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
-import ColorWheel, { RGB } from './colorWheel';
+import ColorWheel, { RGB } from './colorwheel';
 import './App.css'
 // simple webpage
-// has a simple button for on/off
+// has a simple button for on/off 
 // has a slider for brightness
 // has a color picker for color
-
+const host = import.meta.env.VITE_SERVER_HOST;
+const port = import.meta.env.VITE_SERVER_PORT;
 const LedController = ({ stripName }: { stripName: string }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -16,10 +17,13 @@ const LedController = ({ stripName }: { stripName: string }) => {
   const [brightness, setBrightness] = useState(255);
   const [write, setWrite] = useState(false);
 
-  const url = 'http://localhost:2000/stripData/' + stripName
+  const url = `http://${host}:${port}/` + stripName
 
   // get and post requests return the same data, so lets process them the same
   const processResponse = async (res: Response, write=false) => {
+    if (!res.ok) {
+      throw new Error('Request failed, status: ' + res.status + ' ' + res.statusText);
+    }
     const data = await res.json();
     console.log('data returned from request', data);
     const [r, g, b] = data.color;
@@ -85,8 +89,6 @@ const LedController = ({ stripName }: { stripName: string }) => {
   const coloredButton= {
     backgroundColor: on ? 'black' : `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})`,
   }
-
-  console.log('colored background', coloredBackground)
 
   if (loading) {
     return <div>Loading...</div>

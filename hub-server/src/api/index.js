@@ -11,7 +11,7 @@ const logger = getLogger('api/index');
 class HubApp extends express {
     constructor(port = 4000) {
         super();
-        initDb();
+        this.initialization = initDb();
         this.port = port || 4000;
         this.prodMode = prodMode;
         this.applyMiddleware();
@@ -30,6 +30,7 @@ class HubApp extends express {
     };
 
     start = async () => {
+        await this.initialization;
         this.listen(this.port, () => {
             const mode = this.prodMode ? "prod mode" : "dev mode"
             logger.info(

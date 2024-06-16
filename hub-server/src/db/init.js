@@ -43,7 +43,7 @@ const createDevicesTable = async () => {
     results = useConnection(connection => {
         connection.query(sql, (err, results) => {
             if (err) {
-                logger.error('Error creating devices table:', err.stack);
+                logger.error('Error creating devices table', {error: err.stack});
                 return;
             }
             logger.info('devices table ensured');
@@ -64,7 +64,7 @@ const createHandshakesTable = async () => {
     results = useConnection((connection) => {
         connection.query(sql, (err, results) => {
             if (err) {
-                logger.error('Error creating handshakes table:', err.stack);
+                logger.error('Error creating handshakes table', {error: err.stack});
                 return;
             }
             logger.info('handshakes table ensured');

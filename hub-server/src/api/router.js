@@ -3,7 +3,7 @@ const controller = require('./controller')
 const errors = require('./errors')
 
 
-router.route('/:mac')
+router.route('/:id')
     .get(controller.read)
     .post(controller.write);
 router.route('/')

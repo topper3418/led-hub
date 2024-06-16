@@ -4,25 +4,34 @@ const axios = require('axios');
 const db = require('../db');
 const getLogger = require('../logging');
 
-const logger = getLogger('api/controller');
+const logger = getLogger('api/controller', 'debug');
+
+const isMac = (mac) => {
+    if (typeof mac !== 'string') return false;
+    return mac.match(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/);
+}
 
 // gets the device object and attaches it to locals
 const getDevice = async (req, res, next) => {
-    const { mac } = req.params;
-    logger.debug('getting device:', mac);
-    let strip;
+    const { id } = req.params;
+    logger.debug('searching for device device:', {id});
+    let device;
     try {
-        strip = await db.devices.find({ mac });
+        if (isMac(id)) {
+            device = await db.devices.find({ mac: id });
+        } else {
+            device = await db.devices.find({ name: id });
+        }
     } catch (error) {
-        logger.error(`${error.name} finding device: ${error.message}`, { error, mac })
+        logger.error(`${error.name} finding device: ${error.message}`, { error, id })
     }
     // only send 404 if the strip is mandatory
-    if (!strip) {
-        res.status(404).send("Strip not found");
+    if (!device) {
+        res.status(404).send("Device not found");
         return;
     } else {
-        logger.info('found device', error)
-        res.locals.strip = strip;
+        logger.info('found device', {device})
+        res.locals.device = device;
     }
     next();
 }
@@ -69,7 +78,7 @@ const handshake = async (req, res, next) => {
             foundDevice = await db.devices.find({mac: device.mac});
         }
     } catch (error) {
-        logger.error(`${error.name} creating device: ${error.message}`, error)
+        logger.error(`${error.name} creating device: ${error.message}`, {error, mac, ip, type})
         next({
             status: 500,
             message: 'error creating device,' + error
@@ -82,7 +91,7 @@ const handshake = async (req, res, next) => {
         logger.info(`updating device ${foundDevice.name} with ip ${ip}`)
         await db.devices.update(foundDevice); 
     } catch (error) {
-        logger.error(`${error.name} updating device: ${error.message}`, error)
+        logger.error(`${error.name} updating device: ${error.message}`, {error, mac, ip, type})
         next({
             status: 500,
             message: 'error updating device', error
@@ -93,7 +102,7 @@ const handshake = async (req, res, next) => {
     try {
         await db.handshakes.create(handshake.mac, handshake.ip, handshake.type);
     } catch (error) {
-        logger.error(`${error.name} creating handshake entry: ${error.message}`, error)
+        logger.error(`${error.name} creating handshake entry: ${error.message}`, {error, mac, ip, type})
         next({
             status: 500,
             message: 'error creating handshake', error
@@ -107,18 +116,18 @@ const handshake = async (req, res, next) => {
 // Middleware:
 // - getDevice
 const read = async (req, res, next) => {
-    const { strip } = res.locals;
+    const { device } = res.locals;
 
     try {
-        const url = `http://${strip.current_ip}:80/`
+        const url = `http://${device.current_ip}:80/`
         logger.debug(`requesting data from strip at ${url}`)
         const stripData = await axios.get(url);
     
         const { data } = stripData;
-        logger.debug('got data from strip', data)
+        logger.debug('got data from strip', {data})
         res.json(data);
     } catch (error) {
-        logger.error(`${error.name} reading from ${strip.name}: ${error.message}`, error)
+        logger.error(`${error.name} reading from ${device.name}: ${error.message}`, {error, device})
         res.status(500).json({error: error.stack, message: 'error fetching from strip'});
     }
 };
@@ -137,12 +146,12 @@ const list = async (req, res, next) => {
 // Middleware:
 // - getDevice
 const write = async (req, res) => {
-    const { strip } = res.locals;
+    const { device } = res.locals;
 
     const {color, on, brightness} = req.body;
     const onStatus = on ? 'on' : 'off';
-    logger.info(`writing to ${strip.name}`, {color, on, brightness})
-    const url = `http://${strip.current_ip}/`;
+    logger.info(`writing to ${device.name}`, {color, on, brightness})
+    const url = `http://${device.current_ip}/`;
     const body = {
         color,
         state: onStatus,
@@ -156,7 +165,7 @@ const write = async (req, res) => {
 
         res.json(data);
     } catch (error) {
-        logger.error(`${error.name} writing to ${strip.name}: ${error.message}`, error)
+        logger.error(`${error.name} writing to ${device.name}: ${error.message}`, {error})
         res.status(500).json({error: error.stack, message: 'error posting to strip'});
     }
 }
