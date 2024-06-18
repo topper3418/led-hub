@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 // import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
-import ColorWheel, { RGB } from './colorwheel';
+import ColorWheel, { RGB } from '../components/colorWheel';
 import './App.css'
 // simple webpage
 // has a simple button for on/off 

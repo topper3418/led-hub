@@ -20,10 +20,11 @@
         * request should be a "post" request including the pico's mac address. that should be the 
         param, not the name. Mac address to serve as the PK
     5) build a simple UI that allows the user to see all the configured LED strips and then select one. TODO
-        * configure name on the pico
+        * configure name on the pico DONE
         * make a tile for each LED. then you can click into it and control it like before
+        * to facilitate this, I need to implement the react-router to locate the controller. 
         * fix white control while you're at it. 
-    6) add logging throughout, properly.  TODO
+    6) add logging throughout, properly.  DONE
         * get splunk instance up and working, and start logging to it
         * FAILED THE ABOVE, just make the logger spit out to the database. 
         * build a logger API like with my own logger, could probably copy and paste it and adapt queries. 

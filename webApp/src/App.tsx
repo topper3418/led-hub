@@ -1,4 +1,7 @@
- import LedController from "./ledController";
+import { Router } from 'react-router-dom';
+import LedController from "./ledStrip/ledController";
+
+
 
 function App() {
 
