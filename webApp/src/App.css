@@ -107,3 +107,35 @@ input[type="range"]::-webkit-slider-thumb {
 .spaced > * {
   margin-bottom: 20px;
 }
+
+.deviceTile {
+  display: flex;
+  width: 90%;
+  height: 100px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.deviceTile > * {
+  margin: 0;
+}
+
+.name {
+  font-size: 1.5em;
+}
+
+.indicator {
+  width: 75px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.radiant-border {
+  border: 10px solid;
+  border-image: linear-gradient(45deg, red, yellow, green, blue, purple) 1;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+}
