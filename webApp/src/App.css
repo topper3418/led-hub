@@ -10,14 +10,13 @@ body {
   overflow-x: hidden;
   background-color: black;
   color-scheme: dark;
+  margin: 0;
+  padding: 0;
+  overflow-y: hidden;
 }
 
 div {
   background-color: transparent;
-}
-
-body {
-  overflow-y: hidden;
 }
 
 p, h1, h2 {
@@ -42,10 +41,11 @@ h1, h2, h3 {
 }
 
 .wrapper {
+  background-color: black;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   width: 100vw;
   height: 100vh;
   box-sizing: border-box;
@@ -116,6 +116,8 @@ input[type="range"]::-webkit-slider-thumb {
   align-items: center;
   justify-content: space-between;
   padding: 10px;
+  border: 1px solid white;
+  border-radius: 5px;
 }
 
 .deviceTile > * {
@@ -128,7 +130,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .indicator {
   width: 75px;
-  height: 5px;
+  height: 75px;
   border-radius: 50%;
 }
 
