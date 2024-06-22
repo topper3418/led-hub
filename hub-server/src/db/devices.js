@@ -1,15 +1,17 @@
 const { useConnection } = require('./util');
 const getLogger = require('../logging');
-const { query } = require('express');
 
 const logger = getLogger('db/devices', 'debug');
 
 class Device {
-    constructor(mac, name, type, current_ip) {
+    constructor({ mac, name, type, current_ip, on, brightness, red, green, blue }) {
         this.mac = mac;
         this.type = type;
         this.name = name;
         this.current_ip = current_ip;
+        this.on = on;
+        this.brightness = brightness;
+        this.color = [red, green, blue]
     }
 
     isEqual(other) {
@@ -36,7 +38,12 @@ class Device {
             mac: this.mac,
             type: this.type,
             name: this.name,
-            current_ip: this.current_ip
+            current_ip: this.current_ip,
+            state: {
+                on: this.on,
+                brightness: this.brightness,
+                color: this.color
+            }
         }
     }
 }
@@ -72,7 +79,7 @@ const find = ({ mac, name, ip }) => {
                 } else {
                     firstResult = results[0];
                     logger.info('results: ', { firstResult })
-                    resolve(new Device(firstResult.mac, firstResult.name, firstResult.type, firstResult.current_ip))
+                    resolve(new Device(firstResult))
                 }
             });
         });
