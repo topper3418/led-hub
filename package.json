@@ -1,0 +1,23 @@
+{
+  "name": "led-hub",
+  "version": "0.1.0",
+  "description": "application for accessing various IOT devices",
+  "main": "device-hub.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topper3418/led-hub.git"
+  },
+  "keywords": [
+    "led",
+    "pico"
+  ],
+  "author": "Travis Opperud",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/topper3418/led-hub/issues"
+  },
+  "homepage": "https://github.com/topper3418/led-hub#readme"
+}
