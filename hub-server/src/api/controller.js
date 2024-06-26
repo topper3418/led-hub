@@ -1,70 +1,76 @@
-const { json } = require('express');
-const axios = require('axios');
+// const { json } = require('express');
+// const axios = require('axios');
 
 const db = require('../db');
 const getLogger = require('../logging');
-
+const LedStrip = require('../ledStrip');
 const logger = getLogger('api/controller', 'debug');
 
-const isMac = (mac) => {
-    if (typeof mac !== 'string') return false;
-    return mac.match(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/);
-}
+const {
+    isMac,
+    getDevice,
+    bodyHasData,
+    dataHas
+} = require('./middleware');
+// const isMac = (mac) => {
+//     if (typeof mac !== 'string') return false;
+//     return mac.match(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/);
+// }
 
 // gets the device object and attaches it to locals
-const getDevice = async (req, res, next) => {
-    const { id } = req.params;
-    logger.debug('searching for device device:', {id});
-    let device;
-    try {
-        if (isMac(id)) {
-            device = await db.devices.find({ mac: id });
-        } else {
-            device = await db.devices.find({ name: id });
-        }
-    } catch (error) {
-        logger.error(`${error.name} finding device: ${error.message}`, { error, id })
-    }
-    // only send 404 if the strip is mandatory
-    if (!device) {
-        res.status(404).send("Device not found");
-        return;
-    } else {
-        logger.info('found device', {device})
-        res.locals.device = device;
-    }
-    next();
-}
+// const getDevice = async (req, res, next) => {
+//     const { id } = req.params;
+//     logger.debug('searching for device device:', { id });
+//     let device;
+//     try {
+//         if (isMac(id)) {
+//             device = await db.devices.find({ mac: id });
+//         } else {
+//             device = await db.devices.find({ name: id });
+//         }
+//     } catch (error) {
+//         logger.error(`${error.name} finding device: ${error.message}`, { error, id })
+//     }
+//     // only send 404 if the strip is mandatory
+//     if (!device) {
+//         res.status(404).send("Device not found");
+//         return;
+//     } else {
+//         logger.info('found device', { device })
+//         res.locals.device = device;
+//     }
+//     next();
+// }
 
-const bodyHasData = (req, res, next) => {
-    if (!req.body) next({
-        status: 400,
-        message: 'Missing body'
-    })
-    next();
-}
+// const bodyHasData = (req, res, next) => {
+//     if (!req.body) next({
+//         status: 400,
+//         message: 'Missing body'
+//     })
+//     next();
+// }
 
 // factory for checking for items in the body
-const dataHas = (items) => {
-    return (req, res, next) => {
-        for (const item of items) {
-            if (!req.body[item]) {
-                res.status(400).send(`Missing ${item} in body`);
-                return;
-            }
-            res.locals[item] = req.body[item];
-        }
-        next();
-    }
-}
+// const dataHas = (items) => {
+//     return (req, res, next) => {
+//         for (const item of items) {
+//             if (!req.body[item]) {
+//                 res.status(400).send(`Missing ${item} in body`);
+//                 return;
+//             }
+//             res.locals[item] = req.body[item];
+//         }
+//         next();
+//     }
+// }
 
 // Middleware:
 // - dataHas(['mac', 'ip', 'type'])
 const handshake = async (req, res, next) => {
     const { mac, ip, type } = res.locals;
-    const handshake = new db.HandShake(null, null, mac, ip);
+    const handshake = new db.HandShake({ mac, ip });
 
-    logger.info(`handshake request from ${mac}`, {mac, ip, type})
+    logger.info(`handshake request from ${mac}`, { mac, ip, type })
     let foundDevice = await db.devices.find({ mac });
     if (foundDevice) logger.info('found device', { foundDevice });
     // ensure the strip exists
@@ -75,10 +81,10 @@ const handshake = async (req, res, next) => {
             handshake.type = 'init';
             await db.devices.create(device);
             // eventually I should streamline this by figuring out how to return the PK on create
-            foundDevice = await db.devices.find({mac: device.mac});
+            foundDevice = await db.devices.find({ mac: device.mac });
         }
     } catch (error) {
-        logger.error(`${error.name} creating device: ${error.message}`, {error, mac, ip, type})
+        logger.error(`${error.name} creating device: ${error.message}`, { error, mac, ip, type })
         next({
             status: 500,
             message: 'error creating device,' + error
@@ -89,9 +95,9 @@ const handshake = async (req, res, next) => {
     try {
         foundDevice.current_ip = ip;
         logger.info(`updating device ${foundDevice.name} with ip ${ip}`)
-        await db.devices.update(foundDevice); 
+        await db.devices.update(foundDevice);
     } catch (error) {
-        logger.error(`${error.name} updating device: ${error.message}`, {error, mac, ip, type})
+        logger.error(`${error.name} updating device: ${error.message}`, { error, mac, ip, type })
         next({
             status: 500,
             message: 'error updating device', error
@@ -100,9 +106,9 @@ const handshake = async (req, res, next) => {
     }
     // create the handshake
     try {
-        await db.handshakes.create(handshake.mac, handshake.ip, handshake.type);
+        await db.handshakes.create(handshake);
     } catch (error) {
-        logger.error(`${error.name} creating handshake entry: ${error.message}`, {error, mac, ip, type})
+        logger.error(`${error.name} creating handshake entry: ${error.message}`, { error, mac, ip, type })
         next({
             status: 500,
             message: 'error creating handshake', error
@@ -117,18 +123,20 @@ const handshake = async (req, res, next) => {
 // - getDevice
 const read = async (req, res, next) => {
     const { device } = res.locals;
+    // instantiate led strip interface
 
     try {
-        const url = `http://${device.current_ip}:80/`
-        logger.debug(`requesting data from strip at ${url}`)
-        const stripData = await axios.get(url);
-    
-        const { data } = stripData;
-        logger.debug('got data from strip', {data})
+        // const url = `http://${device.current_ip}:80/`
+        // logger.debug(`requesting data from strip at ${url}`)
+        // const stripData = await axios.get(url);
+        //    
+        // const { data } = stripData;
+        // logger.debug('got data from strip', {data})
+        const data = device.interface.getState();
         res.json(data);
     } catch (error) {
-        logger.error(`${error.name} reading from ${device.name}: ${error.message}`, {error, device})
-        res.status(500).json({error: error.stack, message: 'error fetching from strip'});
+        logger.error(`${error.name} reading from ${device.name}: ${error.message}`, { error, device })
+        res.status(500).json({ error: error.stack, message: 'error fetching from strip' });
     }
 };
 
@@ -138,7 +146,7 @@ const list = async (req, res, next) => {
         const devices = await db.devices.list();
         res.json(devices);
     } catch (error) {
-        res.status(500).json({error: error.stack, message: 'error fetching devices'});
+        res.status(500).json({ error: error.stack, message: 'error fetching devices' });
     }
 }
 
@@ -148,25 +156,33 @@ const list = async (req, res, next) => {
 const write = async (req, res) => {
     const { device } = res.locals;
 
-    const {color, on, brightness} = req.body;
+    const { color, on, brightness } = req.body;
     const onStatus = on ? 'on' : 'off';
-    logger.info(`writing to ${device.name}`, {color, on, brightness})
-    const url = `http://${device.current_ip}/`;
-    const body = {
-        color,
-        state: onStatus,
-        brightness
-    }
+
+    // if these are set, the ledStrip
+    // if (color != undefined) ledStripData.color = color;
+    // if (on != undefined) ledStripData.state = onStatus;
+    // if (brightness != undefined) ledStripData.brightness = brightness;
+
+    // logger.info(`writing to ${device.name}`, {color, on, brightness})
+    // const url = `http://${device.current_ip}/`;
+    // const body = {
+    //     color,
+    //     state: onStatus,
+    //     brightness
+    // }
 
     try {
-        const stripData = await axios.post(url, body);
-        // const data = compensateForPicoFuckery(stripData.data)
-        const data = stripData.data;
+        // const stripData = await axios.post(url, body);
+        // // const data = compensateForPicoFuckery(stripData.data)
+        // const data = stripData.data;
 
+        const writeData = { color, on: onStatus, brightness };
+
+        const data = await device.interface.set(writeData);
         res.json(data);
     } catch (error) {
-        logger.error(`${error.name} writing to ${device.name}: ${error.message}`, {error})
-        res.status(500).json({error: error.stack, message: 'error posting to strip'});
+        res.status(500).json({ error: error.stack, message: 'error posting to strip' });
     }
 }
 
@@ -176,9 +192,9 @@ const write = async (req, res) => {
 module.exports = {
     handshake: [
         bodyHasData,
-        dataHas(['mac', 'ip', 'type']), 
+        dataHas(['mac', 'ip', 'type']),
         handshake],
-    read: [getDevice, read], 
+    read: [getDevice, read],
     write: [getDevice, write],
     list
 };

@@ -1,6 +1,6 @@
 const { useConnection } = require('./util');
 const getLogger = require('../logging');
-
+const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices', 'debug');
 
 class Device {
@@ -12,6 +12,7 @@ class Device {
         this.on = on;
         this.brightness = brightness;
         this.color = [red, green, blue]
+        this.interface = LedStripInterface({ name, mac, ip: current_ip });
     }
 
     isEqual(other) {
@@ -28,7 +29,7 @@ class Device {
             return false;
         }
         if (!this.current_ip === other.current_ip) {
-            return false;
+            return false
         }
         return true;
     }
@@ -46,11 +47,17 @@ class Device {
             }
         }
     }
+
+    update({ color, brightness, state }) {
+        this.color = color;
+        this.brightness = brightness;
+        this.on = state === 'on';
+    }
 }
 
 const find = ({ mac, name, ip }) => {
     logger.info('finding device:', { mac, name, ip })
-     return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
             let criteria;
@@ -70,7 +77,7 @@ const find = ({ mac, name, ip }) => {
             logger.debug('running query:', { query, params })
             connection.query(query, params, (err, results) => {
                 if (err) {
-                    logger.error('Error finding device:', {error: err.stack});
+                    logger.error('Error finding device:', { error: err.stack });
                     return reject(err);
                 }
                 if (results.length === 0) {
@@ -102,12 +109,12 @@ const search = ({ searchTerm, type }) => {
                 reject(new Error('No valid search criteria provided'));
             }
             logger.debug('running query:', { query, params })
-            connection.query(query  , params, (err, results) => {
+            connection.query(query, params, (err, results) => {
                 if (err) {
-                    logger.error('Error searching for devices:', {error: err.stack});
+                    logger.error('Error searching for devices:', { error: err.stack });
                     return reject(err);
                 }
-                resolve(results);
+                resolve(results.map(result => new Device(result));
             });
         });
 
@@ -136,7 +143,7 @@ const list = () => {
                     logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
-                resolve(results);
+                resolve(results.map(result => new Device(result)));
             });
         });
     });
@@ -153,23 +160,25 @@ const create = ({ mac, name, current_ip }) => {
             logger.debug('running query:', { query, mac, name, current_ip })
             connection.query(query, [mac, name, current_ip], (err, results) => {
                 if (err) {
-                    logger.error('Error creating device:', {error: err.stack});
+                    logger.error('Error creating device:', { error: err.stack });
                     reject(err);
                 }
-                logger.info('results', {results});
+                logger.info('results', { results });
                 resolve(results);
             });
         });
     });
 }
 
-const update = (strip) => {
-    logger.info('updating device:', { strip })
+// TODO make the update actually capable of updating all things. or at least give the 
+//      other stuff its own update function. then we can update the history separetly. 
+const update = (device) => {
+    logger.info('updating device:', { strip: device })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             const query = 'UPDATE devices SET name = ?, current_ip = ? WHERE mac = ?';
-            logger.debug('running query:', { query, strip })
-            connection.query(query, [strip.name, strip.current_ip, strip.mac], (err, results) => {
+            logger.debug('running query:', { query, strip: device })
+            connection.query(query, [device.name, device.current_ip, device.mac], (err, results) => {
                 if (err) {
                     logger.error('Error updating the device:', { error: err.stack });
                     reject(err);
@@ -189,7 +198,7 @@ const destroy = (mac) => {
             logger.debug('running query:', { query, mac })
             connection.query(query, [mac], (err, results) => {
                 if (err) {
-                    logger.error('Error deleting device', {error: err.stack});
+                    logger.error('Error deleting device', { error: err.stack });
                     reject(err);
                 }
                 logger.info('results:', { results });
@@ -207,5 +216,5 @@ module.exports = {
     generateDeviceName,
     create,
     update,
-    delete: destroy, 
+    delete: destroy,
 }

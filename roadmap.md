@@ -24,11 +24,11 @@
         * make a tile for each LED. then you can click into it and control it like before
         * to facilitate this, I need to implement the react-router to locate the controller. 
         * fix white control while you're at it. 
+        * need to integrate a periodic ping from the hub to speed up load time and make the server aware of devices and their status. 
     6) add logging throughout, properly.  DONE
         * get splunk instance up and working, and start logging to it
-        * FAILED THE ABOVE, just make the logger spit out to the database. 
-        * build a logger API like with my own logger, could probably copy and paste it and adapt queries. 
-        * convert all those pesky console logs into splunk logs. 
+        * FAILED THE ABOVE, just make the logger spit out to the database. DONE
+        * build a logger API like with my own logger, could probably copy and paste it and adapt queries. DONE
     7) finally get environment variables right TODO
         * this will allow you to point things at the right databases and such safely when switching from dev to prod
         * also allows configuring stuff in docker easier. 
