@@ -114,7 +114,7 @@ const search = ({ searchTerm, type }) => {
                     logger.error('Error searching for devices:', { error: err.stack });
                     return reject(err);
                 }
-                resolve(results.map(result => new Device(result));
+                resolve(results.map(result => new Device(result)));
             });
         });
 

@@ -6,63 +6,63 @@ const getLogger = require('../logging');
 const LedStrip = require('../ledStrip');
 const logger = getLogger('api/controller', 'debug');
 
-const {
-    isMac,
-    getDevice,
-    bodyHasData,
-    dataHas
-} = require('./middleware');
-// const isMac = (mac) => {
-//     if (typeof mac !== 'string') return false;
-//     return mac.match(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/);
-// }
+// const {
+//     isMac,
+//     getDevice,
+//     bodyHasData,
+//     dataHas
+// } = require('./middleware');
+const isMac = (mac) => {
+    if (typeof mac !== 'string') return false;
+    return mac.match(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/);
+}
 
 // gets the device object and attaches it to locals
-// const getDevice = async (req, res, next) => {
-//     const { id } = req.params;
-//     logger.debug('searching for device device:', { id });
-//     let device;
-//     try {
-//         if (isMac(id)) {
-//             device = await db.devices.find({ mac: id });
-//         } else {
-//             device = await db.devices.find({ name: id });
-//         }
-//     } catch (error) {
-//         logger.error(`${error.name} finding device: ${error.message}`, { error, id })
-//     }
-//     // only send 404 if the strip is mandatory
-//     if (!device) {
-//         res.status(404).send("Device not found");
-//         return;
-//     } else {
-//         logger.info('found device', { device })
-//         res.locals.device = device;
-//     }
-//     next();
-// }
+const getDevice = async (req, res, next) => {
+    const { id } = req.params;
+    logger.debug('searching for device device:', { id });
+    let device;
+    try {
+        if (isMac(id)) {
+            device = await db.devices.find({ mac: id });
+        } else {
+            device = await db.devices.find({ name: id });
+        }
+    } catch (error) {
+        logger.error(`${error.name} finding device: ${error.message}`, { error, id })
+    }
+    // only send 404 if the strip is mandatory
+    if (!device) {
+        res.status(404).send("Device not found");
+        return;
+    } else {
+        logger.info('found device', { device })
+        res.locals.device = device;
+    }
+    next();
+}
 
-// const bodyHasData = (req, res, next) => {
-//     if (!req.body) next({
-//         status: 400,
-//         message: 'Missing body'
-//     })
-//     next();
-// }
+const bodyHasData = (req, res, next) => {
+    if (!req.body) next({
+        status: 400,
+        message: 'Missing body'
+    })
+    next();
+}
 
 // factory for checking for items in the body
-// const dataHas = (items) => {
-//     return (req, res, next) => {
-//         for (const item of items) {
-//             if (!req.body[item]) {
-//                 res.status(400).send(`Missing ${item} in body`);
-//                 return;
-//             }
-//             res.locals[item] = req.body[item];
-//         }
-//         next();
-//     }
-// }
+const dataHas = (items) => {
+    return (req, res, next) => {
+        for (const item of items) {
+            if (!req.body[item]) {
+                res.status(400).send(`Missing ${item} in body`);
+                return;
+            }
+            res.locals[item] = req.body[item];
+        }
+        next();
+    }
+}
 
 // Middleware:
 // - dataHas(['mac', 'ip', 'type'])
@@ -153,7 +153,7 @@ const list = async (req, res, next) => {
 
 // Middleware:
 // - getDevice
-const write = async (req, res) => {
+const write = async (req, res, next) => {
     const { device } = res.locals;
 
     const { color, on, brightness } = req.body;
@@ -173,8 +173,7 @@ const write = async (req, res) => {
     // }
 
     try {
-        // const stripData = await axios.post(url, body);
-        // // const data = compensateForPicoFuckery(stripData.data)
+        // const stripData = await axios.post(url, body); // const data = compensateForPicoFuckery(stripData.data)
         // const data = stripData.data;
 
         const writeData = { color, on: onStatus, brightness };

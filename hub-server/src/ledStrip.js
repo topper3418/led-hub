@@ -1,4 +1,4 @@
-const getLogger = require('../logging');
+const getLogger = require('./logging');
 const axios = require('axios');
 
 const logger = getLogger('ledStrip', 'debug')
