@@ -43,10 +43,12 @@ const getDevice = async (req, res, next) => {
 }
 
 const bodyHasData = (req, res, next) => {
-    if (!req.body) next({
-        status: 400,
-        message: 'Missing body'
-    })
+    if (!req.body) {
+        return next({
+            status: 400,
+            message: 'Missing body'
+        })
+    }
     next();
 }
 

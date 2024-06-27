@@ -20,7 +20,9 @@
 // }
 //
 const { refreshDevices } = require('./controller');
-const scheduler = require('./scheduler')();
+const Scheduler = require('./scheduler');
+
+const scheduler = new Scheduler();
 
 scheduler.addJob('*/10 * * * * *', refreshDevices);
 

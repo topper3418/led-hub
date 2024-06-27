@@ -26,8 +26,8 @@ const refreshDevices = async () => {
         } catch (error) {
             logger.error(`error refreshing ${device.name}`, { device, error });
         }
-    }
+    });
 }
 
 
-module.exports = { refreshDevices }
+module.exports = { refreshDevices };
