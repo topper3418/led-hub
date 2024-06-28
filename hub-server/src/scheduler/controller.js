@@ -1,19 +1,21 @@
 const db = require('../db');
 const getLogger = require('../logging')
 
-const logger = getLogger('scheduler/controller', 'DEBUG');
+const logger = getLogger('scheduler/controller', 'debug');
 
 // ping a strip and get its data, update the database
 const refreshDevice = async (device) => {
-    try {
-        logger.debug(`refreshing device ${device.name}`);
-        const stripData = await device.interface.getState();
+    logger.debug(`refreshing device "${device.name}"`);
+    console.log('got here at least');
+    const stripData = await device.interface.getState();
+    if (stripData.connected) {
+        console.log('its connected');
         device.update(stripData);
         await db.devices.update(device);
         logger.info(`device ${device.name} updated successfully`, { device });
-    } catch (error) {
-        // TODO make the "no connection" condition set strip to disconnected
-        logger.error(`error refreshing ${device.name}`, { device, error });
+    } else {
+        console.log('its not connected')
+        logger.info(`timeout refreshing device "${device.name}" on ip ${device.current_ip}`, { device, error: stripData.error });
     }
 }
 

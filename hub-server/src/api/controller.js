@@ -79,7 +79,7 @@ const handshake = async (req, res, next) => {
     try {
         if (!foundDevice) {
             logger.info(`creating device ${mac} - ${req.body.name || 'unnamed'}`)
-            const device = new db.Device(mac, req.body.name, ip);
+            const device = new db.Device({ mac, name: req.body.name, current_ip: ip });
             handshake.type = 'init';
             await db.devices.create(device);
             // eventually I should streamline this by figuring out how to return the PK on create
@@ -117,6 +117,7 @@ const handshake = async (req, res, next) => {
         });
         return;
     }
+    logger.debug("returning device", { foundDevice });
     res.status(200).json(foundDevice);
 }
 

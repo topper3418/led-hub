@@ -1,7 +1,7 @@
 const { useConnection } = require('./util');
 const getLogger = require('../logging');
 const LedStripInterface = require('../ledStrip');
-const logger = getLogger('db/devices', 'debug');
+const logger = getLogger('db/devices');
 
 class Device {
     constructor({ mac, name, type, current_ip, on, brightness, red, green, blue }) {
@@ -12,7 +12,7 @@ class Device {
         this.on = on;
         this.brightness = brightness;
         this.color = [red, green, blue]
-        this.interface = LedStripInterface({ name, mac, ip: current_ip });
+        this.interface = new LedStripInterface({ name, mac, ip: current_ip });
     }
 
     isEqual(other) {
@@ -114,7 +114,9 @@ const search = ({ searchTerm, type }) => {
                     logger.error('Error searching for devices:', { error: err.stack });
                     return reject(err);
                 }
-                resolve(results.map(result => new Device(result)));
+                const devices = results.map(result => new Device(result));
+                logger.debug('found devices', { devices });
+                resolve(devices);
             });
         });
 
@@ -122,15 +124,16 @@ const search = ({ searchTerm, type }) => {
 }
 
 const generateDeviceName = (device) => {
-    const allDevices = list();
-    const takenNames = allDevices.map(device => device.name).filter(name => name.startsWith(device.type));
-    let name = `${device.type}1`;
-    let i = 1;
-    while (takenNames.includes(name)) {
-        i++;
-        name = `${device.type}${i}`;
-    }
-    return name;
+    return list().then((allDevices => {
+        const takenNames = allDevices.map(device => device.name).filter(name => name.startsWith(device.type));
+        let name = `${device.type}1`;
+        let i = 1;
+        while (takenNames.includes(name)) {
+            i++;
+            name = `${device.type}${i}`;
+        }
+        return name;
+    }))
 }
 
 const list = () => {
@@ -143,7 +146,9 @@ const list = () => {
                     logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
-                resolve(results.map(result => new Device(result)));
+                const devices = results.map(result => new Device(result));
+                logger.debug('found devices', { devices });
+                resolve(devices);
             });
         });
     });

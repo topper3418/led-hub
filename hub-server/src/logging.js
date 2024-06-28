@@ -30,7 +30,7 @@ class MySQLTransport extends Transport {
   }
 }
 
-const getLogger = (loggerName, level='info') => {
+const getLogger = (loggerName, level = 'info') => {
   return createLogger({
     level: level,
     format: format.combine(

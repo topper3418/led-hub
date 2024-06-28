@@ -11,18 +11,22 @@ class LedStripInterface {
     }
 
     async getState() {
+        const url = `http://${this.ip}:80/`
+        logger.debug(`requesting data from strip at ${url}`)
         try {
-            const url = `http://${this.ip}:80/`
-            logger.debug(`requesting data from strip at ${url}`)
-            const stripData = await axios.get(url);
-
+            const stripData = await axios.get(url, { timeout: 2000 });
             const { data } = stripData;
-            logger.debug('got data from strip', { data })
-            return data
+            data.connected = true;
         } catch (error) {
-            logger.error(`${error.name} reading from ${this.name}: ${error.message}`, { error })
+            console.log('error caught by strip');
+            if (error.code == "ECONNABORTED") {
+                console.log('its a conn aborted');
+                return { connected: false, error };
+            }
             throw error;
         }
+        logger.debug('got data from strip', { data })
+        return data
     }
 
     async set({ state, brightness, color }) {

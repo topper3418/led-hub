@@ -31,7 +31,7 @@ static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
 # end deprecation wish
 
 SERVER_ADDRESS = '192.168.68.52'
-SERVER_PORT = 4000
+SERVER_PORT = 2000
 HANDSHAKE_ENDPOINT = f'http://{SERVER_ADDRESS}:{SERVER_PORT}/'
 print(f'Handshake endpoint: {HANDSHAKE_ENDPOINT}')
 
