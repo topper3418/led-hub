@@ -14,9 +14,11 @@ class LedStripInterface {
         const url = `http://${this.ip}:80/`
         logger.debug(`requesting data from strip at ${url}`)
         try {
-            const stripData = await axios.get(url, { timeout: 2000 });
+            const stripData = await axios.get(url, { timeout: 5000 });
             const { data } = stripData;
             data.connected = true;
+            logger.debug('got data from strip', { data })
+            return data
         } catch (error) {
             console.log('error caught by strip');
             if (error.code == "ECONNABORTED") {
@@ -25,8 +27,6 @@ class LedStripInterface {
             }
             throw error;
         }
-        logger.debug('got data from strip', { data })
-        return data
     }
 
     async set({ state, brightness, color }) {
