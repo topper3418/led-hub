@@ -3,7 +3,7 @@ const router = require('./api')
 const { init: initDb } = require('./db')
 const scheduler = require('./scheduler')
 const getLogger = require('./logging')
-
+const cors = require('cors');
 const logger = getLogger('api/index');
 
 // Use logger after it has been resolved
@@ -44,6 +44,7 @@ const logger = getLogger('api/index');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
     const { method, url, body } = req;
@@ -51,7 +52,6 @@ app.use((req, res, next) => {
     next();
 });
 app.use('/', router);
-
 const startHub = async ({ port }) => {
     await initDb();
     scheduler.start();

@@ -7,8 +7,13 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': 'http://localhost:2000'
+      '/api': {
+        target: 'http://logalhost:2000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
     },
     host: true
   }
 })
+

@@ -15,17 +15,14 @@ class MySQLTransport extends Transport {
     setImmediate(() => {
       this.emit('logged', info);
     });
-
     const { level, message, ...meta } = info;
     const query = `INSERT INTO logs (logger, level, message, meta, timestamp) VALUES (?, ?, ?, ?, ?)`;
     const timestamp = new Date();
-
     try {
       await this.connection.execute(query, [this.loggerName, level, message, JSON.stringify(meta), timestamp]);
     } catch (error) {
       console.error('Failed to log to MySQL:', error);
     }
-
     callback();
   }
 }
@@ -34,13 +31,16 @@ const getLogger = (loggerName, level = 'info') => {
   return createLogger({
     level: level,
     format: format.combine(
-      format.label({ label: path.basename(__filename) }),
-      format.timestamp(),
-      // format.printf(({ timestamp, level, message, label }) => {
-      //   return `${timestamp} [${loggerName}] ${level}: ${message}`;
-      // }),
-      format.json()
+      format.printf(({ message }) => message) // Only print the message to console
     ),
+    // format: format.combine(
+    //   format.label({ label: path.basename(__filename) }),
+    //   format.timestamp(),
+    //   // format.printf(({ timestamp, level, message, label }) => {
+    //   //   return `${timestamp} [${loggerName}] ${level}: ${message}`;
+    //   // }),
+    //   format.json()
+    // ),
     transports: [
       new MySQLTransport({ loggerName }),
       new transports.Console()

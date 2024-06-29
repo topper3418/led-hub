@@ -20,11 +20,17 @@ class LedStripInterface {
             logger.debug('got data from strip', { data })
             return data
         } catch (error) {
-            console.log('error caught by strip');
             if (error.code == "ECONNABORTED") {
-                console.log('its a conn aborted');
+                logger.debug('its a conn aborted');
+                return { connected: false, error };
+            } else if (error.code == "EHOSTDOWN") {
+                logger.debug('its a host down');
+                return { connected: false, error };
+            } else if (error.code == "EHOSTUNREACH") {
+                logger.debug('its an unreachable');
                 return { connected: false, error };
             }
+            logger.error('error caught by strip', { error });
             throw error;
         }
     }
