@@ -26,11 +26,13 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
             res.statusText
           );
         }
+        console.log('res', res);
         return res.json();
       })
       .then((data) => {
         console.log("data returned from request", data);
         const [r, g, b] = data.color;
+        console.log('r', r, 'g', g, 'b', b)
         setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
         setOn(data.on);
         setBrightness(Math.round((data.brightness * 10) / 255)); // convert 0-255 to 0-10 and round to the nearest integer
@@ -69,7 +71,7 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
         },
         body: JSON.stringify(payload),
       })
-      
+
       if (!response.ok) {
         throw new Error(
           "Request failed, status: " +

@@ -29,6 +29,9 @@ class LedStripInterface {
             } else if (error.code == "EHOSTUNREACH") {
                 logger.debug('its an unreachable');
                 return { connected: false, error };
+            } else if (error.code == "ECONNREFUSED") {
+                logger.debug('its a host down');
+                return { connected: false, error };
             }
             logger.error('error caught by strip', { error });
             throw error;

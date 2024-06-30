@@ -24,9 +24,9 @@ export const Devices: React.FC = () => {
                 if (!res.ok) {
                     throw new Error(
                         "Request failed, status: " +
-                            res.status +
-                            " " +
-                            res.statusText
+                        res.status +
+                        " " +
+                        res.statusText
                     );
                 }
                 return res.json();
@@ -65,7 +65,7 @@ export const Devices: React.FC = () => {
             <div className="deviceContainer">
                 {data.map((device) => (
                     <LedCard
-                        key={device.id}
+                        key={device.mac}
                         ledStrip={device}
                         selectDevice={() => navToDevice(device)}
                     />

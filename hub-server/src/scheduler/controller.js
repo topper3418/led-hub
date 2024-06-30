@@ -11,12 +11,13 @@ const refreshDevice = async (device) => {
     if (stripData.connected) {
         console.log('its connected');
         device.update(stripData);
-        await db.devices.update(device);
         logger.info(`device ${device.name} updated successfully`, { device });
     } else {
         console.log('its not connected')
-        logger.info(`timeout refreshing device "${device.name}" on ip ${device.current_ip}`, { device, error: stripData.error });
+        logger.info(`unsuccessful refreshing device "${device.name}" on ip ${device.current_ip}`, { device, error: stripData.error });
+        device.connected = false;
     }
+    db.devices.update(device);
 }
 
 

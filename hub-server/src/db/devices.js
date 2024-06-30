@@ -1,18 +1,28 @@
-const { useConnection } = require('./util');
+const { useConnection, QueryBuilder, findSql } = require('./util');
 const getLogger = require('../logging');
 const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices');
+const fs = require('fs/promises');
 
 class Device {
-    constructor({ mac, name, type, current_ip, on, brightness, red, green, blue }) {
+    constructor({ mac, name, type, current_ip, on, brightness, red, green, blue, connected }) {
         this.mac = mac;
         this.type = type;
         this.name = name;
         this.current_ip = current_ip;
         this.on = on;
         this.brightness = brightness;
-        this.color = [red, green, blue]
+        this.color = [red, green, blue];
         this.interface = new LedStripInterface({ name, mac, ip: current_ip });
+        this.connected = connected || false;
+    }
+
+    get state() {
+        return {
+            brightness: this.brightness,
+            color: this.color,
+            on: this.on
+        }
     }
 
     isEqual(other) {
@@ -53,7 +63,22 @@ class Device {
         this.brightness = brightness;
         this.on = state === 'on';
     }
+
+    async refreshState() {
+        const newState = await self.interface.getState();
+        this.update(newState);
+    }
+
+    async write(newState) {
+        const { color, on, brightness } = newState;
+        const onStatus = on ? 'on' : 'off';
+        const writeData = { color, on: onStatus, brightness };
+        const data = await this.interface.set(writeData);
+        this.update(data);
+    }
 }
+
+// const devicesQueryBuilder = QueryBuilder('devices');
 
 const find = ({ mac, name, ip }) => {
     logger.info('finding device:', { mac, name, ip })
@@ -88,35 +113,6 @@ const find = ({ mac, name, ip }) => {
                     logger.info('results: ', { firstResult })
                     resolve(new Device(firstResult))
                 }
-            });
-        });
-
-    });
-}
-
-const search = ({ searchTerm, type }) => {
-    logger.info('searching for device:', { searchTerm, type })
-    return new Promise((resolve, reject) => {
-        useConnection((connection) => {
-            let query;
-            if (type) {
-                query = `SELECT * FROM devices WHERE AND type = ?`;
-                params = [type];
-            } else if (searchTerm) {
-                query = `SELECT * FROM devices WHERE mac LIKE ? OR name LIKE ? OR current_ip LIKE ?`;
-                params = [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`];
-            } else {
-                reject(new Error('No valid search criteria provided'));
-            }
-            logger.debug('running query:', { query, params })
-            connection.query(query, params, (err, results) => {
-                if (err) {
-                    logger.error('Error searching for devices:', { error: err.stack });
-                    return reject(err);
-                }
-                const devices = results.map(result => new Device(result));
-                logger.debug('found devices', { devices });
-                resolve(devices);
             });
         });
 
@@ -177,13 +173,24 @@ const create = ({ mac, name, current_ip }) => {
 
 // TODO make the update actually capable of updating all things. or at least give the 
 //      other stuff its own update function. then we can update the history separetly. 
-const update = (device) => {
+const update = async (device) => {
     logger.info('updating device:', { strip: device })
+    const query = await findSql('update/devices.sql');
+    const params = [
+        device.name,
+        device.current_ip,
+        device.on,
+        device.brightness,
+        device.color[0],
+        device.color[1],
+        device.color[2],
+        device.connected,
+        device.mac
+    ];
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
-            const query = 'UPDATE devices SET name = ?, current_ip = ? WHERE mac = ?';
-            logger.debug('running query:', { query, strip: device })
-            connection.query(query, [device.name, device.current_ip, device.mac], (err, results) => {
+            logger.debug('running query:', { query, strip: device, params })
+            connection.query(query, params, (err, results) => {
                 if (err) {
                     logger.error('Error updating the device:', { error: err.stack });
                     reject(err);
@@ -216,7 +223,6 @@ const destroy = (mac) => {
 module.exports = {
     Device,
     find,
-    search,
     list,
     generateDeviceName,
     create,

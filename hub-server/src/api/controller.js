@@ -31,7 +31,6 @@ const getDevice = async (req, res, next) => {
     } catch (error) {
         logger.error(`${error.name} finding device: ${error.message}`, { error, id })
     }
-    // only send 404 if the strip is mandatory
     if (!device) {
         res.status(404).send("Device not found");
         return;
@@ -135,8 +134,9 @@ const read = async (req, res, next) => {
         //    
         // const { data } = stripData;
         // logger.debug('got data from strip', {data})
-        const data = device.interface.getState();
-        res.json(data);
+        // const data = device.interface.getState();
+        // res.json(data);
+        res.json(device.state)
     } catch (error) {
         logger.error(`${error.name} reading from ${device.name}: ${error.message}`, { error, device })
         res.status(500).json({ error: error.stack, message: 'error fetching from strip' });
@@ -158,9 +158,9 @@ const list = async (req, res, next) => {
 // - getDevice
 const write = async (req, res, next) => {
     const { device } = res.locals;
-
-    const { color, on, brightness } = req.body;
-    const onStatus = on ? 'on' : 'off';
+    //
+    // const { color, on, brightness } = req.body;
+    // const onStatus = on ? 'on' : 'off';
 
     // if these are set, the ledStrip
     // if (color != undefined) ledStripData.color = color;
@@ -175,13 +175,16 @@ const write = async (req, res, next) => {
     //     brightness
     // }
 
+    const { color, on, brightness } = req.body;
     try {
         // const stripData = await axios.post(url, body); // const data = compensateForPicoFuckery(stripData.data)
         // const data = stripData.data;
 
-        const writeData = { color, on: onStatus, brightness };
+        // const writeData = { color, on: onStatus, brightness };
 
-        const data = await device.interface.set(writeData);
+        await device.write({ color, on, brightness });
+        const data = device.state;
+        db.devices.update(device);
         res.json(data);
     } catch (error) {
         res.status(500).json({ error: error.stack, message: 'error posting to strip' });
