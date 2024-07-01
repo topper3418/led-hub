@@ -3,7 +3,7 @@
 
 const db = require('../db');
 const getLogger = require('../logging');
-const LedStrip = require('../ledStrip');
+// const LedStrip = require('../ledStrip');
 const logger = getLogger('api/controller', 'debug');
 
 // const {
@@ -174,8 +174,9 @@ const write = async (req, res, next) => {
     //     state: onStatus,
     //     brightness
     // }
-
+    // console.log('extracting state');
     const { color, on, brightness } = req.body;
+    // console.log('body', req.body);
     try {
         // const stripData = await axios.post(url, body); // const data = compensateForPicoFuckery(stripData.data)
         // const data = stripData.data;
@@ -184,6 +185,7 @@ const write = async (req, res, next) => {
 
         await device.write({ color, on, brightness });
         const data = device.state;
+        // console.log({ device });
         db.devices.update(device);
         res.json(data);
     } catch (error) {

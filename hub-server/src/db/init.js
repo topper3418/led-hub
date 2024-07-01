@@ -38,7 +38,6 @@ const createDevicesTable = async () => {
     //     return;
     // }
     const sql = await findSql('create/devices-table.sql');
-    console.log('ensuring devices table', { sql });
     // logger.debug('ensuring devices table', { sql });
     results = useConnection(connection => {
         connection.query(sql, (err, results) => {

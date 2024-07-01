@@ -20,7 +20,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
   const url = `http://${host}:${port}/` + stripName
 
   // get and post requests return the same data, so lets process them the same
-  const processResponse = async (res: Response, write=false) => {
+  const processResponse = async (res: Response, write = false) => {
     if (!res.ok) {
       throw new Error('Request failed, status: ' + res.status + ' ' + res.statusText);
     }
@@ -59,11 +59,14 @@ const LedController = ({ stripName }: { stripName: string }) => {
   }
 
   useEffect(() => {
-    if (write) sendChange();
+    if (write) {
+      sendChange();
+      setWrite(false);
+    }
   }, [color, on, brightness]);
 
   const sendChange = async () => {
-    console.log('sending change', {color, on, brightness})
+    console.log('sending change', { color, on, brightness })
     try {
       const postData = await fetch(url, {
         method: 'POST',
@@ -71,7 +74,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          color,
+          color: [color.r, color.g, color.b],
           on,
           brightness: Math.round(brightness * 255 / 10)  // convert 0-10 to 0-255
         })
@@ -86,7 +89,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
     backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` : 'black',
   }
 
-  const coloredButton= {
+  const coloredButton = {
     backgroundColor: on ? 'black' : `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})`,
   }
 
@@ -97,26 +100,26 @@ const LedController = ({ stripName }: { stripName: string }) => {
   if (error) {
     return <div>Error loading data</div>
   }
-  
+
   return (
     <div className="wrapper column bottom" style={coloredBackground}>
-        <div className="view spaced column">
-          <h1>LED control</h1>
-          <div className='center'>
-            <ColorWheel 
-              color={color} 
-              onChange={colorChanged} />
-          </div>
-          <input 
-            type="range" 
-            min="0" 
-            max="10" 
-            value={brightness} 
-            onChange={brightnessChanged} />
-          <button onClick={togglePressed} style={coloredButton}>
-            {on ? 'Off' : 'On'}
-            </button>
+      <div className="view spaced column">
+        <h1>LED control</h1>
+        <div className='center'>
+          <ColorWheel
+            color={color}
+            onChange={colorChanged} />
         </div>
+        <input
+          type="range"
+          min="0"
+          max="10"
+          value={brightness}
+          onChange={brightnessChanged} />
+        <button onClick={togglePressed} style={coloredButton}>
+          {on ? 'Off' : 'On'}
+        </button>
+      </div>
     </div>
   )
 }

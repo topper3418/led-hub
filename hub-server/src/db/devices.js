@@ -1,7 +1,7 @@
 const { useConnection, QueryBuilder, findSql } = require('./util');
 const getLogger = require('../logging');
 const LedStripInterface = require('../ledStrip');
-const logger = getLogger('db/devices');
+const logger = getLogger('db/devices', 'debug');
 const fs = require('fs/promises');
 
 class Device {
@@ -58,22 +58,30 @@ class Device {
         }
     }
 
-    update({ color, brightness, state }) {
-        this.color = color;
-        this.brightness = brightness;
-        this.on = state === 'on';
+    update({ color, brightness, state, connected }) {
+        if (color) this.color = color;
+        if (brightness) this.brightness = brightness;
+        if (state) {
+            if (typeof state == Boolean) {
+                this.on = state;
+            } else this.on = state === 'on';
+        }
+        if (connected) this.connected = connected;
     }
 
     async refreshState() {
-        const newState = await self.interface.getState();
+        const newState = await this.interface.getState();
         this.update(newState);
     }
 
     async write(newState) {
+        console.log('new state:', newState);
         const { color, on, brightness } = newState;
         const onStatus = on ? 'on' : 'off';
-        const writeData = { color, on: onStatus, brightness };
+        const writeData = { color, state: onStatus, brightness };
+        console.log('writeData: ', writeData);
         const data = await this.interface.set(writeData);
+        console.log('data: ', data);
         this.update(data);
     }
 }
@@ -175,7 +183,9 @@ const create = ({ mac, name, current_ip }) => {
 //      other stuff its own update function. then we can update the history separetly. 
 const update = async (device) => {
     logger.info('updating device:', { strip: device })
+    console.log('device:', { device });
     const query = await findSql('update/devices.sql');
+    console.log('query', query);
     const params = [
         device.name,
         device.current_ip,
@@ -187,6 +197,7 @@ const update = async (device) => {
         device.connected,
         device.mac
     ];
+    console.log('params', params);
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             logger.debug('running query:', { query, strip: device, params })

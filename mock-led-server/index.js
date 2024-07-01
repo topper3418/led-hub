@@ -58,6 +58,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
+    console.log('request body', req.body);
     if (req.body.brightness !== undefined) {
         console.log('Setting brightness:', req.body.brightness);
         ledStrip.brightness = req.body.brightness;

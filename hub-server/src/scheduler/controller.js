@@ -6,16 +6,13 @@ const logger = getLogger('scheduler/controller', 'debug');
 // ping a strip and get its data, update the database
 const refreshDevice = async (device) => {
     logger.debug(`refreshing device "${device.name}"`);
-    logger.debug('got here at least');
-    const stripData = await device.interface.getState();
-    if (stripData.connected) {
-        console.log('its connected');
-        device.update(stripData);
+    console.log('device before:', device);
+    await device.refreshState();
+    console.log('device after:', device);
+    if (device.connected) {
         logger.info(`device ${device.name} updated successfully`, { device });
     } else {
-        console.log('its not connected')
         logger.info(`unsuccessful refreshing device "${device.name}" on ip ${device.current_ip}`, { device, error: stripData.error });
-        device.connected = false;
     }
     db.devices.update(device);
 }

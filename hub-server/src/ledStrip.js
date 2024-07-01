@@ -46,7 +46,7 @@ class LedStripInterface {
             state,
             brightness
         }
-
+        console.log('state post body:', body)
         try {
             const stripData = await axios.post(url, body);
             // const data = compensateForPicoFuckery(stripData.data)
