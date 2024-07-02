@@ -8,11 +8,11 @@ export interface RGB {
 }
 
 interface ColorWheelProps {
-    color: RGB;
-    onChange: (color: RGB) => void;
-  }
+  color: RGB;
+  onChange: (color: RGB) => void;
+}
 
-const ColorWheel: React.FC<ColorWheelProps> = ({color, onChange: setColor }) => {
+const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange: setColor }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   console.warn('need to use the color value. in the future we should have a cursor on the wheel representing last click. ', color);
   useEffect(() => {
@@ -39,11 +39,11 @@ const ColorWheel: React.FC<ColorWheelProps> = ({color, onChange: setColor }) => 
 
   return (
     <canvas
-    ref={canvasRef}
-    width={300}
-    height={300}
-    onClick={handleClick}
-    style={{ backgroundColor: 'transparent' }}
+      ref={canvasRef}
+      width={300}
+      height={300}
+      onClick={handleClick}
+      style={{ backgroundColor: 'transparent' }}
     />
   );
 };
@@ -64,6 +64,14 @@ function drawColorWheel(canvas: HTMLCanvasElement) {
     ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
     ctx.fill();
   }
+
+  // Draw white circle in the center
+  const innerRadius = radius / 4; // Adjust this value to change the size of the inner circle
+  ctx.beginPath();
+  ctx.arc(radius, radius, innerRadius, 0, 2 * Math.PI, false);
+  ctx.closePath();
+  ctx.fillStyle = 'white';
+  ctx.fill();
 }
 
 export default ColorWheel;

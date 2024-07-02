@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../App.css";
-import LedControllerElement from "../ledStrip/ledController";
+// import LedControllerElement from "../ledStrip/ledController";
 import { LedCard } from "../ledStrip/ledCard";
 import { Device } from "../types";
 
@@ -20,7 +20,7 @@ export const Devices: React.FC = () => {
         setLoading(true);
         fetch(url)
             .then((res: Response) => {
-                console.log("Processing esponse");
+                console.log("Processing response");
                 if (!res.ok) {
                     throw new Error(
                         "Request failed, status: " +
@@ -62,7 +62,7 @@ export const Devices: React.FC = () => {
             <header className="App-header">
                 <h1>Devices</h1>
             </header>
-            <div className="deviceContainer">
+            <div className="deviceContainer spaced">
                 {data.map((device) => (
                     <LedCard
                         key={device.mac}

@@ -84,7 +84,7 @@ const createLoggingTable = async () => {
     results = useConnection((connection) => {
         connection.query(sql, (err, results) => {
             if (err) {
-                console.error('Error creating logging tables:', err.stack);
+                console.error('Error creating logging table:', err.stack);
                 return;
             }
             // logger.info('logging tables ensured');
@@ -93,9 +93,22 @@ const createLoggingTable = async () => {
     });
 }
 
+const createPingTable = async () => {
+    const sql = await findSql('create/ping-table.sql');
+    results = useConnection((connection) => {
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.error('Error creating ping table:', err.stack);
+                return;
+            }
+            return results;
+        });
+    });
+}
 
 module.exports = {
     createDevicesTable,
     createHandshakesTable,
     createLoggingTable,
+    createPingTable,
 }

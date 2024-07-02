@@ -2,10 +2,10 @@ const { useConnection, QueryBuilder, findSql } = require('./util');
 const getLogger = require('../logging');
 const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices', 'debug');
-const fs = require('fs/promises');
 
 class Device {
-    constructor({ mac, name, type, current_ip, on, brightness, red, green, blue, connected }) {
+    constructor({ id, mac, name, type, current_ip, on, brightness, red, green, blue, connected }) {
+        this.id = id;
         this.mac = mac;
         this.type = type;
         this.name = name;
@@ -59,6 +59,7 @@ class Device {
     }
 
     update({ color, brightness, state, connected }) {
+        logger.debug(`updating device, {this.name || this.mac}`, { device: this, newState: { color, brightness, state, connected } });
         if (color) this.color = color;
         if (brightness) this.brightness = brightness;
         if (state) {

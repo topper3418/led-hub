@@ -1,8 +1,9 @@
-const { 
-    tableExists, 
-    createDevicesTable, 
+const {
+    tableExists,
+    createDevicesTable,
     createHandshakesTable,
-    createLoggingTable
+    createLoggingTable,
+    createPingTable,
 } = require('./init');
 const { useConnection, connectionObj } = require('./util');
 const {
@@ -21,6 +22,7 @@ module.exports = {
         await createDevicesTable();
         await createHandshakesTable();
         await createLoggingTable();
+        // await createPingTable();
     },
     tableExists,
     connectionObj,
@@ -29,5 +31,5 @@ module.exports = {
     devices: deviceApi,
     HandShake,
     handshakes: handshakeApi,
-//    getLogger,
+    //    getLogger,
 }

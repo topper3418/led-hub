@@ -1,7 +1,7 @@
 
 export interface ledCardInterface {
-    ledStrip: Device;
-    selectDevice: () => void;
+  ledStrip: Device;
+  selectDevice: () => void;
 }
 
 export interface Device {
@@ -9,5 +9,9 @@ export interface Device {
   mac: string;
   name: string;
   current_ip: string;
+  on: boolean;
+  brightness: number;
+  color: [number, number, number];
+  connected: boolean;
 }
 
