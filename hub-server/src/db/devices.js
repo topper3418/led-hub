@@ -4,7 +4,7 @@ const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices', 'debug');
 
 class Device {
-    constructor({ id, mac, name, type, current_ip, on, brightness, red, green, blue, connected }) {
+    constructor({ id, mac, name, type, current_ip, on, brightness, red, green, blue, connected, error }) {
         this.id = id;
         this.mac = mac;
         this.type = type;
@@ -15,6 +15,7 @@ class Device {
         this.color = [red, green, blue];
         this.interface = new LedStripInterface({ name, mac, ip: current_ip });
         this.connected = connected || false;
+        this.error = error;
     }
 
     get state() {
@@ -54,20 +55,22 @@ class Device {
                 on: this.on,
                 brightness: this.brightness,
                 color: this.color
-            }
+            },
+            connected: this.connected
         }
     }
 
-    update({ color, brightness, state, connected }) {
+    update({ color, brightness, state, connected, error }) {
         logger.debug(`updating device, {this.name || this.mac}`, { device: this, newState: { color, brightness, state, connected } });
-        if (color) this.color = color;
-        if (brightness) this.brightness = brightness;
-        if (state) {
+        if (color != undefined) this.color = color;
+        if (brightness != undefined) this.brightness = brightness;
+        if (state != undefined) {
             if (typeof state == Boolean) {
                 this.on = state;
             } else this.on = state === 'on';
         }
-        if (connected) this.connected = connected;
+        if (connected != undefined) this.connected = connected;
+        if (error) this.error = error;
     }
 
     async refreshState() {
@@ -76,13 +79,10 @@ class Device {
     }
 
     async write(newState) {
-        console.log('new state:', newState);
-        const { color, on, brightness } = newState;
+        const { color, on, brightness, connected, error } = newState;
         const onStatus = on ? 'on' : 'off';
-        const writeData = { color, state: onStatus, brightness };
-        console.log('writeData: ', writeData);
+        const writeData = { color, state: onStatus, brightness, connected, error };
         const data = await this.interface.set(writeData);
-        console.log('data: ', data);
         this.update(data);
     }
 }
@@ -184,9 +184,7 @@ const create = ({ mac, name, current_ip }) => {
 //      other stuff its own update function. then we can update the history separetly. 
 const update = async (device) => {
     logger.info('updating device:', { strip: device })
-    console.log('device:', { device });
     const query = await findSql('update/devices.sql');
-    console.log('query', query);
     const params = [
         device.name,
         device.current_ip,
@@ -198,7 +196,6 @@ const update = async (device) => {
         device.connected,
         device.mac
     ];
-    console.log('params', params);
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             logger.debug('running query:', { query, strip: device, params })

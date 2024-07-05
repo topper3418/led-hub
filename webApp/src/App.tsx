@@ -4,6 +4,7 @@ import React from "react";
 import { Route, Routes, useParams, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 import LedControllerElement from "./ledStrip/ledController";
+// import LogView from "./logs";
 // import { LedCard } from "./ledStrip/ledCard";
 // import { Device } from "./types";
 import { Devices } from "./views/devices";
