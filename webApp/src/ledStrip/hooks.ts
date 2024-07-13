@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
-import { Color, StripData, AllDevicesData, fetchState, StripState, fetchStripResponse } from "../types";
+import { StripData, AllDevicesData, StripState, fetchStripResponse, fetchState } from "../types";
+import axios, { AxiosResponse } from 'axios';
+
+const defaultProcessJson = (data: fetchStripResponse) => data;
 
 // base hook for fetching data. should probably refactor to a util module later
-const useFetch = (url: string, processJson: () => fetchState): Object => {
+const useFetch = (
+  url: string,
+  processJson: (data: fetchStripResponse) => any = defaultProcessJson,
+): fetchState => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState(false);
-  const [data, setData] = useState<Array | Object | undefined>(undefined);
+  const [data, setData] = useState<any>(undefined);
 
   const refetch = () => setTrigger(!trigger);
 
   useEffect(() => {
     setLoading(true);
-    fetch(url)
-      .then((res: Response) => {
-        if (!res.ok) {
+    axios.get(url)
+      .then((res: AxiosResponse) => {
+        if (res.statusText != 'OK') {
           throw new Error(
             "Request failed, status: " +
             res.status +
@@ -22,7 +28,8 @@ const useFetch = (url: string, processJson: () => fetchState): Object => {
             res.statusText
           );
         }
-        return res.json();
+        console.log('response data:', res.data);
+        return res.data;
       })
       .then(processJson)
       .then(setData)
@@ -38,110 +45,64 @@ const useFetch = (url: string, processJson: () => fetchState): Object => {
   return { data, loading, error, refetch };
 }
 
+
+export const usePost = (
+  url: string,
+  processJson: (data: fetchStripResponse) => any = defaultProcessJson,
+): fetchState => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [trigger, setTrigger] = useState(false);
+  const [data, setData] = useState<any>(undefined);
+
+  const refetch = () => setTrigger(!trigger);
+
+  const updateStrip = (newState: StripState): void => {
+    setLoading(true);
+    axios.post(url, newState)
+      .then((res: AxiosResponse) => {
+        if (res.statusText != 'OK') {
+          throw new Error(
+            "Request failed, status: " +
+            res.status +
+            " " +
+            res.statusText
+          );
+        }
+        return res.data;
+      })
+      .then(processJson)
+      .then(setData)
+      .catch((err) => {
+        setError(err.message);
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  return { updateStrip, data, loading, error };
+}
+
 export const useStripData = (url: string): StripData => {
   const processData = (data: fetchStripResponse): StripState => {
     const [r, g, b] = data.color;
     const color = { r: parseInt(r), g: parseInt(g), b: parseInt(b) };
-    const brightness = Math.round((parseInt(data.brightness) * 10) / 255));
+    const brightness = Math.round((parseInt(data.brightness) * 10) / 255);
     const on = data.on;
     return { color, brightness, on };
   }
+  const update = (newState: StripState) => {
+
+  }
   const { data, loading, error, refetch } = useFetch(url, processData);
-  return { state: data, loading, error, refetch };
-
-  export const useStripData = (url: string): StripData => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | undefined>(undefined);
-    const [color, setColor] = useState<Color>({ r: 0, g: 0, b: 0 });
-    const [on, setOn] = useState(false);
-    const [brightness, setBrightness] = useState(0);
-    const [trigger, setTrigger] = useState(false);
-
-    const refetch = () => setTrigger(!trigger);
-
-    useEffect(() => {
-      console.log("loading data");
-      setLoading(true);
-      fetch(url)
-        .then((res: Response) => {
-          if (!res.ok) {
-            throw new Error(
-              "Request failed, status: " +
-              res.status +
-              " " +
-              res.statusText
-            );
-          }
-          return res.json();
-        })
-        .then((data) => {
-          const [r, g, b] = data.color;
-          setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
-          setOn(data.on);
-          setBrightness(Math.round((data.brightness * 10) / 255));
-        })
-        .catch((err) => {
-          setError(err.message);
-          console.error(err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, [url, trigger]);
-
-    return {
-      loading,
-      error,
-      state: { color, on, brightness },
-      refetch,
-    };
-  };
+  return { state: data, loading, error, refetch, update };
+}
 
 
-  export const useAllStrips = (url: string): AllDevicesData => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | undefined>(undefined);
-    const [color, setColor] = useState<Color>({ r: 0, g: 0, b: 0 });
-    const [on, setOn] = useState(false);
-    const [brightness, setBrightness] = useState(0);
-    const [trigger, setTrigger] = useState(false);
+export const useAllStrips = (url: string): AllDevicesData => {
+  const { data, loading, error, refetch } = useFetch(url);
+  return { devices: data, loading, error, refetch };
+}
 
-    const refetch = () => setTrigger(!trigger);
-
-    useEffect(() => {
-      console.log("loading data");
-      setLoading(true);
-      fetch(url)
-        .then((res: Response) => {
-          if (!res.ok) {
-            throw new Error(
-              "Request failed, status: " +
-              res.status +
-              " " +
-              res.statusText
-            );
-          }
-          return res.json();
-        })
-        .then((data) => {
-          const [r, g, b] = data.color;
-          setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
-          setOn(data.on);
-          setBrightness(Math.round((data.brightness * 10) / 255));
-        })
-        .catch((err) => {
-          setError(err.message);
-          console.error(err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, [url, trigger]);
-
-    return {
-      loading,
-      error,
-      state: { color, on, brightness },
-      refetch,
-    };
-  };
