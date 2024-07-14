@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS `handshakes` (
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `mac` VARCHAR(17) NULL,
   `ip` VARCHAR(15) NULL,
+  `port` VARCHAR(6) NULL,
   `type` ENUM("init", "restart", "retry") NULL,
   PRIMARY KEY (`id`));

@@ -4,7 +4,7 @@ const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices', 'debug');
 
 class Device {
-    constructor({ id, mac, name, type, current_ip, on, brightness, red, green, blue, connected, error }) {
+    constructor({ id, mac, name, type, current_ip, current_port, on, brightness, red, green, blue, connected, error }) {
         this.id = id;
         this.mac = mac;
         this.type = type;
@@ -42,6 +42,9 @@ class Device {
         if (!this.current_ip === other.current_ip) {
             return false
         }
+        if (!this.current_port === other.current_port) {
+            return false
+        }
         return true;
     }
 
@@ -51,6 +54,7 @@ class Device {
             type: this.type,
             name: this.name,
             current_ip: this.current_ip,
+            current_port: this.current_port,
             state: {
                 on: this.on,
                 brightness: this.brightness,
@@ -89,8 +93,8 @@ class Device {
 
 // const devicesQueryBuilder = QueryBuilder('devices');
 
-const find = ({ mac, name, ip }) => {
-    logger.info('finding device:', { mac, name, ip })
+const find = ({ mac, name, ip, port }) => {
+    logger.info('finding device:', { mac, name, ip, port })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
@@ -104,6 +108,9 @@ const find = ({ mac, name, ip }) => {
             } else if (ip) {
                 criteria = ip;
                 query += 'current_ip = ?';
+            } else if (port) {
+                criteria = port;
+                query += 'current_port = ?';
             } else {
                 return reject(new Error('No valid search criteria provided'))
             }

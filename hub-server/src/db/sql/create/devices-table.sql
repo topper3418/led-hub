@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `devices` (
     `mac` VARCHAR(17) NOT NULL,
     `name` VARCHAR(45) NULL,
     `current_ip` VARCHAR(15) NULL,
+    `current_port` VARCHAR(6) NULL,
     `on` BOOLEAN DEFAULT FALSE,
     `brightness` INT NOT NULL DEFAULT 0,
     `red` INT DEFAULT 255,
