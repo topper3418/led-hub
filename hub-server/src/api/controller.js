@@ -66,19 +66,24 @@ const dataHas = (items) => {
 }
 
 // Middleware:
-// - dataHas(['mac', 'ip', 'type'])
+// - dataHas(['mac', 'ip', 'port'])
 const handshake = async (req, res, next) => {
-    const { mac, ip, type } = res.locals;
-    const handshake = new db.HandShake({ mac, ip });
+    const { mac, ip, port } = res.locals;
+    const handshake = new db.HandShake({ mac, ip, port });
 
-    logger.info(`handshake request from ${mac}`, { mac, ip, type })
+    logger.info(`handshake request from ${mac}`, { mac, ip, port })
     let foundDevice = await db.devices.find({ mac });
     if (foundDevice) logger.info('found device', { foundDevice });
     // ensure the strip exists
     try {
         if (!foundDevice) {
             logger.info(`creating device ${mac} - ${req.body.name || 'unnamed'}`)
-            const device = new db.Device({ mac, name: req.body.name, current_ip: ip });
+            const device = new db.Device({ 
+                mac: handshake.mac, 
+                name: req.body.name, 
+                current_ip: handshake.ip, 
+                current_port: handshake.port
+            });
             handshake.type = 'init';
             await db.devices.create(device);
             // eventually I should streamline this by figuring out how to return the PK on create
@@ -95,7 +100,8 @@ const handshake = async (req, res, next) => {
     // ensure the strip is updated
     try {
         foundDevice.current_ip = ip;
-        logger.info(`updating device ${foundDevice.name} with ip ${ip}`)
+        foundDevice.current_port = port;
+        logger.info(`updating device ${foundDevice.name} to ${ip}:${port}`)
         await db.devices.update(foundDevice);
     } catch (error) {
         logger.error(`${error.name} updating device: ${error.message}`, { error, mac, ip, type })
@@ -199,7 +205,7 @@ const write = async (req, res, next) => {
 module.exports = {
     handshake: [
         bodyHasData,
-        dataHas(['mac', 'ip', 'type']),
+        dataHas(['mac', 'ip', 'port']),
         handshake],
     read: [getDevice, read],
     write: [getDevice, write],

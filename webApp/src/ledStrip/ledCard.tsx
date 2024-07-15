@@ -14,7 +14,8 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
 
   const url = `http://${host}:${port}/` + ledStrip.name;
   const { state, loading, error, refetch } = useStripData(url);
-  const { color, on, brightness } = state;
+  console.log('state', state);
+  const { color, on, brightness } = state | {};
 
   // useEffect(() => {
   //   console.log("loading data for device", ledStrip);
@@ -49,7 +50,8 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   //     });
   // }, []);
 
-  const colorIndicator = `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})`;
+  const colorIndicator = color ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` :
+    'rgba(0,0,0,0';
   const indicatorClass = `indicator ${on ? "radiant-border" : ""}`;
 
   if (loading) {

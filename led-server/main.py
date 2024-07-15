@@ -62,7 +62,8 @@ def handshake(connection):
         'mac': mac,
         'type': 'LedStrip',
         'ip': connection.ip,
-        'name': 'DevPi'
+        'name': 'DevPi',
+        'port': 80
     }
     
     try:

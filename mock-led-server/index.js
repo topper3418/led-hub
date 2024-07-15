@@ -4,8 +4,10 @@ const cors = require('cors');
 
 
 const app = express();
-const PORT = 2000;
+const SERVER_PORT = 2000;
 const SERVER_ADDRESS = 'localhost'; // Replace with your server address
+
+const PORT = 80;  // the port this will be listening on
 
 app.use(cors());
 
@@ -20,7 +22,7 @@ let ledStrip = {
 };
 
 // Handshake endpoint
-const HANDSHAKE_ENDPOINT = `http://${SERVER_ADDRESS}:${PORT}/`;
+const HANDSHAKE_ENDPOINT = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`;
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -34,7 +36,8 @@ async function handshake() {
         mac: 'mockMacAddress',
         type: 'LedStrip',
         ip: '127.0.0.1',
-        name: 'mock-led'
+        name: 'mock-led',
+        port: PORT
     };
 
     try {
@@ -47,7 +50,7 @@ async function handshake() {
             return false;
         }
     } catch (error) {
-        console.error('Error during handshake:', error.message);
+        console.error(`Error during handshake: ${error.stack}`);
         return false;
     }
 }
@@ -86,7 +89,7 @@ async function startServer() {
             handShakeComplete = await handshake();
             if (!handShakeComplete) await delay(500);
         }
-        app.listen(80, () => {
+        app.listen(PORT, () => {
             console.log(`Express server running at http://localhost:80`);
         });
     } catch (error) {

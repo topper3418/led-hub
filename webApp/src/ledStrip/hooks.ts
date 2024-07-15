@@ -32,7 +32,10 @@ const useFetch = (
         return res.data;
       })
       .then(processJson)
-      .then(setData)
+      .then((data) => {
+        console.log('setting data:', data);
+        setData(data)
+      })
       .catch((err) => {
         setError(err.message);
         console.error(err);
@@ -41,6 +44,8 @@ const useFetch = (
         setLoading(false);
       });
   }, [url, trigger]);
+
+  console.log('data in the hook', data);
 
   return { data, loading, error, refetch };
 }
@@ -87,6 +92,7 @@ export const usePost = (
 
 export const useStripData = (url: string): StripData => {
   const processData = (data: fetchStripResponse): StripState => {
+    console.log('processing data:', data);
     const [r, g, b] = data.color;
     const color = { r: parseInt(r), g: parseInt(g), b: parseInt(b) };
     const brightness = Math.round((parseInt(data.brightness) * 10) / 255);
@@ -94,9 +100,10 @@ export const useStripData = (url: string): StripData => {
     return { color, brightness, on };
   }
   const update = (newState: StripState) => {
-
+    throw new Error('need to implement update');
   }
   const { data, loading, error, refetch } = useFetch(url, processData);
+  console.log('state at the absolutely last possible second', data);
   return { state: data, loading, error, refetch, update };
 }
 

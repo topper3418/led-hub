@@ -10,6 +10,7 @@ class Device {
         this.type = type;
         this.name = name;
         this.current_ip = current_ip;
+        this.current_port = current_port;
         this.on = on;
         this.brightness = brightness;
         this.color = [red, green, blue];
@@ -64,8 +65,9 @@ class Device {
         }
     }
 
+
     update({ color, brightness, state, connected, error }) {
-        logger.debug(`updating device, {this.name || this.mac}`, { device: this, newState: { color, brightness, state, connected } });
+        logger.debug(`updating device ${this.name}`, { device: this, newState: { color, brightness, state, connected } });
         if (color != undefined) this.color = color;
         if (brightness != undefined) this.brightness = brightness;
         if (state != undefined) {
@@ -78,7 +80,9 @@ class Device {
     }
 
     async refreshState() {
+        console.log('refreshing state')
         const newState = await this.interface.getState();
+        console.log('new state:', newState);
         this.update(newState);
     }
 
@@ -158,6 +162,7 @@ const list = () => {
                     logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
+                console.log('results:', results)
                 const devices = results.map(result => new Device(result));
                 logger.debug('found devices', { devices });
                 resolve(devices);
@@ -195,6 +200,7 @@ const update = async (device) => {
     const params = [
         device.name,
         device.current_ip,
+        device.current_port,
         device.on,
         device.brightness,
         device.color[0],
@@ -210,9 +216,10 @@ const update = async (device) => {
                 if (err) {
                     logger.error('Error updating the device:', { error: err.stack });
                     reject(err);
+                } else {
+                    logger.info('results:', { results });
+                    resolve(results);
                 }
-                logger.info('results:', { results });
-                resolve(results);
             });
         });
     });

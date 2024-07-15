@@ -36,7 +36,7 @@ export const Devices: React.FC = () => {
             <div className="deviceContainer">
                 {devices.map((device) => (
                     <LedCard
-                        key={device.id}
+                        key={device.name}
                         ledStrip={device}
                         selectDevice={() => navToDevice(device)}
                     />
