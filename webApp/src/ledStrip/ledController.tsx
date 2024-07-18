@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 // import { Router } from 'react-router-dom'
 // import { SketchPicker } from 'react-color';
+import { useNavigate } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
 import '../App.css'
 // simple webpage
@@ -16,6 +17,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
   const [on, setOn] = useState(false);
   const [brightness, setBrightness] = useState(255);
   const [write, setWrite] = useState(false);
+  const navigate = useNavigate();
 
   const url = `http://${host}:${port}/` + stripName
 
@@ -103,8 +105,13 @@ const LedController = ({ stripName }: { stripName: string }) => {
 
   return (
     <div className="wrapper column bottom" style={coloredBackground}>
+      <button 
+        className="backbutton"
+        onClick={() => navigate('/')}> 
+        Back
+      </button>
       <div className="view spaced column">
-        <h1>LED control</h1>
+          <h1>LED control</h1>
         <div className='center'>
           <ColorWheel
             color={color}

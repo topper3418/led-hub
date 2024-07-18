@@ -6,49 +6,11 @@ import '../App.css';
 import { useStripData } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(false);
-  // const [color, setColor] = useState({ r: 171, g: 37, b: 103 });
-  // const [on, setOn] = useState(false);
-  // const [brightness, setBrightness] = useState(255);
-
   const url = `http://${host}:${port}/` + ledStrip.name;
   const { state, loading, error, refetch } = useStripData(url);
   console.log('state', state);
-  const { color, on, brightness } = state | {};
 
-  // useEffect(() => {
-  //   console.log("loading data for device", ledStrip);
-  //   setLoading(true);
-  //   fetch(url)
-  //     .then((res: Response) => {
-  //       if (!res.ok) {
-  //         throw new Error(
-  //           "Request failed, status: " +
-  //           res.status +
-  //           " " +
-  //           res.statusText
-  //         );
-  //       }
-  //       console.log('res', res);
-  //       return res.json();
-  //     })
-  //     .then((data) => {
-  //       console.log("data returned from request", data);
-  //       const [r, g, b] = data.color;
-  //       console.log('r', r, 'g', g, 'b', b)
-  //       setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
-  //       setOn(data.on);
-  //       setBrightness(Math.round((data.brightness * 10) / 255)); // convert 0-255 to 0-10 and round to the nearest integer
-  //     })
-  //     .catch((err) => {
-  //       setError(true);
-  //       console.error(err);
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // }, []);
+  const { color, on, brightness } = state | {};
 
   const colorIndicator = color ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` :
     'rgba(0,0,0,0';

@@ -35,6 +35,18 @@ h1, h2, h3 {
   flex-direction: row;
 }
 
+.backbutton {
+  position: 'fixed',
+  top: '5px',
+  left: '5px'
+}
+
+.spaced-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
 .column {
   display: flex;
   flex-direction: column;
