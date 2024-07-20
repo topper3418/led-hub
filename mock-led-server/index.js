@@ -7,7 +7,7 @@ const app = express();
 const SERVER_PORT = 2000;
 const SERVER_ADDRESS = 'localhost'; // Replace with your server address
 
-const PORT = 80;  // the port this will be listening on
+const PORT = 2001;  // the port this will be listening on
 
 app.use(cors());
 
@@ -90,7 +90,7 @@ async function startServer() {
             if (!handShakeComplete) await delay(500);
         }
         app.listen(PORT, () => {
-            console.log(`Express server running at http://localhost:80`);
+            console.log(`Mock server running at http://localhost:${PORT}`);
         });
     } catch (error) {
         console.error('Failed to start server:', error.message);
