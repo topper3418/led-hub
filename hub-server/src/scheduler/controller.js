@@ -12,7 +12,6 @@ const refreshDevice = async (device) => {
     } else {
         logger.info(`unsuccessful refreshing device "${device.name}" on ip ${device.current_ip}`, { device });
     }
-    console.log('current state of device', device)
     db.devices.update(device);
 }
 

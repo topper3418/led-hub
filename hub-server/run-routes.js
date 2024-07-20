@@ -4,6 +4,8 @@ const Express = require('express');
 
 const app = Express();
 
+const PORT = 4000;
+
 app.use(router);
 
-app.listen(4000, () => console.log("running on 4000"));
+app.listen(PORT, () => console.log(`running on ${PORT}`));

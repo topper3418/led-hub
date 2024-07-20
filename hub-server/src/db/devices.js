@@ -80,9 +80,7 @@ class Device {
     }
 
     async refreshState() {
-        console.log('refreshing state')
         const newState = await this.interface.getState();
-        console.log('new state:', newState);
         this.update(newState);
     }
 
@@ -162,7 +160,6 @@ const list = () => {
                     logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
-                console.log('results:', results)
                 const devices = results.map(result => new Device(result));
                 logger.debug('found devices', { devices });
                 resolve(devices);
