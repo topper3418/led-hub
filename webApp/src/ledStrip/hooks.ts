@@ -28,12 +28,10 @@ const useFetch = (
             res.statusText
           );
         }
-        console.log('response data:', res.data);
         return res.data;
       })
       .then(processJson)
       .then((data) => {
-        console.log('setting data:', data);
         setData(data)
       })
       .catch((err) => {
@@ -44,8 +42,6 @@ const useFetch = (
         setLoading(false);
       });
   }, [url, trigger]);
-
-  console.log('data in the hook', data);
 
   return { data, loading, error, refetch };
 }
@@ -99,17 +95,15 @@ export const useStripData = (url: string): StripData => {
     const on = data.on;
     return { color, brightness, on };
   }
-  const update = (newState: StripState) => {
-    throw new Error('need to implement update');
-  }
   const { data, loading, error, refetch } = useFetch(url, processData);
   console.log('state at the absolutely last possible second', data);
-  return { state: data, loading, error, refetch, update };
+  return { state: data, loading, error, refetch };
 }
 
 
 export const useAllStrips = (url: string): AllDevicesData => {
   const { data, loading, error, refetch } = useFetch(url);
+  console.log('data returned for all strips: ', data);
   return { devices: data, loading, error, refetch };
 }
 

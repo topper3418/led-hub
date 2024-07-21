@@ -8,13 +8,10 @@ import { useStripData } from "./hooks";
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = `http://${host}:${port}/` + ledStrip.name;
   const { state, loading, error, refetch } = useStripData(url);
-  console.log('state', state);
 
-  const { color, on, brightness } = state | {};
-
-  const colorIndicator = color ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` :
-    'rgba(0,0,0,0';
-  const indicatorClass = `indicator ${on ? "radiant-border" : ""}`;
+  const colorIndicator = `rgba(${state?.color?.r}, ${state?.color?.g}, ${state?.color?.b}, ${state?.brightness / 10})`;
+  // TODO may just go with ON/OFF, can remove comment below when thats accomplished. 
+  const indicatorClass = `indicator` // ${state?.on ? "radiant-border" : ""}`;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -24,12 +21,13 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
     return <div>Error loading data</div>;
   }
 
-  const toggleLed = async () => {
+  const toggleLed = async (event) => {
     const payload = {
-      on: !on,
-      color: [color.r, color.g, color.b],
-      brightness: Math.round((brightness * 255) / 10),
+      on: !state?.on,
+      color: [state?.color?.r, state?.color?.g, state?.color?.b],
+      brightness: Math.round((state?.brightness * 255) / 10),
     };
+    event.stopPropagation();
     try {
       const response: Response = await fetch(`http://${host}:${port}/${ledStrip.name}`, {
         method: "POST",
@@ -50,9 +48,8 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
       const responseBody = await response.json();
 
       console.log("data returned from request", responseBody);
-      setOn(responseBody.on);
+      refetch();
     } catch (err) {
-      setError(true);
       console.error(err);
     }
   }
@@ -65,7 +62,9 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
         className={indicatorClass}
         style={{ backgroundColor: colorIndicator }}
         onClick={toggleLed}
-      ></div>
+      >
+          {state?.on ? "ON" : "OFF"}
+      </div>
     </div>
   );
 };

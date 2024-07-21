@@ -4,17 +4,21 @@ const axios = require('axios');
 const logger = getLogger('ledStrip', 'debug')
 
 class LedStripInterface {
-    constructor({ name, mac, ip }) {
+    constructor({ name, mac, ip, port }) {
         this.name = name;
         this.mac = mac;
         this.ip = ip;
+        this.port = port;
+    }
+
+    get url() {
+        return `http://${this.ip}:${this.port}`
     }
 
     async getState() {
-        const url = `http://${this.ip}:80/`
-        logger.debug(`requesting data from strip at ${url}`)
+        logger.debug(`requesting data from strip at ${this.url}`)
         try {
-            const stripData = await axios.get(url, { timeout: 5000 });
+            const stripData = await axios.get(this.url, { timeout: 5000 });
             const { data } = stripData;
             data.connected = true;
             logger.debug('got data from strip', { data })
@@ -40,14 +44,13 @@ class LedStripInterface {
 
     async set({ state, brightness, color }) {
         logger.info(`writing to ${this.name}`, { color, state, brightness })
-        const url = `http://${this.ip}/`;
         const body = {
             color,
             state,
             brightness
         }
         try {
-            const stripData = await axios.post(url, body);
+            const stripData = await axios.post(this.url, body);
             // const data = compensateForPicoFuckery(stripData.data)
             const data = stripData.data;
 

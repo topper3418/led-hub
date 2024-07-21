@@ -14,7 +14,9 @@ class Device {
         this.on = on;
         this.brightness = brightness;
         this.color = [red, green, blue];
-        this.interface = new LedStripInterface({ name, mac, ip: current_ip });
+        this.interface = new LedStripInterface({ 
+            name, mac, ip: current_ip, port: current_port
+        });
         this.connected = connected || false;
         this.error = error;
     }
