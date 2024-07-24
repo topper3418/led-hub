@@ -1,5 +1,6 @@
+require('dotenv').config();
 const HubApp = require('./src')
 
-// const app =  HubApp({ port: 2000 });
+const port = process.env.SERVER_PORT;
 
-HubApp.start({ port: 2000 });
+HubApp.start({ port });

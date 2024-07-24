@@ -7,7 +7,7 @@ const app = express();
 const SERVER_PORT = 2000;
 const SERVER_ADDRESS = 'localhost'; // Replace with your server address
 
-const PORT = 2001;  // the port this will be listening on
+const PORT = 3100;  // the port this will be listening on
 
 app.use(cors());
 

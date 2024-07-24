@@ -54,10 +54,13 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
     }
   }
 
-  // Rest of the code...
+  let nameClass = "name" 
+  console.log({ledStrip})
+  if (!ledStrip.connected) nameClass += " disconnected"
+
   return (
     <div className="deviceTile" onClick={selectDevice}>
-      <div className="name">{ledStrip.name}</div>
+      <div className={nameClass}>{ledStrip.name}</div>
       <div
         className={indicatorClass}
         style={{ backgroundColor: colorIndicator }}
