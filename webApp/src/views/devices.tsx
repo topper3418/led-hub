@@ -24,7 +24,6 @@ export const Devices: React.FC = () => {
     }
 
     const navToDevice = (device: Device) => {
-        console.log('navigating to', device.name);
         navigate(`/${device.name}`);
     }
 

@@ -38,13 +38,19 @@ h1, h2, h3 {
 .backbutton {
   position: 'fixed',
   top: '5px',
-  left: '5px'
+  left: '5px',
+  width: '75px',
+  height: '50px'
 }
 
 .spaced-row {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+}
+
+.space-between {
+  justify-content: space-between;
 }
 
 .column {
@@ -161,4 +167,10 @@ input[type="range"]::-webkit-slider-thumb {
 
 .radiant-border {
   border-color: yellow;
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }

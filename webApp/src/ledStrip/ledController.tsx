@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 // import { SketchPicker } from 'react-color';
 import { useNavigate } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
+import Banner from '../components/banner';
 import '../App.css'
 // simple webpage
 // has a simple button for on/off 
@@ -27,7 +28,6 @@ const LedController = ({ stripName }: { stripName: string }) => {
       throw new Error('Request failed, status: ' + res.status + ' ' + res.statusText);
     }
     const data = await res.json();
-    console.log('data returned from request', data);
     const [r, g, b] = data.color;
     setWrite(write)
     setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
@@ -41,8 +41,8 @@ const LedController = ({ stripName }: { stripName: string }) => {
       setError(true);
       console.error(err);
     }).finally(() => {
-      setLoading(false);
-    });
+        setLoading(false);
+      });
   }, []);
 
   const togglePressed = () => {
@@ -68,7 +68,6 @@ const LedController = ({ stripName }: { stripName: string }) => {
   }, [color, on, brightness]);
 
   const sendChange = async () => {
-    console.log('sending change', { color, on, brightness })
     try {
       const postData = await fetch(url, {
         method: 'POST',
@@ -103,26 +102,26 @@ const LedController = ({ stripName }: { stripName: string }) => {
     return <div>Error loading data</div>
   }
 
-  return (
-    <div className="wrapper column bottom" style={coloredBackground}>
-      <button 
-        className="backbutton"
-        onClick={() => navigate('/')}> 
-        Back
-      </button>
-      <div className="view spaced column">
-          <h1>LED control</h1>
+  return (      
+    <div className="wrapper view column bottom" style={coloredBackground}>
+      <Banner title='LED control'>
+        <button 
+          onClick={() => navigate('/')}> 
+          Back
+        </button>
+      </Banner>
+      <div className="spaced column">
         <div className='center'>
           <ColorWheel
-            color={color}
-            onChange={colorChanged} />
+          color={color}
+          onChange={colorChanged} />
         </div>
         <input
-          type="range"
-          min="0"
-          max="10"
-          value={brightness}
-          onChange={brightnessChanged} />
+        type="range"
+        min="0"
+        max="10"
+        value={brightness}
+        onChange={brightnessChanged} />
         <button onClick={togglePressed} style={coloredButton}>
           {on ? 'Off' : 'On'}
         </button>

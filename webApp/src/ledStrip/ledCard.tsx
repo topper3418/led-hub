@@ -47,7 +47,6 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
       }
       const responseBody = await response.json();
 
-      console.log("data returned from request", responseBody);
       refetch();
     } catch (err) {
       console.error(err);
@@ -55,7 +54,6 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   }
 
   let nameClass = "name" 
-  console.log({ledStrip})
   if (!ledStrip.connected) nameClass += " disconnected"
 
   return (

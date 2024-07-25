@@ -27,7 +27,6 @@ interface ledStripInterface {
 export const useStripData = (url: string): StripState => {
   const state = new StripState();
   useEffect(() => {
-    console.log("loading data");
     state.setLoading(true);
     fetch(url)
       .then((res: Response) => {

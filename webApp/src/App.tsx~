@@ -27,7 +27,6 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = `http://${host}:${port}/` + ledStrip.name
 
   useEffect(() => {
-    console.log('loading data for device', ledStrip);
     setLoading(true);
     fetch(url).then((res: Response) => {
       if (!res.ok) {
@@ -35,7 +34,6 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
       }
       return res.json();
     }).then(data => {
-      console.log('data returned from request', data);
       const [r, g, b] = data.color;
       setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
       setOn(data.on);
@@ -79,13 +77,11 @@ function App() {
   useEffect(() => {
     setLoading(true);
     fetch(url).then((res: Response) => {
-      console.log('processing response');
       if (!res.ok) {
         throw new Error('Request failed, status: ' + res.status + ' ' + res.statusText);
       }
       return res.json();
     }).then(data => {
-      console.log('data returned from request', data);
       setData(data);
     }).catch(err => {
       setError(true);
