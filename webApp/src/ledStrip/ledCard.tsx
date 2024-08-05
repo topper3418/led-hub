@@ -2,16 +2,33 @@ import { host, port } from "../App";
 
 import { useState, useEffect } from "react";
 import { ledCardInterface } from "../types";
+import { MultiStateButton } from "../components/multiStateButton";
 import '../App.css';
-import { useStripData } from "./hooks";
+import { useGetStrip, useSetStrip } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = `http://${host}:${port}/` + ledStrip.name;
-  const { state, loading, error, refetch } = useStripData(url);
+  const { 
+    state, 
+    loading, 
+    error, 
+    refetch 
+  } = useGetStrip(url);
+  const { 
+    updateStrip, 
+    data: setResponseData, 
+    loading: setLoading,
+    error: setError
+  } = useSetStrip(url)
+  const [ uiOnState, setUiOnState ] = useState('on')
+
+  // refresh the button state when there's response on the update
+  useEffect(() => {
+    console.log('setReponse changed: ', setResponseData)
+    refetch()
+  }, [setResponseData])
 
   const colorIndicator = `rgba(${state?.color?.r}, ${state?.color?.g}, ${state?.color?.b}, ${state?.brightness / 10})`;
-  // TODO may just go with ON/OFF, can remove comment below when thats accomplished. 
-  const indicatorClass = `indicator` // ${state?.on ? "radiant-border" : ""}`;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -21,51 +38,28 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
     return <div>Error loading data</div>;
   }
 
-  const toggleLed = async (event) => {
-    const payload = {
-      on: !state?.on,
-      color: [state?.color?.r, state?.color?.g, state?.color?.b],
-      brightness: Math.round((state?.brightness * 255) / 10),
-    };
-    event.stopPropagation();
-    try {
-      const response: Response = await fetch(`http://${host}:${port}/${ledStrip.name}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error(
-          "Request failed, status: " +
-          response.status +
-          " " +
-          response.statusText
-        );
-      }
-      const responseBody = await response.json();
-
-      refetch();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   let nameClass = "name" 
   if (!ledStrip.connected) nameClass += " disconnected"
+
+  const selectState = (newState: str) => {
+    updateStrip({...state, on: newState == 'on'});
+    refetch();
+  }
+
+
+  // TODO: 
+  // make the indicator show one way when clicked
+  // and then show fully once the server confirms the change
 
   return (
     <div className="deviceTile" onClick={selectDevice}>
       <div className={nameClass}>{ledStrip.name}</div>
-      <div
-        className={indicatorClass}
-        style={{ backgroundColor: colorIndicator }}
-        onClick={toggleLed}
-      >
-          {state?.on ? "ON" : "OFF"}
-      </div>
+      <MultiStateButton 
+        options={['off', 'on']}
+        clicked={state.on ? 'on' : 'off'}
+        setClicked={selectState}
+        selectedColor={`rgb(${state.color.r},${state.color.g},${state.color.b})`}
+      />
     </div>
   );
 };

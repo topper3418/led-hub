@@ -43,6 +43,10 @@ h1, h2, h3 {
   height: '50px'
 }
 
+.clicked {
+  background-color: lightblue;
+}
+
 .spaced-row {
   display: flex;
   flex-direction: row;

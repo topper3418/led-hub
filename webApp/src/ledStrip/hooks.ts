@@ -47,7 +47,7 @@ const useFetch = (
 }
 
 
-export const usePost = (
+export const useSetStrip = (
   url: string,
   processJson: (data: fetchStripResponse) => any = defaultProcessJson,
 ): fetchState => {
@@ -59,6 +59,7 @@ export const usePost = (
   const refetch = () => setTrigger(!trigger);
 
   const updateStrip = (newState: StripState): void => {
+    console.log('setting state to: ', newState)
     setLoading(true);
     axios.post(url, newState)
       .then((res: AxiosResponse) => {
@@ -86,16 +87,48 @@ export const usePost = (
   return { updateStrip, data, loading, error };
 }
 
-export const useStripData = (url: string): StripData => {
+export const useGetStrip = (url: string): StripData => {
+  const [uiOn, setUiOn] = useState<bool>(false);
   const processData = (data: fetchStripResponse): StripState => {
     const [r, g, b] = data.color;
     const color = { r: parseInt(r), g: parseInt(g), b: parseInt(b) };
     const brightness = Math.round((parseInt(data.brightness) * 10) / 255);
     const on = data.on;
+    setUiOn(on);
+    console.log('data from fetch', { color, brightness, on })
     return { color, brightness, on };
   }
+  const setLed = async (url: string) => {
+    const payload = {
+      on: !state?.on,
+      color: [state?.color?.r, state?.color?.g, state?.color?.b],
+      brightness: Math.round((state?.brightness * 255) / 10),
+    };
+    try {
+      const response: Response = await fetch(`http://${host}:${port}/${ledStrip.name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) {
+        throw new Error(
+          "Request failed, status: " +
+          response.status +
+          " " +
+          response.statusText
+        );
+      }
+      const responseBody = await response.json();
+      console.log("response from toggle request", responseBody);
+      refetch();
+    } catch (err) {
+      console.error(err);
+    }
+  }
   const { data, loading, error, refetch } = useFetch(url, processData);
-  return { state: data, loading, error, refetch };
+  return { state: data, setLed, loading, error, refetch };
 }
 
 

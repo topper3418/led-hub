@@ -5,5 +5,8 @@
 [X] need to integrate environment variables in all places
 [X] fix the "back" button on LED control
 [ ] need to fix the "click lag" on the ledcards for the on/off
+    [ ] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
+    [ ] make the button a multi-state to make it more clear
+        [ ] figure out the indication issue then this should be good. 
 [ ] update docker files to use environment variables and have dev and prod builds and such
 [ ] deploy and start replicating strips. 

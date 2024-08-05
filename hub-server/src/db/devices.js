@@ -162,7 +162,7 @@ const list = () => {
                     logger.error('Error retrieving devices:', { error: err.stack });
                     reject(err);
                 }
-                const devices = results.map(result => new Device(result));
+                const devices = results?.map(result => new Device(result));
                 logger.debug('found devices', { devices });
                 resolve(devices);
             });

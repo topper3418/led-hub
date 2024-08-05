@@ -57,6 +57,7 @@ async function handshake() {
 
 // Routes
 app.get('/', (req, res) => {
+    console.log('returning state: ', ledStrip)
     res.json(ledStrip);
 });
 
