@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-// import { Router } from 'react-router-dom'
-// import { SketchPicker } from 'react-color';
 import { useNavigate } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
 import Banner from '../components/banner';
+import { useLedStripHooks } from "./hooks";
 import '../App.css'
 // simple webpage
 // has a simple button for on/off 
@@ -12,87 +11,12 @@ import '../App.css'
 const host = import.meta.env.VITE_SERVER_HOST;
 const port = import.meta.env.VITE_SERVER_PORT;
 const LedController = ({ stripName }: { stripName: string }) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [color, setColor] = useState({ r: 171, g: 37, b: 103 });
-  const [on, setOn] = useState(false);
-  const [brightness, setBrightness] = useState(255);
-  const [write, setWrite] = useState(false);
-  const navigate = useNavigate();
-
   const url = `http://${host}:${port}/` + stripName
-
-  // get and post requests return the same data, so lets process them the same
-  const processResponse = async (res: Response, write = false) => {
-    if (!res.ok) {
-      throw new Error('Request failed, status: ' + res.status + ' ' + res.statusText);
-    }
-    const data = await res.json();
-    const [r, g, b] = data.color;
-    setWrite(write)
-    setColor({ r: parseInt(r), g: parseInt(g), b: parseInt(b) });
-    setOn(data.on);
-    setBrightness(Math.round(data.brightness * 10 / 255));  // convert 0-255 to 0-10 and round to the nearest integer
-  }
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(url).then(processResponse).catch(err => {
-      setError(true);
-      console.error(err);
-    }).finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  const togglePressed = () => {
-    setWrite(true);
-    setOn(!on)
-  }
-
-  const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWrite(true);
-    setBrightness(parseInt(e.target.value));
-  }
-
-  const colorChanged = (color: RGB) => {
-    setWrite(true);
-    setColor(color);
-  }
-
-  useEffect(() => {
-    if (write) {
-      sendChange();
-      setWrite(false);
-    }
-  }, [color, on, brightness]);
-
-  const sendChange = async () => {
-    try {
-      const postData = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          color: [color.r, color.g, color.b],
-          on,
-          brightness: Math.round(brightness * 255 / 10)  // convert 0-10 to 0-255
-        })
-      });
-      processResponse(postData);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  const coloredBackground = {
-    backgroundColor: on ? `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})` : 'black',
-  }
-
-  const coloredButton = {
-    backgroundColor: on ? 'black' : `rgba(${color.r}, ${color.g}, ${color.b}, ${brightness / 10})`,
-  }
+  const {
+    state: { data, loading, error },
+    api: { refetch, update }
+  } = useLedStripHooks(url);
+  const navigate = useNavigate();
 
   if (loading) {
     return <div>Loading...</div>
@@ -100,6 +24,29 @@ const LedController = ({ stripName }: { stripName: string }) => {
 
   if (error) {
     return <div>Error loading data</div>
+  }
+
+  const togglePressed = () => {
+    update({ on: !data.on })
+  }
+
+  const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    update({ brightness: parseInt(e.target.value) });
+  }
+
+  const colorChanged = (color: RGB) => {
+    update({ color })
+  }
+
+  const displayColor = `rgba(${data?.color.r}, ${data?.color.g}, ${data?.color.b}, ${data?.brightness / 10})`;
+
+  const coloredBackground = {
+    backgroundColor: data.on ? displayColor : 'black',
+  }
+
+  const coloredButton = {
+    backgroundColor: data.on ? 'black' : displayColor,
+    textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
   return (      
@@ -113,17 +60,17 @@ const LedController = ({ stripName }: { stripName: string }) => {
       <div className="spaced column">
         <div className='center'>
           <ColorWheel
-          color={color}
-          onChange={colorChanged} />
+            color={data.color}
+            onChange={colorChanged} />
         </div>
         <input
-        type="range"
-        min="0"
-        max="10"
-        value={brightness}
-        onChange={brightnessChanged} />
+          type="range"
+          min="0"
+          max="10"
+          value={data.brightness}
+          onChange={brightnessChanged} />
         <button onClick={togglePressed} style={coloredButton}>
-          {on ? 'Off' : 'On'}
+          { data.on ? 'Off' : 'On' }
         </button>
       </div>
     </div>

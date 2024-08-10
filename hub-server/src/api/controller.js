@@ -148,7 +148,9 @@ const write = async (req, res, next) => {
     const { device } = res.locals;
     const { color, on, brightness } = req.body;
     try {
-        await device.write({ color, on, brightness });
+        const newState = { color, on, brightness }
+        if (on === undefined) newState.on = device.on;
+        await device.write(newState);
         const data = device.state;
         db.devices.update(device);
         res.json(data);

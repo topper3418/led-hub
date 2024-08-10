@@ -4,10 +4,11 @@
     [X] need to update the strip logic to include its port in the handshake
 [X] need to integrate environment variables in all places
 [X] fix the "back" button on LED control
-[ ] need to fix the "click lag" on the ledcards for the on/off
-    [ ] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
-    [ ] make the button a multi-state to make it more clear
-        [ ] figure out the indication issue then this should be good. 
-            [ ] the solution might actually be to integrate the hooks for reading and writing to the state
+[X] need to fix the "click lag" on the ledcards for the on/off
+    [X] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
+    [X] make the button a multi-state to make it more clear
+        [X] figure out the indication issue then this should be good. 
+            [X] the solution might actually be to integrate the hooks for reading and writing to the state
+        [X] now I need to make it so that the text is always legible
 [ ] update docker files to use environment variables and have dev and prod builds and such
 [ ] deploy and start replicating strips. 
