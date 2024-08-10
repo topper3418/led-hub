@@ -13,7 +13,11 @@ class Device {
         this.current_port = current_port;
         this.on = on;
         this.brightness = brightness;
-        this.color = [red, green, blue];
+        this.color = {
+            r: red,
+            g: green,
+            b: blue
+        };
         this.interface = new LedStripInterface({ 
             name, mac, ip: current_ip, port: current_port
         });
@@ -202,9 +206,9 @@ const update = async (device) => {
         device.current_port,
         device.on,
         device.brightness,
-        device.color[0],
-        device.color[1],
-        device.color[2],
+        device.color.r,
+        device.color.g,
+        device.color.b,
         device.connected,
         device.mac
     ];

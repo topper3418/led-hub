@@ -34,7 +34,7 @@ class LedStripInterface {
                 logger.debug('its an unreachable');
                 return { connected: false, error };
             } else if (error.code == "ECONNREFUSED") {
-                logger.debug('its a host down');
+                logger.debug('its a connection refused');
                 return { connected: false, error };
             }
             logger.error('error caught by strip', { error });
@@ -44,14 +44,12 @@ class LedStripInterface {
 
     async set({ state, brightness, color }) {
         logger.info(`writing to ${this.name}`, { color, state, brightness })
-        const body = {
-            color,
-            state,
-            brightness
-        }
+        const body = {};
+        if (color !== undefined) body.color = color;
+        if (state !== undefined) body.state = state;
+        if (brightness !== undefined) body.brightness = brightness;
         try {
             const stripData = await axios.post(this.url, body);
-            // const data = compensateForPicoFuckery(stripData.data)
             const data = stripData.data;
 
             return data;

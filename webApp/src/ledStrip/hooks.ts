@@ -46,7 +46,7 @@ const useFetch = (
   return { data, loading, error, refetch };
 }
 
-
+// I think this can be removed
 export const useSetStrip = (
   url: string,
   processJson: (data: fetchStripResponse) => any = defaultProcessJson,
@@ -87,10 +87,11 @@ export const useSetStrip = (
   return { updateStrip, data, loading, error };
 }
 
+// I think this can be removed
 export const useGetStrip = (url: string): StripData => {
   const [uiOn, setUiOn] = useState<bool>(false);
   const processData = (data: fetchStripResponse): StripState => {
-    const [r, g, b] = data.color;
+    const { r, g, b } = data.color;
     const color = { r: parseInt(r), g: parseInt(g), b: parseInt(b) };
     const brightness = Math.round((parseInt(data.brightness) * 10) / 255);
     const on = data.on;
@@ -129,6 +130,84 @@ export const useGetStrip = (url: string): StripData => {
   }
   const { data, loading, error, refetch } = useFetch(url, processData);
   return { state: data, setLed, loading, error, refetch };
+}
+
+interface Color {
+  r: number;
+  g: number;
+  b: number;
+}
+
+interface LedStripState {
+  on: bool;
+  brightness: number;
+  color: Color;
+}
+
+export const useLedStripHooks = (url: string): StripData => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [trigger, setTrigger] = useState(0);
+  const [data, setData] = useState<any>(undefined);
+  // function to update the strip with an object
+  const update = (newState: Partial<LedStripState>) => {
+    console.log('updating state: ', newState);
+    setLoading(true);
+    axios.post(url, newState)
+      .then((res: AxiosResponse) => {
+        if (res.statusText != 'OK') {
+          throw new Error(
+            "Request failed, status: " +
+            res.status +
+            " " +
+            res.statusText
+          );
+        }
+        return res.data;
+      })
+      .then(setData)
+      .catch((err) => {
+        setError(err.message);
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+  // function to refetch the data from the server
+  const refetch = () => {
+    setTrigger((oldVal) => oldVal + 1)
+  }
+  // effect that refreshes the data
+  useEffect(() => {
+    setLoading(true);
+    axios.get(url)
+      .then((res: AxiosResponse) => {
+        if (res.statusText != 'OK') {
+          throw new Error(
+            "Request failed, status: " +
+            res.status +
+            " " +
+            res.statusText
+          );
+        }
+        return res.data;
+      })
+      .then((data) => {
+        setData(data)
+      })
+      .catch((err) => {
+        setError(err.message);
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [url, trigger]);
+  return {
+    state: { data, loading, error },
+    api: { refetch, update }
+  }
 }
 
 

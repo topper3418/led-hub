@@ -17,8 +17,12 @@ app.use(express.json());
 // Mock LED strip state and control
 let ledStrip = {
     brightness: 100,
-    state: 'off',
-    color: [0, 0, 0]
+    on: false,
+    color: {
+        r: 255,
+        g: 255, 
+        b: 255
+    }
 };
 
 // Handshake endpoint

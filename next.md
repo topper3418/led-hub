@@ -8,5 +8,6 @@
     [ ] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
     [ ] make the button a multi-state to make it more clear
         [ ] figure out the indication issue then this should be good. 
+            [ ] the solution might actually be to integrate the hooks for reading and writing to the state
 [ ] update docker files to use environment variables and have dev and prod builds and such
 [ ] deploy and start replicating strips. 

@@ -8,10 +8,12 @@ interface MultiStateButtonProps {
 }
 
 export const MultiStateButton: React.FC<MultiStateButtonProps> = (
-  { options, clicked, setClicked, selectedColor='lightblue' }
+  { options, clicked, setClicked, selectedColor }
 ) => {
+  const newSelectedColor = selectedColor || '#4287f5';
   const selectedStyle = {
-    backgroundColor: selectedColor
+    backgroundColor: newSelectedColor,
+    textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   };
   return (
     <div className="row">
