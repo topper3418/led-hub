@@ -17,4 +17,4 @@ class Request:
         self.params = {key: value for key, value in param_list}
     
     def __repr__(self):
-        return f'method: {self.method}\nroute: {self.route}\n{self.params}'
+        return f'method: {self.method}\nroute: {self.route}\nbody: {self.body}'

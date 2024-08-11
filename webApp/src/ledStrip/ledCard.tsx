@@ -8,29 +8,11 @@ import { useGetStrip, useSetStrip, useLedStripHooks } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = `http://${host}:${port}/` + ledStrip.name;
-  // const { 
-  //   state, 
-  //   loading, 
-  //   error, 
-  //   refetch 
-  // } = useGetStrip(url);
-  // const { 
-  //   updateStrip, 
-  //   data: setResponseData, 
-  //   loading: setLoading,
-  //   error: setError
-  // } = useSetStrip(url)
   const {
     state: { data, loading, error },
     api: { refetch, update }
   } = useLedStripHooks(url);
   const [ uiOnState, setUiOnState ] = useState('on')
-
-  // refresh the button state when there's response on the update
-  // useEffect(() => {
-  //   console.log('setReponse changed: ', setResponseData)
-  //   refetch()
-  // }, [setResponseData])
 
   const colorIndicator = `rgba(${data?.color?.r}, ${data?.color?.g}, ${data?.color?.b}, ${data?.brightness / 10})`;
 

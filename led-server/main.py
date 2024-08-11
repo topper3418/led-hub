@@ -75,17 +75,15 @@ def handshake(connection):
     }
     
     try:
-        print('before request')
+        print(f'attempting handshake with at "{HANDSHAKE_ENDPOINT}')
         res = requests.post(HANDSHAKE_ENDPOINT, json=handshake_data, headers=headers)
-        print('after request')
         if res.status_code == 200:
             print('handshake successful')
         else: 
             print('handshake failed')
             return False
-        print('about to parse response')
         res_json = res.json()
-        print(res_json)
+        print(f'received response:\n', res_json)
         return True
     except Exception as e:
         print('error during handshake:', e)
