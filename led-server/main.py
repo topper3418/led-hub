@@ -14,33 +14,16 @@ from getMac import get_mac_address
 from networkConnection import NetworkConnection
 from boardLed import BoardLed
 
-# from config import (ssid, 
-#                     password, 
-#                     static_ip_config)
-
-ssid = "the way of the wamel"
-password = 'Maisie129'
-
-# hopefully deprecate this static ip stuff soon
-# static_ip = '192.168.68.69'
-# subnet_mask = '255.255.255.0'
-# gateway = '192.168.68.1'
-# dns_server = '8.8.8.8'
-#
-# static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
-# end deprecation wish
-
-SERVER_ADDRESS = '192.168.68.69'
-SERVER_PORT = 2000
-HANDSHAKE_ENDPOINT = f'http://{SERVER_ADDRESS}:{SERVER_PORT}/'
-print(f'Handshake endpoint: {HANDSHAKE_ENDPOINT}')
+from config import (SSID, 
+                    PASSWORD,
+                    HANDSHAKE_ENDPOINT)
 
 
 # gpio 
 ledStrip = LedStrip(4, 30)
 boardLed = BoardLed()
 # server
-connection = NetworkConnection(ssid, password, pending=boardLed.toggle, complete=boardLed.turnOn)
+connection = NetworkConnection(SSID, PASSWORD, pending=boardLed.toggle, complete=boardLed.turnOn)
 server = Server(connection)
 
 
