@@ -42,12 +42,14 @@ class LedStripInterface {
         }
     }
 
-    async set({ state, brightness, color }) {
-        logger.info(`writing to ${this.name}`, { color, state, brightness })
+    async set({ on, brightness, color }) {
+        console.log("SET CALLED")
+        logger.info(`writing to ${this.name}`, { color, on, brightness })
         const body = {};
         if (color !== undefined) body.color = color;
-        if (state !== undefined) body.state = state;
+        if (on !== undefined) body.on = on;
         if (brightness !== undefined) body.brightness = brightness;
+        console.log("WRITING TO STRIP WITH BODY", { body })
         try {
             const stripData = await axios.post(this.url, body);
             const data = stripData.data;

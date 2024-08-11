@@ -72,15 +72,11 @@ class Device {
     }
 
 
-    update({ color, brightness, state, connected, error }) {
-        logger.debug(`updating device ${this.name}`, { device: this, newState: { color, brightness, state, connected } });
+    update({ color, brightness, on, connected, error }) {
+        logger.debug(`updating device ${this.name}`, { device: this, newState: { color, brightness, on, connected } });
         if (color != undefined) this.color = color;
         if (brightness != undefined) this.brightness = brightness;
-        if (state != undefined) {
-            if (typeof state == Boolean) {
-                this.on = state;
-            } else this.on = state === 'on';
-        }
+        if (on != undefined) this.on = on
         if (connected != undefined) this.connected = connected;
         if (error) this.error = error;
     }
@@ -91,9 +87,10 @@ class Device {
     }
 
     async write(newState) {
+        console.log('WRITING LEDSTRIP', { newState })
         const { color, on, brightness, connected, error } = newState;
-        const onStatus = on ? 'on' : 'off';
-        const writeData = { color, state: onStatus, brightness, connected, error };
+        const writeData = { color, on, brightness, connected, error };
+        logger.info(`writing to device ${this.name}`, { writeData })
         const data = await this.interface.set(writeData);
         this.update(data);
     }

@@ -22,15 +22,15 @@ ssid = "the way of the wamel"
 password = 'Maisie129'
 
 # hopefully deprecate this static ip stuff soon
-static_ip = '192.168.68.69'
-subnet_mask = '255.255.255.0'
-gateway = '192.168.68.1'
-dns_server = '8.8.8.8'
-
-static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
+# static_ip = '192.168.68.69'
+# subnet_mask = '255.255.255.0'
+# gateway = '192.168.68.1'
+# dns_server = '8.8.8.8'
+#
+# static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
 # end deprecation wish
 
-SERVER_ADDRESS = '192.168.68.52'
+SERVER_ADDRESS = '192.168.68.69'
 SERVER_PORT = 2000
 HANDSHAKE_ENDPOINT = f'http://{SERVER_ADDRESS}:{SERVER_PORT}/'
 print(f'Handshake endpoint: {HANDSHAKE_ENDPOINT}')
@@ -43,8 +43,16 @@ boardLed = BoardLed()
 connection = NetworkConnection(ssid, password, pending=boardLed.toggle, complete=boardLed.turnOn)
 server = Server(connection)
 
+
+# middleware and scripts
+
+bigQuote = '"""'
 def log_request(req: Request, _):
-    print(req)
+    print(f"new request: \n{bigQuote}\n{req}\n{bigQuote}\n\n")
+
+
+def log_response(_, res: Response):
+    print(f"returning response: \n{bigQuote}\n{res.render()}\n{bigQuote}\n\n")
     
 
 def handshake(connection):
@@ -83,7 +91,12 @@ def handshake(connection):
         print('error during handshake:', e)
         return False
 
+
+
+# build pipeline
+
 server.use(log_request)
+
 
 @server.route('GET', '/')
 def get_data(_, res: Response):
@@ -98,8 +111,8 @@ def set_strip(req: Request, res: Response):
     if 'brightness' in req.body:
         print('setting brightness')
         ledStrip.setBrightness(int(req.body['brightness']))
-    if 'state' in req.body:
-        if req.body['state'] == 'on':
+    if 'on' in req.body:
+        if req.body['on']:
             print('turning on')
             ledStrip.turnOn()
         else:
@@ -107,10 +120,14 @@ def set_strip(req: Request, res: Response):
             ledStrip.turnOff()
     if 'color' in req.body:
         print('setting color')
-        color_strs = req.body['color']
-        color = tuple(int(color_val) for color_val in color_strs)
-        ledStrip.setColor(color)   
+        ledStrip.setColor(req.body['color'])   
     res.content = ledStrip.getState()
+
+
+server.use(log_response)
+
+
+# execution
 
 if __name__ == '__main__':
     try:

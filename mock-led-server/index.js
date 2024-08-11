@@ -71,9 +71,9 @@ app.post('/', (req, res) => {
         console.log('Setting brightness:', req.body.brightness);
         ledStrip.brightness = req.body.brightness;
     }
-    if (req.body.state !== undefined) {
-        console.log('Setting state:', req.body.state);
-        ledStrip.state = req.body.state;
+    if (req.body.on !== undefined) {
+        console.log('Setting state:', req.body.on);
+        ledStrip.on = req.body.on;
     }
     if (req.body.color !== undefined) {
         console.log('Setting color:', req.body.color);

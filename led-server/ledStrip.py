@@ -9,11 +9,16 @@ class LedStrip:
         self.leds = list(range(num_leds))
         self.brightness = 255
         self.on = False
-        self.color = (255, 255, 255)
+        self.color = {
+            'r': 255, 
+            'g': 255, 
+            'b': 255
+        }
         self.write()
     
-    def setColor(self, color):
-        self.color = color
+    def setColor(self, newColor: dict):
+        """color is expected to have the shape {r: int, g: int, b: int}"""
+        self.color = newColor
         self.write()
 
     def setBrightness(self, brightness):
@@ -23,7 +28,7 @@ class LedStrip:
     def write(self):
         if self.on:
             for led in self.leds:
-                newValue = tuple(int(rgbval * self.brightness/255) for rgbval in self.color)
+                newValue = tuple(int(self.color[ii] * self.brightness/255) for ii in ['r', 'g', 'b'])
                 self.strip[led] = newValue
         else:
             for led in self.leds:
@@ -40,8 +45,8 @@ class LedStrip:
     
     def getState(self):
         return {
-            'color': list(self.color),
+            'color': self.color,
             'brightness': self.brightness,
-            'state': 'on' if self.on else 'off'
+            'on': self.on
         }
    

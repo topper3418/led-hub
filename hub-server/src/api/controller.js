@@ -146,15 +146,20 @@ const list = async (req, res, next) => {
 // - getDevice
 const write = async (req, res, next) => {
     const { device } = res.locals;
+    console.log('GOING TO WRITE TO DEVICE', { device })
     const { color, on, brightness } = req.body;
     try {
         const newState = { color, on, brightness }
+        logger.info(`writing to device ${device.name}`, { body: req.body, newState })
         if (on === undefined) newState.on = device.on;
+        console.log('first test')
         await device.write(newState);
+        console.log('second test')
         const data = device.state;
         db.devices.update(device);
         res.json(data);
     } catch (error) {
+        logger.error('error posting to strip', { error: error.stack })
         res.status(500).json({ error: error.stack, message: 'error posting to strip' });
     }
 }

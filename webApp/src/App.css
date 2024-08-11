@@ -146,6 +146,16 @@ input[type="range"]::-webkit-slider-thumb {
   margin: 0;
 }
 
+.deviceContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.deviceContainer > * {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
 .name {
   font-size: 1.5em;
 }
