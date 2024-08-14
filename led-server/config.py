@@ -1,8 +1,8 @@
-ssid = "the way of the wamel"
-password = 'Maisie129'
-static_ip = '192.168.68.69'
-subnet_mask = '255.255.255.0'
-gateway = '192.168.68.1'
-dns_server = '8.8.8.8'
+# wifi config
+SSID = "the way of the wamel"
+PASSWORD = 'Maisie129'
 
-static_ip_config = (static_ip, subnet_mask, gateway, dns_server)
+# hub server config
+SERVER_ADDRESS = '192.168.68.69'
+SERVER_PORT = 2000
+HANDSHAKE_ENDPOINT = f'http://{SERVER_ADDRESS}:{SERVER_PORT}/'

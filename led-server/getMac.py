@@ -8,5 +8,6 @@ def get_mac_address():
     mac_address = ':'.join('{:02x}'.format(b) for b in mac)
     return mac_address
 
-mac_address = get_mac_address()
-print(f'MAC Address: {mac_address}')
+if __name__ == '__main__':
+    mac_address = get_mac_address()
+    print(f'MAC Address: {mac_address}')

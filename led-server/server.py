@@ -1,53 +1,18 @@
-import network
-import socket
-import time
-import select
 import select
 
-from boardLed import BoardLed
 from request import Request
 from response import Response
+from networkConnection import NetworkConnection
 
-boardLed = BoardLed()
 
 class Server:
     """Abstracts away all the socket nonsense"""
-    def __init__(self, ssid, password, static_ip_config=None):
-        self.ssid = ssid
-        self.password = password
-        self.ip = None
-        self.connection = None
+    def __init__(self, network_connection: NetworkConnection):
+        self.connection = network_connection
         self.routes = {'GET': {}, 'POST': {}, 'PUT': {}}
         self.middleware = []
-        self.static_ip_config = static_ip_config
-    
-    def connect(self):
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
-        wlan.connect(self.ssid, self.password)
-        if self.static_ip_config:
-            wlan.ifconfig(self.static_ip_config)
-        while wlan.isconnected() == False:
-            print('Waiting for connection...')
-            boardLed.toggle()
-            time.sleep(.5)
-        ip = wlan.ifconfig()[0]
-        print(f'Connected on {ip}')
-        boardLed.turnOn()
-        self.ip = ip
-    
-    def open_socket(self):
-        try:
-            address = (self.ip, 80)
-            connection = socket.socket()
-            connection.bind(address)
-            connection.listen(9)
-            connection.setblocking(False)
-            self.connection = connection
-            print(f'Socket opened on {self.ip}:80')
-        except Exception as e:
-            print(f'Failed to open socket: {e}')
 
+    # PIPELINE BUILDERS
     def use(self, func):
         """Adds a middleware function to be executed for every request"""
         self.middleware.append(func)
@@ -67,6 +32,7 @@ class Server:
             return wrapped_func
         return decorator
     
+    # EXECUTION
     def handle_request(self, client):
         request = Request(client.recv(1024))
         response = Response()
@@ -86,15 +52,18 @@ class Server:
         client.send(response.render())
         client.close()
     
+    # TODO fix this horriffic connection.connection nonsense 
     def run(self):
-        self.connect()
-        self.open_socket()
-        inputs = [self.connection]
+        if self.connection.ip is None:
+            self.connection.connect()
+        if self.connection.connection is None:
+            self.connection.open_server_socket()
+        inputs = [self.connection.connection]
         while True:
             readable, _, _ = select.select(inputs, [], [])
             for s in readable:
-                if s is self.connection:
-                    client, _ = self.connection.accept()
+                if s is self.connection.connection:
+                    client, _ = self.connection.connection.accept()
                     client.setblocking(False)
                     inputs.append(client)
                 else:

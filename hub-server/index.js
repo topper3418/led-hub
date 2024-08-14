@@ -1,5 +1,6 @@
-const HubApp = require('./app')
+require('dotenv').config();
+const HubApp = require('./src')
 
-const app = new HubApp(prodMode=false, port=2000);
+const port = process.env.SERVER_PORT;
 
-app.start();
+HubApp.start({ port });
