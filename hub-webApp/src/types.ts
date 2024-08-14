@@ -27,6 +27,12 @@ export interface StripState {
   brightness: number;
 }
 
+export interface SoftStripState {
+  color?: Color;
+  on?: boolean;
+  brightness?: number;
+}
+
 export interface fetchStripResponse {
   color: [string, string, string];
   brightness: string;
@@ -39,13 +45,26 @@ export interface baseFetchState {
   refetch: () => void;
 }
 
-export interface fetchState extends baseFetchState {
-  data: any;
+export interface fetchState {
+  devices: any;
+  loading: boolean;
+  error: string | undefined;
 }
 
-export interface StripData extends baseFetchState {
-  state: StripState;
-  update: (newState: StripState) => void;
+export interface AllStripData {
+  state: fetchState;
+  api: {
+    refetch: () => void;
+  }
+}
+
+
+export interface StripData {
+  state: fetchState;
+  api: {
+    update: (newState: SoftStripState) => void;
+    refetch: () => void;
+  }
 }
 
 export interface AllDevicesData extends baseFetchState {

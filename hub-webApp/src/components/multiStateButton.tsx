@@ -1,3 +1,4 @@
+import React from 'react';
 import '../App.css'
 
 interface MultiStateButtonProps {
@@ -18,7 +19,7 @@ export const MultiStateButton: React.FC<MultiStateButtonProps> = (
   return (
     <div className="row">
       {options.map(option => {
-        const onClick = (event) => {
+        const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
           event.stopPropagation()
           console.log(`internally setting to ${option}`)
           setClicked(option)

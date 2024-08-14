@@ -4,7 +4,7 @@ import React, { ReactElement } from 'react';
 interface BannerProps {
   title: string;
   titleElement?: 'h1' | 'h2' | ReactElement;
-  children?: React.ReactNode[];
+  children?: React.ReactNode;
 }
 
 const Banner: React.FC<BannerProps> = ({ title, children }) => {

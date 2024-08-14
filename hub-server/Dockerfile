@@ -5,7 +5,8 @@ FROM node:20
 WORKDIR /hub-server
 
 # Copy the package.json and package-lock.json files
-COPY package*.json ./
+# COPY package*.json ./
+COPY . .
 
 # Install dependencies
 RUN npm install
@@ -14,7 +15,7 @@ RUN npm install
 RUN npm rebuild
 
 # Copy the rest of the application code
-COPY . .
+# COPY . .
 
 # # Set the working directory to the webapp folder
 # WORKDIR /hub-server/webApp

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StripData, AllDevicesData, StripState, fetchStripResponse, fetchState } from "../types";
+import { StripData, AllStripData } from "../types";
 import axios, { AxiosResponse } from 'axios';
 
 // const defaultProcessJson = (data: fetchStripResponse) => data;
@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from 'axios';
 // base hook for fetching data. should probably refactor to a util module later
 export const useAllStrips = (
   url: string
-): fetchState => {
+): AllStripData => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState(false);
@@ -41,7 +41,10 @@ export const useAllStrips = (
       });
   }, [url, trigger]);
 
-  return { devices: data, loading, error, refetch };
+  return { 
+    state: { devices: data, loading, error }, 
+    api: { refetch }
+  };
 }
 
 interface Color {
@@ -51,7 +54,7 @@ interface Color {
 }
 
 interface LedStripState {
-  on: bool;
+  on: boolean;
   brightness: number;
   color: Color;
 }
@@ -117,7 +120,7 @@ export const useLedStripHooks = (url: string): StripData => {
       });
   }, [url, trigger]);
   return {
-    state: { data, loading, error },
+    state: { devices: data, loading, error },
     api: { refetch, update }
   }
 }

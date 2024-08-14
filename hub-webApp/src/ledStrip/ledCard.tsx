@@ -1,20 +1,20 @@
 import { host, port } from "../App";
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import { ledCardInterface } from "../types";
 import { MultiStateButton } from "../components/multiStateButton";
 import '../App.css';
-import { useGetStrip, useSetStrip, useLedStripHooks } from "./hooks";
+import { useLedStripHooks } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = `http://${host}:${port}/` + ledStrip.name;
   const {
-    state: { data, loading, error },
+    state: { devices, loading, error },
     api: { refetch, update }
   } = useLedStripHooks(url);
-  const [ uiOnState, setUiOnState ] = useState('on')
+  // const [ uiOnState, setUiOnState ] = useState('on')
 
-  const colorIndicator = `rgba(${data?.color?.r}, ${data?.color?.g}, ${data?.color?.b}, ${data?.brightness / 10})`;
+  // const colorIndicator = `rgba(${devices?.color?.r}, ${devices?.color?.g}, ${devices?.color?.b}, ${devices?.brightness / 10})`;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -27,11 +27,11 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   let nameClass = "name" 
   if (!ledStrip.connected) nameClass += " disconnected"
 
-  const selectState = (newState: str) => {
-    console.log('current state is', data);
+  const selectState = (newState: string) => { 
+    console.log('current state is', devices);
     
-    console.log('setting state to', {...data, on: newState == 'on'})
-    update({...data, on: newState == 'on'});
+    console.log('setting state to', {...devices, on: newState == 'on'})
+    update({...devices, on: newState == 'on'});
     refetch();
   }
 
@@ -46,9 +46,9 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
       <div className={nameClass}>{ledStrip.name}</div>
       <MultiStateButton 
         options={['off', 'on']}
-        clicked={data.on ? 'on' : 'off'}
+        clicked={devices.on ? 'on' : 'off'}
         setClicked={selectState}
-        selectedColor={`rgb(${data.color.r},${data.color.g},${data.color.b})`}
+        selectedColor={`rgb(${devices.color.r},${devices.color.g},${devices.color.b})`}
       />
     </div>
   );
