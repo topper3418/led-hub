@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: led-hub-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: led-hub-db-pass
+      MYSQL_DATABASE: led-hub
+      MYSQL_USER: led-hub-server
+      MYSQL_PASSWORD: led-hub-db-pass
+    ports:
+      - '3306:3306'
+    volumes:
+      - led-hub-data:/var/lib/mysql
+    networks:
+      - led-hub-network
+
+  app-server:
+    image: topper3418/led-hub-server:latest
+    container_name: led-hub-server
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USER: led-hub-server
+      DATABASE_PASSWORD: led-hub-db-pass
+      DATABASE_NAME: led-hub
+      SERVER_PORT: 2000
+    ports:
+      - '2000:2000'  # Adjust according to your app's exposed port
+    networks:
+      - led-hub-network
+    platform: linux/amd64
+
+  webapp: 
+    image: topper3418/led-hub-webapp:latest
+    container_name: led-hub-webapp
+    restart: always
+    depends_on:
+      - app-server
+    environment:
+      VITE_SERVER_HOST: app-server
+      VITE_SERVER_PORT: 2000
+    ports: 
+      - '8080:8080'
+    networks:
+      - led-hub-network
+
+networks:
+  led-hub-network:
+
+volumes:
+  led-hub-data:
