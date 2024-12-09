@@ -44,9 +44,6 @@ services:
   webapp:
     build:
       context: ./hub-webapp
-      args:
-        VITE_SERVER_HOST: ""
-        VITE_SERVER_PORT: ""
     ports:
       - '8080:80'
     depends_on:

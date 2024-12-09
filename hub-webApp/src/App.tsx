@@ -9,8 +9,6 @@ import LedControllerElement from "./ledStrip/ledController";
 // import { Device } from "./types";
 import { Devices } from "./views/devices";
 
-export const port = import.meta.env.VITE_SERVER_PORT;
-export const host = import.meta.env.VITE_SERVER_HOST;
 
 // wrap it to pass the params
 const LedController: React.FC = () => {

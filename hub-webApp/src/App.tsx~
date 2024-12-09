@@ -1,8 +1,7 @@
 // import { Router } from 'react-router-dom';
+import React from 'react';
 import { useEffect, useState } from 'react';
-
-const host = import.meta.env.VITE_SERVER_HOST;
-const port = import.meta.env.VITE_SERVER_PORT;
+import { hostUrl } from "./config"
 
 interface Device {
   id: number;
@@ -24,7 +23,7 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const [on, setOn] = useState(false);
   const [brightness, setBrightness] = useState(255);
 
-  const url = `http://${host}:${port}/` + ledStrip.name
+  const url = hostUrl + ledStrip.name
 
   useEffect(() => {
     setLoading(true);
@@ -59,9 +58,9 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
 
   // Rest of the code...
   return (
-    <div className="deviceTile" onClick={()=>selectDevice(ledStrip)}>
+    <div className="deviceTile" onClick={() => selectDevice(ledStrip)}>
       <div className="name">{ledStrip.name}</div>
-      <div className={indicatorClass} style={{backgroundColor: colorIndicator}}></div>
+      <div className={indicatorClass} style={{ backgroundColor: colorIndicator }}></div>
     </div>
   );
 }
@@ -72,7 +71,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const url = `http://${host}:${port}/`
+  const url = hostUrl;
 
   useEffect(() => {
     setLoading(true);
@@ -111,4 +110,4 @@ function App() {
 }
 
 export default App
- 
+

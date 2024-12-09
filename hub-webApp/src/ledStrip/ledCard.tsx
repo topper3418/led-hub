@@ -1,4 +1,4 @@
-import { host, port } from "../App";
+import { hostUrl } from "../config";
 
 // import { useState, useEffect } from "react";
 import { ledCardInterface } from "../types";
@@ -7,7 +7,7 @@ import '../App.css';
 import { useLedStripHooks } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
-  const url = `http://${host}:${port}/` + ledStrip.name;
+  const url = hostUrl + ledStrip.name;
   const {
     state: { devices, loading, error },
     api: { refetch, update }
@@ -24,14 +24,14 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
     return <div>Error loading data</div>;
   }
 
-  let nameClass = "name" 
+  let nameClass = "name"
   if (!ledStrip.connected) nameClass += " disconnected"
 
-  const selectState = (newState: string) => { 
+  const selectState = (newState: string) => {
     console.log('current state is', devices);
-    
-    console.log('setting state to', {...devices, on: newState == 'on'})
-    update({...devices, on: newState == 'on'});
+
+    console.log('setting state to', { ...devices, on: newState == 'on' })
+    update({ ...devices, on: newState == 'on' });
     refetch();
   }
 
@@ -44,7 +44,7 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   return (
     <div className="deviceTile" onClick={selectDevice}>
       <div className={nameClass}>{ledStrip.name}</div>
-      <MultiStateButton 
+      <MultiStateButton
         options={['off', 'on']}
         clicked={devices.on ? 'on' : 'off'}
         setClicked={selectState}

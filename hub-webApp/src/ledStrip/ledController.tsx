@@ -3,15 +3,14 @@ import { useNavigate } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
 import Banner from '../components/banner';
 import { useLedStripHooks } from "./hooks";
+import { hostUrl } from "../config";
 import '../App.css'
 // simple webpage
 // has a simple button for on/off 
 // has a slider for brightness
 // has a color picker for color
-const host = import.meta.env.VITE_SERVER_HOST;
-const port = import.meta.env.VITE_SERVER_PORT;
 const LedController = ({ stripName }: { stripName: string }) => {
-  const url = `http://${host}:${port}/` + stripName
+  const url = hostUrl + stripName
   const {
     state: { devices, loading, error },
     api: { update }
@@ -51,7 +50,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
 
   const BackButton = () => <button onClick={() => navigate("/")}>Back</button>;
 
-  return (      
+  return (
     <div className="wrapper view column bottom" style={coloredBackground}>
       <Banner title='LED control'>
         <BackButton />
@@ -69,7 +68,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
           value={devices.brightness}
           onChange={brightnessChanged} />
         <button onClick={togglePressed} style={coloredButton}>
-          { devices.on ? 'Off' : 'On' }
+          {devices.on ? 'Off' : 'On'}
         </button>
       </div>
     </div>
