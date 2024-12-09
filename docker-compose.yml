@@ -41,19 +41,16 @@ services:
       - led-hub-network
     platform: linux/amd64
 
-  webapp: 
-    build: ./hub-webapp
-    container_name: led-hub-webapp
-    restart: always
+  webapp:
+    build:
+      context: ./hub-webapp
+      args:
+        VITE_SERVER_HOST: "localhost"
+        VITE_SERVER_PORT: "2000"
+    ports:
+      - '8080:80'
     depends_on:
       - app-server
-    environment:
-      VITE_SERVER_HOST: app-server
-      VITE_SERVER_PORT: 2000
-    ports: 
-      - '8080:8080'
-    networks:
-      - led-hub-network
 
 networks:
   led-hub-network:

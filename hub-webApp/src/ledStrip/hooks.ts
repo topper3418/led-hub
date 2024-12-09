@@ -17,6 +17,7 @@ export const useAllStrips = (
 
   useEffect(() => {
     setLoading(true);
+    console.log('fetching data from: ', url);
     axios.get(url)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {

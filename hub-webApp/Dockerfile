@@ -1,52 +1,33 @@
-# FROM node:20
+# Stage 1: Build the React app
+FROM node:20-slim as build
 
-# WORKDIR /hub-webapp
+# Define build arguments that will override .env variables at build time
+ARG VITE_SERVER_HOST
+ARG VITE_SERVER_PORT
 
-# # COPY package*.json ./
-# COPY . . 
-
-# RUN npm install
-
-# RUN npm rebuild
-
-
-# RUN npm run build
-
-# EXPOSE 3000
-
-# CMD ["npm", "start"]
-# Use an official Node.js runtime as a parent image
-FROM node:20 AS build
-
-# Set the working directory in the container
 WORKDIR /hub-webapp
 
-# Copy package.json and package-lock.json (if available)
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install app dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Set the environment variables using the passed build args so that the React build picks them up
+ENV VITE_SERVER_HOST=$VITE_SERVER_HOST
+ENV VITE_SERVER_PORT=$VITE_SERVER_PORT
+
+# Copy the rest of the source code
 COPY . .
 
-# Run the Vite build
+# Build the production version of the React app
 RUN npm run build
 
-# Use a minimal Node.js image for the final stage
-FROM node:20-slim
+# Stage 2: Serve the app with Nginx
+FROM nginx:alpine
+# Copy the built files into the Nginx default static directory
+COPY --from=build /hub-webapp/dist /usr/share/nginx/html
 
-# Set the working directory
-WORKDIR /hub-webapp
-
-# Install http-server globally
-RUN npm install -g http-server
-
-# Copy the built application from the build stage
-COPY --from=build /hub-webapp/dist /hub-webapp/dist
-
-# Expose port 8080 (or any port you choose for http-server)
+# Expose port 8080 for the web app
 EXPOSE 8080
 
-# Command to run the http-server
-CMD ["http-server", "dist", "-p", "8080"]
+# Run Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
