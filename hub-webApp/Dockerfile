@@ -25,7 +25,8 @@ RUN npm run build
 FROM nginx:alpine
 # Copy the built files into the Nginx default static directory
 COPY --from=build /hub-webapp/dist /usr/share/nginx/html
-
+# Copy your nginx config into the image
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 8080 for the web app
 EXPOSE 8080
 
