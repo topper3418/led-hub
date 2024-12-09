@@ -16,19 +16,24 @@ services:
       - led-hub-data:/var/lib/mysql
     networks:
       - led-hub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 10
 
   app-server:
-    image: topper3418/led-hub-server:latest
+    build: ./hub-server
     container_name: led-hub-server
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
-      DATABASE_HOST: mysql
-      DATABASE_PORT: 3306
-      DATABASE_USER: led-hub-server
-      DATABASE_PASSWORD: led-hub-db-pass
-      DATABASE_NAME: led-hub
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: led-hub-server
+      DB_PASSWORD: led-hub-db-pass
+      DB_NAME: led-hub
       SERVER_PORT: 2000
     ports:
       - '2000:2000'  # Adjust according to your app's exposed port
@@ -37,7 +42,7 @@ services:
     platform: linux/amd64
 
   webapp: 
-    image: topper3418/led-hub-webapp:latest
+    build: ./hub-webapp
     container_name: led-hub-webapp
     restart: always
     depends_on:
