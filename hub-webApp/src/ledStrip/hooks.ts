@@ -31,6 +31,7 @@ export const useAllStrips = (
         return res.data;
       })
       .then((data) => {
+        console.log('got data:', data)
         setData(data)
       })
       .catch((err) => {
@@ -42,8 +43,8 @@ export const useAllStrips = (
       });
   }, [url, trigger]);
 
-  return { 
-    state: { devices: data, loading, error }, 
+  return {
+    state: { devices: data, loading, error },
     api: { refetch }
   };
 }

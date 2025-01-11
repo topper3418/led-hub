@@ -1,4 +1,4 @@
-import { hostUrl } from "../config";
+import { BACKEND_ROOT_URL } from "../config";
 
 // import { useState, useEffect } from "react";
 import { ledCardInterface } from "../types";
@@ -7,7 +7,7 @@ import '../App.css';
 import { useLedStripHooks } from "./hooks";
 
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
-  const url = hostUrl + ledStrip.name;
+  const url = BACKEND_ROOT_URL + ledStrip.name;
   const {
     state: { devices, loading, error },
     api: { refetch, update }

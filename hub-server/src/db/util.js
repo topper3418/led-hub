@@ -10,9 +10,12 @@ const connectionObj = {
     database: process.env.DB_NAME
 }
 
-const useConnection = (callback) => {
-    const connection = mysql.createConnection(connectionObj);
-
+const useConnection = (callback, { multipleStatements = false } = {}) => {
+    const connectionConfig = { ...connectionObj };
+    if (multipleStatements) {
+        connectionConfig.multipleStatements = true;
+    }
+    const connection = mysql.createConnection(connectionConfig);
     connection.connect((err) => {
         if (err) {
             console.error('Error connecting to the database:', err.stack);

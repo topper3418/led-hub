@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
 import Banner from '../components/banner';
 import { useLedStripHooks } from "./hooks";
-import { hostUrl } from "../config";
+import { BACKEND_ROOT_URL } from "../config";
 import '../App.css'
 // simple webpage
 // has a simple button for on/off 
 // has a slider for brightness
 // has a color picker for color
 const LedController = ({ stripName }: { stripName: string }) => {
-  const url = hostUrl + stripName
+  const url = BACKEND_ROOT_URL + stripName
   const {
     state: { devices, loading, error },
     api: { update }

@@ -1,7 +1,9 @@
 # Stage 1: Build the React app
 FROM node:20-slim as build
 
-# Define build arguments that will override .env variables at build time
+# argument to set the backend url
+ARG BACKEND_ROOT_URL
+ENV VITE_BACKEND_ROOT_URL=$BACKEND_ROOT_URL
 
 WORKDIR /hub-webapp
 

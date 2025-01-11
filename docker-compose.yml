@@ -44,8 +44,10 @@ services:
   webapp:
     build:
       context: ./hub-webapp
+      args: 
+        BACKEND_ROOT_URL: "http://${HOSTNAME}:2000/"
     ports:
-      - '8080:80'
+      - '80:80'
     depends_on:
       - app-server
     networks:

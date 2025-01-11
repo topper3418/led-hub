@@ -1,51 +1,83 @@
-const { createLogger, format, transports } = require('winston');
-const Transport = require('winston-transport');
-const mysql = require('mysql2/promise');
-const path = require('path');
-const { connectionObj } = require('./db/util');
+// logger.js
+const { useConnection } = require('./db/util');
 
-class MySQLTransport extends Transport {
-  constructor(opts) {
-    super(opts);
-    this.connection = mysql.createPool(connectionObj);
-    this.loggerName = opts.loggerName || 'default';
+// You can customize or extend these levels
+const LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
+
+class MyLogger {
+  constructor({ loggerName = 'default', level = 'info', consoleEnabled = true }) {
+    this.loggerName = loggerName;
+    this.level = level;
+    this.consoleEnabled = consoleEnabled;
   }
 
-  async log(info, callback) {
-    setImmediate(() => {
-      this.emit('logged', info);
-    });
-    const { level, message, ...meta } = info;
-    const query = `INSERT INTO logs (logger, level, message, meta, timestamp) VALUES (?, ?, ?, ?, ?)`;
-    const timestamp = new Date();
-    try {
-      await this.connection.execute(query, [this.loggerName, level, message, JSON.stringify(meta), timestamp]);
-    } catch (error) {
-      console.error('Failed to log to MySQL:', error);
+  // Utility to check if the current level is loggable
+  shouldLog(level) {
+    return LEVELS[level] <= LEVELS[this.level];
+  }
+
+  async log(level, message, meta = {}) {
+    if (!this.shouldLog(level)) return;
+
+    // Print to console if enabled
+    if (this.consoleEnabled) {
+      console.log(`[${new Date().toISOString()}][${this.loggerName}][${level}] ${message}`, meta);
     }
-    callback();
+
+    // Write to DB asynchronously using useConnection
+    try {
+      useConnection((connection) => {
+        const query = `
+          INSERT INTO logs (logger, level, message, meta, timestamp)
+          VALUES (?, ?, ?, ?, ?)
+        `;
+        connection.query(query, [
+          this.loggerName,
+          level,
+          message,
+          JSON.stringify(meta),
+          new Date(),
+        ]);
+      });
+    } catch (error) {
+      // If logging fails, you might want to handle it or ignore it
+      console.error('Failed to log to DB:', error);
+    }
+  }
+
+  debug(message, meta = {}) {
+    return this.log('debug', message, meta);
+  }
+
+  info(message, meta = {}) {
+    return this.log('info', message, meta);
+  }
+
+  warn(message, meta = {}) {
+    return this.log('warn', message, meta);
+  }
+
+  error(message, meta = {}) {
+    return this.log('error', message, meta);
   }
 }
 
-const getLogger = (loggerName, level = 'info') => {
-  return createLogger({
-    level: level,
-    format: format.combine(
-      format.printf(({ message }) => message) // Only print the message to console
-    ),
-    // format: format.combine(
-    //   format.label({ label: path.basename(__filename) }),
-    //   format.timestamp(),
-    //   // format.printf(({ timestamp, level, message, label }) => {
-    //   //   return `${timestamp} [${loggerName}] ${level}: ${message}`;
-    //   // }),
-    //   format.json()
-    // ),
-    transports: [
-      new MySQLTransport({ loggerName }),
-      new transports.Console()
-    ]
-  });
-};
+// Keep a cache of loggers so we don’t recreate them unnecessarily
+const loggerCache = {};
+
+/**
+ * Get a logger instance by name. If it doesn’t exist, it is created.
+ *
+ * @param {string} loggerName - Name of the logger (e.g. 'authLogger')
+ * @param {string} level - Log level (e.g. 'info', 'warn', 'error', 'debug')
+ * @param {boolean} consoleEnabled - Whether to log to the console
+ */
+function getLogger(loggerName = 'default', level = 'info', consoleEnabled = true) {
+  const cacheKey = `${loggerName}-${level}-${consoleEnabled}`;
+  if (!loggerCache[cacheKey]) {
+    loggerCache[cacheKey] = new MyLogger({ loggerName, level, consoleEnabled });
+  }
+  return loggerCache[cacheKey];
+}
 
 module.exports = getLogger;
