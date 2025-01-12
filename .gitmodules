@@ -1,0 +1,3 @@
+[submodule "logging-service"]
+    path = logging-service
+    url = https://github.com/topper3418/logging-microservice.git
