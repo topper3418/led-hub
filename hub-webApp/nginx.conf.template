@@ -1,5 +1,5 @@
 server {
-  listen 80;
+  listen $WEBAPP_PORT;
   server_name app-server;
 
   # Serve the frontend build output
@@ -10,7 +10,7 @@ server {
 
   # Proxy API requests to the backend
   location /api {
-    proxy_pass http://hub-server:2000;
+    proxy_pass http://$BACKEND_HOST:$BACKEND_PORT;
   }
 }
 
