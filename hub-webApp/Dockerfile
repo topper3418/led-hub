@@ -2,8 +2,9 @@
 FROM node:20-slim as build
 
 # argument to set the backend url
-ARG BACKEND_ROOT_URL
-ENV VITE_BACKEND_ROOT_URL=$BACKEND_ROOT_URL
+ENV BACKEND_HOST=localhost
+ENV BACKEND_PORT=2000
+ENV WEBAPP_PORT=80
 
 WORKDIR /hub-webapp
 
@@ -13,6 +14,9 @@ RUN npm install
 
 # Copy the rest of the source code
 COPY . .
+
+# Run the Node.js script to generate the nginx.conf file
+RUN node ./generate-nginx-config.cjs
 
 # Build the production version of the React app
 RUN npm run build
@@ -24,7 +28,7 @@ RUN apk add --no-cache gettext
 # Copy the built files into the Nginx default static directory
 COPY --from=build /hub-webapp/dist /usr/share/nginx/html
 # Copy your nginx config into the image
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /hub-webapp/nginx.conf /etc/nginx/conf.d/default.conf
 
 # ENV BACKEND_HOST=localhost
 # ENV BACKEND_PORT=2000
