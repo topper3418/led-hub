@@ -1,5 +1,5 @@
 const db = require('../db');
-const getLogger = require('../logging');
+const { getLogger } = require('../logging');
 const logger = getLogger('api/controller', 'debug');
 
 const isMac = (mac) => {
@@ -68,10 +68,10 @@ const handshake = async (req, res, next) => {
     try {
         if (!foundDevice) {
             logger.info(`creating device ${mac} - ${req.body.name || 'unnamed'}`)
-            const device = new db.Device({ 
-                mac: handshake.mac, 
-                name: req.body.name, 
-                current_ip: handshake.ip, 
+            const device = new db.Device({
+                mac: handshake.mac,
+                name: req.body.name,
+                current_ip: handshake.ip,
                 current_port: handshake.port
             });
             handshake.type = 'init';

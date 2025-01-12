@@ -1,5 +1,5 @@
 const { useConnection } = require('./util');
-const getLogger = require('../logging');
+const { getLogger } = require('../logging');
 const logger = getLogger('db/handshakes');
 
 class HandShake {

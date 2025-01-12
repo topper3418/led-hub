@@ -1,5 +1,5 @@
 const { useConnection, QueryBuilder, findSql } = require('./util');
-const getLogger = require('../logging');
+const { getLogger } = require('../logging');
 const LedStripInterface = require('../ledStrip');
 const logger = getLogger('db/devices', 'debug');
 
@@ -18,7 +18,7 @@ class Device {
             g: green,
             b: blue
         };
-        this.interface = new LedStripInterface({ 
+        this.interface = new LedStripInterface({
             name, mac, ip: current_ip, port: current_port
         });
         this.connected = connected || false;

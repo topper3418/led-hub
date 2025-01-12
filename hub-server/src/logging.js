@@ -1,8 +1,8 @@
-import axios from 'axios';
+const axios = require('axios');
 
 const LOGGING_SERVICE_ENDPOINT = process.env.LOGGING_SERVICE_ENDPOINT || 'http://localhost:8080';
 
-export function getLogger(loggerName) {
+function getLogger(loggerName) {
   const log = async (level, message, meta = {}) => {
     try {
       await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
@@ -23,3 +23,5 @@ export function getLogger(loggerName) {
     error: (message, meta) => log('error', message, meta)
   };
 }
+
+module.exports = { getLogger };

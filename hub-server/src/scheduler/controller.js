@@ -1,5 +1,5 @@
 const db = require('../db');
-const getLogger = require('../logging')
+const { getLogger } = require('../logging')
 
 const logger = getLogger('scheduler/controller', 'debug');
 

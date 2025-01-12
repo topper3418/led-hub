@@ -1,5 +1,5 @@
 const { useConnection, findSql } = require('./util');
-const getLogger = require('../logging');
+const { getLogger } = require('../logging');
 
 const logger = getLogger('db/init', 'debug');
 

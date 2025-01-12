@@ -2,7 +2,7 @@ const express = require('express')
 const router = require('./api')
 const { init: initDb } = require('./db')
 const scheduler = require('./scheduler')
-const getLogger = require('./logging')
+const { getLogger } = require('./logging')
 const cors = require('cors');
 const logger = getLogger('api/index');
 
