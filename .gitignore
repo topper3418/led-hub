@@ -1,3 +1,5 @@
 */node_modules*
 /node_modules*
 *.env
+/led-hub-db-data*
+/led-hub-data*
