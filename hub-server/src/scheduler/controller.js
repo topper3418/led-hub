@@ -5,8 +5,12 @@ const logger = getLogger('scheduler/controller');
 
 // ping a strip and get its data, update the database
 const refreshDevice = async (device) => {
-    logger.debug(`refreshing device "${device.name}"`);
-    await device.refreshState();
+    logger.debugp(`refreshing device "${device.name}"`);
+    try {
+        await device.refreshState();
+    } catch (error) {
+        logger.errorp(`error frefreshing device ${device.name}: ${error.stack}`, error)
+    }
     if (device.connected) {
         logger.info(`device ${device.name} updated successfully`, { device });
     } else {
@@ -18,6 +22,7 @@ const refreshDevice = async (device) => {
 
 const refreshDevices = async () => {
     const devices = await db.devices.list()
+    logger.infop('refreshing devices...')
     devices.forEach(device => {
         try {
             refreshDevice(device);

@@ -4,7 +4,7 @@ const cors = require('cors');
 
 
 const app = express();
-const SERVER_PORT = 1002;
+const SERVER_PORT = 2000;
 const SERVER_ADDRESS = 'localhost'; // Replace with your server address
 
 const PORT = 3100;  // the port this will be listening on
@@ -27,6 +27,11 @@ let ledStrip = {
 
 // Handshake endpoint
 const HANDSHAKE_ENDPOINT = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`;
+
+// axios config
+const client = axios.create({
+    httpsAgent: new (require('https').Agent)
+})
 
 // Logging middleware
 app.use((req, res, next) => {

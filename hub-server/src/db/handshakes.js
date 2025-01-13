@@ -18,13 +18,13 @@ const create = ({ mac, ip, port }) => {
         useConnection((connection) => {
             const query = 'INSERT INTO handshakes (mac, ip, port) VALUES (?, ?, ?)';
             const params = [mac, ip, port];
-            logger.debug('running query:', { query, params });
+            logger.debug('running query', { query, params });
             connection.query(query, params, (err, results) => {
                 if (err) {
-                    logger.error('Error querying the database:', { error: err.stack });
+                    logger.errorp('Error querying the database:', { error: err.stack });
                     reject(err);
                 }
-                logger.info('results', { results });
+                logger.debugp('results from handshake creation', { results });
                 resolve(results);
             });
         });

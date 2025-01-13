@@ -10,7 +10,7 @@ const isMac = (mac) => {
 // gets the device object and attaches it to locals
 const getDevice = async (req, res, next) => {
     const { id } = req.params;
-    logger.debug('searching for device device:', { id });
+    logger.debugp('searching for device device:', { id });
     let device;
     try {
         if (isMac(id)) {
@@ -74,13 +74,12 @@ const handshake = async (req, res, next) => {
                 current_ip: handshake.ip,
                 current_port: handshake.port
             });
-            handshake.type = 'init';
             await db.devices.create(device);
             // eventually I should streamline this by figuring out how to return the PK on create
             foundDevice = await db.devices.find({ mac: device.mac });
         }
     } catch (error) {
-        logger.error(`${error.name} creating device: ${error.message}`, { error, mac, ip, type })
+        logger.error(`${error.name} creating device: ${error.message}`, { error, mac, ip })
         next({
             status: 500,
             message: 'error creating device,' + error
@@ -94,7 +93,7 @@ const handshake = async (req, res, next) => {
         logger.info(`updating device ${foundDevice.name} to ${ip}:${port}`)
         await db.devices.update(foundDevice);
     } catch (error) {
-        logger.error(`${error.name} updating device: ${error.message}`, { error, mac, ip, type })
+        logger.error(`${error.name} updating device: ${error.message}`, { error, mac, ip })
         next({
             status: 500,
             message: 'error updating device', error

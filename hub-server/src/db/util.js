@@ -2,6 +2,9 @@ require('dotenv').config();
 const mysql = require('mysql2');
 const path = require('path');
 const fs = require('fs/promises');
+const { getLogger } = require('../logging');
+
+const logger = getLogger('db/util');
 
 const connectionObj = {
     host: process.env.DB_HOST,
@@ -18,17 +21,17 @@ const useConnection = (callback, { multipleStatements = false } = {}) => {
     const connection = mysql.createConnection(connectionConfig);
     connection.connect((err) => {
         if (err) {
-            console.error('Error connecting to the database:', err.stack);
+            logger.errorp(`Error connecting to the database: ${err.stack}`, err);
             return;
         }
-        console.log('Connected to the database as id ' + connection.threadId);
+        logger.debug('Connected to the database as id ' + connection.threadId);
     });
     try {
         results = callback(connection)
         connection.end();
         return results
     } catch (error) {
-        console.error('Error using the connection:', error.stack);
+        logger.errorp(`Error using the connection: ${error.stack}`, error);
         connection.end();
         throw error;
     }
@@ -36,10 +39,11 @@ const useConnection = (callback, { multipleStatements = false } = {}) => {
 
 const findSql = async (sqlPath) => {
     const filePath = path.resolve(__dirname, 'sql', sqlPath);
-    console.log('found filepath', filePath)
+    logger.debug(`found filepath: ${filePath}`)
     try {
         return await fs.readFile(filePath, 'utf8');
     } catch (err) {
+        logger.warnp(`no file fount at path: ${filePath}`);
         return undefined;
     }
 };
@@ -48,10 +52,10 @@ const tableExists = (tableName) => {
     results = useConnection(connection => {
         connection.query('SHOW TABLES LIKE ?', [tableName], (err, results) => {
             if (err) {
-                console.error('Error querying the database:', err.stack);
+                logger.errorp(`Error querying the database: ${err.stack}`, err);
                 throw err;
             }
-            console.log(`results looking for ${tableName} table:`, results);
+            logger.debug(`results looking for ${tableName} table:`, results);
             return results.length > 0;
         });
     });

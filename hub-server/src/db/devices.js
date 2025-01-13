@@ -57,6 +57,7 @@ class Device {
 
     toJSON() {
         return {
+            id: this.id,
             mac: this.mac,
             type: this.type,
             name: this.name,
@@ -99,7 +100,7 @@ class Device {
 // const devicesQueryBuilder = QueryBuilder('devices');
 
 const find = ({ mac, name, ip, port }) => {
-    logger.info('finding device:', { mac, name, ip, port })
+    logger.infop('finding device:', { mac, name, ip, port })
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'SELECT * FROM devices WHERE ';
@@ -120,7 +121,7 @@ const find = ({ mac, name, ip, port }) => {
                 return reject(new Error('No valid search criteria provided'))
             }
             params = [criteria];
-            logger.debug('running query:', { query, params })
+            logger.debugp('running query:', { query, params })
             connection.query(query, params, (err, results) => {
                 if (err) {
                     logger.error('Error finding device:', { error: err.stack });
