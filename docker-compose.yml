@@ -29,6 +29,8 @@ services:
       - '${LED_HUB_LOGGER_PORT:-8080}:8080' 
     networks:
       - led-hub-network
+    volumes:
+      - led-hub-log-data:/app/data/
 
   app-server:
     build: ./hub-server
@@ -74,3 +76,4 @@ networks:
 
 volumes:
   led-hub-data:
+  led-hub-log-data:

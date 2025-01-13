@@ -1,6 +1,6 @@
 const db = require('../db');
 const { getLogger } = require('../logging');
-const logger = getLogger('api/controller', 'debug');
+const logger = getLogger('api/controller');
 
 const isMac = (mac) => {
     if (typeof mac !== 'string') return false;
