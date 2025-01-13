@@ -4,7 +4,7 @@ const cors = require('cors');
 
 
 const app = express();
-const SERVER_PORT = 2000;
+const SERVER_PORT = 1002;
 const SERVER_ADDRESS = 'localhost'; // Replace with your server address
 
 const PORT = 3100;  // the port this will be listening on
@@ -39,10 +39,12 @@ async function handshake() {
     const handshakeData = {
         mac: 'mockMacAddress',
         type: 'LedStrip',
-        ip: '127.0.0.1',
+        ip: '192.168.68.69',
         name: 'mock-led',
         port: PORT
     };
+
+    console.log("attempting handshake with data:", handshakeData)
 
     try {
         const response = await axios.post(HANDSHAKE_ENDPOINT, handshakeData);
