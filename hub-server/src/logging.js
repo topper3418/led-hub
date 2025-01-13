@@ -3,7 +3,7 @@ const axios = require('axios');
 const LOGGING_SERVICE_ENDPOINT = process.env.LOGGING_SERVICE_ENDPOINT || 'http://localhost:8080';
 
 function getLogger(loggerName) {
-  const log = async (level, message, meta = {}) => {
+  const log = async (level, message, meta = {}, print = false) => {
     try {
       await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
         logger: loggerName,
@@ -11,6 +11,11 @@ function getLogger(loggerName) {
         message,
         meta
       });
+      if (print) {
+        const fmtMessage = `${loggerName} - ${level.toUpperCase()} - ${message}`;
+        const printPackage = Object.keys(meta).length !== 0 ? [fmtMessage, meta] : [fmtMessage];
+        console.log(...printPackage);
+      }
     } catch (error) {
       console.error('Failed to send log:', error);
     }
@@ -18,9 +23,13 @@ function getLogger(loggerName) {
 
   return {
     debug: (message, meta) => log('debug', message, meta),
+    debugp: (message, meta) => log('debug', message, meta, print=true),
     info: (message, meta) => log('info', message, meta),
+    infop: (message, meta) => log('info', message, meta, print=true),
     warn: (message, meta) => log('warn', message, meta),
-    error: (message, meta) => log('error', message, meta)
+    warnp: (message, meta) => log('warn', message, meta, print=true),
+    error: (message, meta) => log('error', message, meta),
+    errorp: (message, meta) => log('error', message, meta, print=true),
   };
 }
 

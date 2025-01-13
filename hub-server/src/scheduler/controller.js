@@ -1,7 +1,7 @@
 const db = require('../db');
 const { getLogger } = require('../logging')
 
-const logger = getLogger('scheduler/controller', 'debug');
+const logger = getLogger('scheduler/controller');
 
 // ping a strip and get its data, update the database
 const refreshDevice = async (device) => {
@@ -22,7 +22,7 @@ const refreshDevices = async () => {
         try {
             refreshDevice(device);
         } catch (error) {
-            logger.error(`error refreshing ${device.name}`, { device, error });
+            logger.errorp(`error refreshing ${device.name}`, { device, error });
         }
     });
 }

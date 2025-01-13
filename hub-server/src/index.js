@@ -21,7 +21,7 @@ app.use('/', router);
 const startHub = async ({ port = 2000 }) => {
     await initDb();
     scheduler.start();
-    app.listen(port, () => logger.info(`hub server is running on port ${port}`));
+    app.listen(port, () => logger.infop(`hub server is running on port ${port}`));
 }
 
 module.exports = {
