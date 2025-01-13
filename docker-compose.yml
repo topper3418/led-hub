@@ -57,17 +57,13 @@ services:
     build:
       context: ./hub-webapp
       args: 
-        BACKEND_HOST: ${HOSTNAME:-localhost}
-        BACKEND_PORT: ${BACKEND_PORT:-2000}
+        BACKEND_HOST: app-server
+        BACKEND_PORT: 2000
         WEBAPP_PORT: ${WEBAPP_PORT:-80}
     ports:
       - '${LED_HUB_WEBAPP_PORT:-80}:80' 
     depends_on:
       - app-server
-    environment:
-      BACKEND_HOST: ${HOSTNAME:-localhost}
-      BACKEND_PORT: 2000
-      WEBAPP_PORT: 80
     networks:
       - led-hub-network
 

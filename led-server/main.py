@@ -16,7 +16,8 @@ from boardLed import BoardLed
 
 from config import (SSID, 
                     PASSWORD,
-                    HANDSHAKE_ENDPOINT)
+                    HANDSHAKE_ENDPOINT,
+                    DEVICE_NAME)
 
 
 # gpio 
@@ -53,7 +54,7 @@ def handshake(connection):
         'mac': mac,
         'type': 'LedStrip',
         'ip': connection.ip,
-        'name': 'DevPi',
+        'name': DEVICE_NAME,
         'port': 80
     }
     

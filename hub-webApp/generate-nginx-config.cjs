@@ -1,9 +1,9 @@
 const fs = require('fs');
 
 // Get environment variables passed as build args
-const BACKEND_HOST = process.env.BACKEND_HOST || 'localhost';
-const BACKEND_PORT = process.env.BACKEND_PORT || '3000';
-const WEBAPP_PORT = process.env.WEBAPP_PORT || '80';
+const BACKEND_HOST = process.env.VITE_BACKEND_HOST || 'localhost';
+const BACKEND_PORT = process.env.VITE_BACKEND_PORT || '3000';
+const WEBAPP_PORT = process.env.VITE_WEBAPP_PORT || '80';
 
 // Generate the Nginx config file
 const nginxConfig = `
@@ -18,8 +18,8 @@ server {
   }
 
   # Proxy API requests to the backend
-  location /api {
-    proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
+  location /api/ {
+    proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/;
   }
 }
 `;
