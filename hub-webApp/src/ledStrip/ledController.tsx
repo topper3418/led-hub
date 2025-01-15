@@ -11,10 +11,7 @@ import '../App.css'
 // has a color picker for color
 const LedController = ({ stripName }: { stripName: string }) => {
   const url = BACKEND_ROOT_URL + stripName
-  const {
-    state: { devices, loading, error },
-    api: { update }
-  } = useLedStripHooks(url);
+  const { state: { data, loading, error }, api } = useLedStripHooks(url);
   const navigate = useNavigate();
 
   if (loading) {
@@ -26,49 +23,52 @@ const LedController = ({ stripName }: { stripName: string }) => {
   }
 
   const togglePressed = () => {
-    update({ on: !devices.on })
+    update({ on: !data.on })
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    update({ brightness: parseInt(e.target.value) });
+    api.update({ brightness: parseInt(e.target.value) });
   }
 
   const colorChanged = (color: RGB) => {
-    update({ color })
+    api.update({ color })
   }
 
-  const displayColor = `rgba(${devices?.color.r}, ${devices?.color.g}, ${devices?.color.b}, ${devices?.brightness / 10})`;
+  const displayColor = `rgba(${data?.color.r}, ${data?.color.g}, ${data?.color.b}, ${data?.brightness / 10})`;
 
   const coloredBackground = {
-    backgroundColor: devices.on ? displayColor : 'black',
+    backgroundColor: data.on ? displayColor : 'black',
   }
 
   const coloredButton = {
-    backgroundColor: devices.on ? 'black' : displayColor,
+    backgroundColor: data.on ? 'black' : displayColor,
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
   const BackButton = () => <button onClick={() => navigate("/")}>Back</button>;
 
+  const DeleteButton = () => <button onClick={api.delete}>Delete</button>;
+
   return (
     <div className="wrapper view column bottom" style={coloredBackground}>
       <Banner title='LED control'>
         <BackButton />
+        <DeleteButton />
       </Banner>
       <div className="spaced column">
         <div className='center'>
           <ColorWheel
-            color={devices.color}
+            color={data.color}
             onChange={colorChanged} />
         </div>
         <input
           type="range"
           min="0"
           max="10"
-          value={devices.brightness}
+          value={data.brightness}
           onChange={brightnessChanged} />
         <button onClick={togglePressed} style={coloredButton}>
-          {devices.on ? 'Off' : 'On'}
+          {data.on ? 'Off' : 'On'}
         </button>
       </div>
     </div>

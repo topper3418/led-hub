@@ -226,15 +226,16 @@ const update = async (device) => {
     });
 }
 
-const destroy = (mac) => {
-    logger.info('deleting device:', { mac })
+const destroy = (device) => {
+    logger.info('deleting device:', { device })
+    const { mac } = device;
     return new Promise((resolve, reject) => {
         useConnection((connection) => {
             let query = 'DELETE FROM devices WHERE mac = ?';
             logger.debug('running query:', { query, mac })
             connection.query(query, [mac], (err, results) => {
                 if (err) {
-                    logger.error('Error deleting device', { error: err.stack });
+                    logger.errorp(`Error deleting device ${device.name}: ${error.stack}`, { error, device });
                     reject(err);
                 }
                 logger.info('results:', { results });

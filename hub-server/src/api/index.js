@@ -5,7 +5,8 @@ const errors = require('./errors')
 
 router.route('/:id')
     .get(controller.read)
-    .post(controller.write);
+    .post(controller.write)
+    .delete(controller.delete);
 router.route('/')
     .get(controller.list)
     .post(controller.handshake);

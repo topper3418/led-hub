@@ -91,6 +91,31 @@ export const useLedStripHooks = (url: string): StripData => {
         setLoading(false);
       });
   }
+  // function to delete the strip
+  const destroy = () => {
+    console.log('deleting device')
+    setLoading(true);
+    axios.delete(url)
+      .then((res: AxiosResponse) => {
+        if (res.statusText != 'OK') {
+          throw new Error(
+            "Request failed, status: " +
+            res.status +
+            " " +
+            res.statusText
+          );
+        }
+        return res.data;
+      })
+      .then(setData)
+      .catch((err) => {
+        setError(err.message);
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+  }
   // function to refetch the data from the server
   const refetch = () => {
     setTrigger((oldVal) => oldVal + 1)
@@ -122,7 +147,7 @@ export const useLedStripHooks = (url: string): StripData => {
       });
   }, [url, trigger]);
   return {
-    state: { devices: data, loading, error },
-    api: { refetch, update }
+    state: { data, loading, error },
+    api: { refetch, update, delete: destroy }
   }
 }

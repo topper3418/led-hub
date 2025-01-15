@@ -25,7 +25,7 @@ const getDevice = async (req, res, next) => {
         res.status(404).send("Device not found");
         return;
     } else {
-        logger.info('found device', { device })
+        logger.infop('found device', { device })
         res.locals.device = device;
     }
     next();
@@ -120,9 +120,8 @@ const handshake = async (req, res, next) => {
 // - getDevice
 const read = async (req, res, next) => {
     const { device } = res.locals;
-    // instantiate led strip interface
-
     try {
+        logger.debug(`attemtping to read device: ${device.name}`, device)
         res.json(device.state)
     } catch (error) {
         logger.error(`${error.name} reading from ${device.name}: ${error.message}`, { error, device })
@@ -133,6 +132,7 @@ const read = async (req, res, next) => {
 // no Middleware
 const list = async (req, res, next) => {
     try {
+        logger.debug('listing devices')
         const devices = await db.devices.list();
         res.json(devices);
     } catch (error) {
@@ -145,26 +145,35 @@ const list = async (req, res, next) => {
 // - getDevice
 const write = async (req, res, next) => {
     const { device } = res.locals;
-    console.log('GOING TO WRITE TO DEVICE', { device })
     const { color, on, brightness } = req.body;
     try {
         const newState = { color, on, brightness }
-        logger.info(`writing to device ${device.name}`, { body: req.body, newState })
+        logger.debug(`attempting to write to device ${device.name}`, { device, newState })
         if (on === undefined) newState.on = device.on;
-        console.log('first test')
         await device.write(newState);
-        console.log('second test')
         const data = device.state;
         db.devices.update(device);
+        logger.infop(`successfully wrote to device ${device.name}`, { device, newState })
         res.json(data);
     } catch (error) {
-        logger.error('error posting to strip', { error: error.stack })
+        logger.errorp('error posting to strip', { error: error.stack })
         res.status(500).json({ error: error.stack, message: 'error posting to strip' });
     }
 }
 
+// Middleware:
+// - getDevice
+const destroy = async (req, res, next) => {
+    const { device } = res.locals;
+    try {
+        logger.debug(`attempting to delete device ${device.name}`, {device});
+        db.devices.delete(device);
+        logger.infop(`successfully deleted device ${device.name}`)
+    } catch (error) {
+        logger.errorp(`error deleting device ${device.name}: ${error.stack}`, { error, device});
+    }
+}
 
-// Middleware: 
 
 module.exports = {
     handshake: [
@@ -173,5 +182,6 @@ module.exports = {
         handshake],
     read: [getDevice, read],
     write: [getDevice, write],
-    list
+    list,
+    delete: [getDevice, destroy]
 };
