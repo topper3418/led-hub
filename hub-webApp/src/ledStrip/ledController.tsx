@@ -23,7 +23,7 @@ const LedController = ({ stripName }: { stripName: string }) => {
   }
 
   const togglePressed = () => {
-    update({ on: !data.on })
+    api.update({ on: !data.on })
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {

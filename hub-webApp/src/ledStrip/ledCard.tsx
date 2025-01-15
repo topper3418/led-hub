@@ -9,12 +9,10 @@ import { useLedStripHooks } from "./hooks";
 export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   const url = BACKEND_ROOT_URL + ledStrip.name;
   const {
-    state: { devices, loading, error },
+    state: { data, loading, error },
     api: { refetch, update }
   } = useLedStripHooks(url);
-  // const [ uiOnState, setUiOnState ] = useState('on')
 
-  // const colorIndicator = `rgba(${devices?.color?.r}, ${devices?.color?.g}, ${devices?.color?.b}, ${devices?.brightness / 10})`;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -28,10 +26,10 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   if (!ledStrip.connected) nameClass += " disconnected"
 
   const selectState = (newState: string) => {
-    console.log('current state is', devices);
+    console.log('current state is', data);
 
-    console.log('setting state to', { ...devices, on: newState == 'on' })
-    update({ ...devices, on: newState == 'on' });
+    console.log('setting state to', { ...data, on: newState == 'on' })
+    update({ ...data, on: newState == 'on' });
     refetch();
   }
 
@@ -46,9 +44,9 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
       <div className={nameClass}>{ledStrip.name}</div>
       <MultiStateButton
         options={['off', 'on']}
-        clicked={devices.on ? 'on' : 'off'}
+        clicked={data.on ? 'on' : 'off'}
         setClicked={selectState}
-        selectedColor={`rgb(${devices.color.r},${devices.color.g},${devices.color.b})`}
+        selectedColor={`rgb(${data.color.r},${data.color.g},${data.color.b})`}
       />
     </div>
   );
