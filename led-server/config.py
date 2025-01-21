@@ -1,5 +1,7 @@
 # device-specific
 DEVICE_NAME = 'FlatPi'
+LED_PIN = 16
+LED_COUNT = 1
 
 # wifi config
 SSID = "the way of the wamel"

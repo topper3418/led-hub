@@ -17,11 +17,13 @@ from boardLed import BoardLed
 from config import (SSID, 
                     PASSWORD,
                     HANDSHAKE_ENDPOINT,
-                    DEVICE_NAME)
+                    DEVICE_NAME,
+                    LED_PIN,
+                    LED_COUNT)
 
 
 # gpio 
-ledStrip = LedStrip(4, 30)
+ledStrip = LedStrip(LED_PIN, LED_COUNT)
 boardLed = BoardLed()
 # server
 connection = NetworkConnection(SSID, PASSWORD, pending=boardLed.toggle, complete=boardLed.turnOn)
