@@ -26,9 +26,6 @@ export const LedCard = ({ ledStrip, selectDevice }: ledCardInterface) => {
   if (!ledStrip.connected) nameClass += " disconnected"
 
   const selectState = (newState: string) => {
-    console.log('current state is', data);
-
-    console.log('setting state to', { ...data, on: newState == 'on' })
     update({ ...data, on: newState == 'on' });
     refetch();
   }

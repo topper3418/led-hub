@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { StripData, AllStripData } from "../types";
 import axios, { AxiosResponse } from 'axios';
+import { getLogger } from "../logging";
+
+const logger = getLogger('hooks');
 
 // const defaultProcessJson = (data: fetchStripResponse) => data;
 
@@ -17,7 +20,7 @@ export const useAllStrips = (
 
   useEffect(() => {
     setLoading(true);
-    console.log('fetching data from: ', url);
+    logger.debugp('fetching data from: ', url);
     axios.get(url)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {
@@ -31,12 +34,12 @@ export const useAllStrips = (
         return res.data;
       })
       .then((data) => {
-        console.log('got data:', data)
+        logger.debugp('got data:', data)
         setData(data)
       })
       .catch((err) => {
         setError(err.message);
-        console.error(err);
+        logger.errorp(err);
       })
       .finally(() => {
         setLoading(false);
@@ -44,7 +47,7 @@ export const useAllStrips = (
   }, [url, trigger]);
 
   return {
-    state: { devices: data, loading, error },
+    state: { data, loading, error },
     api: { refetch }
   };
 }
@@ -68,7 +71,7 @@ export const useLedStripHooks = (url: string): StripData => {
   const [data, setData] = useState<any>(undefined);
   // function to update the strip with an object
   const update = (newState: Partial<LedStripState>) => {
-    console.log('updating state: ', newState);
+    logger.infop('updating state: ', newState);
     setLoading(true);
     axios.post(url, newState)
       .then((res: AxiosResponse) => {
@@ -85,7 +88,7 @@ export const useLedStripHooks = (url: string): StripData => {
       .then(setData)
       .catch((err) => {
         setError(err.message);
-        console.error(err);
+        logger.errorp("Error updating device", err);
       })
       .finally(() => {
         setLoading(false);
@@ -93,7 +96,7 @@ export const useLedStripHooks = (url: string): StripData => {
   }
   // function to delete the strip
   const destroy = () => {
-    console.log('deleting device')
+    logger.infop('deleting device')
     setLoading(true);
     axios.delete(url)
       .then((res: AxiosResponse) => {
@@ -110,7 +113,7 @@ export const useLedStripHooks = (url: string): StripData => {
       .then(setData)
       .catch((err) => {
         setError(err.message);
-        console.error(err);
+        logger.errorp("error deleting device", err);
       })
       .finally(() => {
         setLoading(false);
@@ -123,6 +126,7 @@ export const useLedStripHooks = (url: string): StripData => {
   // effect that refreshes the data
   useEffect(() => {
     setLoading(true);
+    logger.debugp('fetching data from: ', url);
     axios.get(url)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {
@@ -140,7 +144,7 @@ export const useLedStripHooks = (url: string): StripData => {
       })
       .catch((err) => {
         setError(err.message);
-        console.error(err);
+        logger.errorp("Error refreshing device data", err);
       })
       .finally(() => {
         setLoading(false);

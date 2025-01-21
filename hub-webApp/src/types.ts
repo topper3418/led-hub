@@ -46,7 +46,7 @@ export interface baseFetchState {
 }
 
 export interface fetchState {
-  devices: any;
+  data: any;
   loading: boolean;
   error: string | undefined;
 }
@@ -58,12 +58,12 @@ export interface AllStripData {
   }
 }
 
-
 export interface StripData {
   state: fetchState;
   api: {
     update: (newState: SoftStripState) => void;
     refetch: () => void;
+    delete: () => void;
   }
 }
 

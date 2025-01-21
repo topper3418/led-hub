@@ -1,15 +1,25 @@
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import { LedCard } from "../ledStrip/ledCard";
 import { Device } from "../types";
 import { useAllStrips } from "../ledStrip/hooks";
 import { BACKEND_ROOT_URL } from "../config";
+import { getLogger } from "../logging";
+
+const logger = getLogger('views/devices');
 
 export const Devices: React.FC = () => {
     const navigate = useNavigate();
 
     const url = BACKEND_ROOT_URL;
-    const { state: { devices, loading, error } } = useAllStrips(url);
+    const { state: { data, loading, error } } = useAllStrips(url);
+
+    useEffect(() => {
+        if (!loading) {
+            logger.infop('data loaded:', data);
+        }
+    }, [loading]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -19,8 +29,8 @@ export const Devices: React.FC = () => {
         return <div>Error loading data</div>;
     }
 
-    const navToDevice = (device: Device) => {
-        navigate(`/${device.name}`);
+    const navToDevice = (data: Device) => {
+        navigate(`/${data.name}`);
     }
 
     return (
@@ -28,15 +38,18 @@ export const Devices: React.FC = () => {
             <header className="App-header">
                 <h1>Devices</h1>
             </header>
-            <div className="deviceContainer">
-                {devices.map((device: Device) => (
+            {loading ? <div>Loading...</div> :
+             !loading && error ? <div>Error loading data</div> :
+             !loading && data.length === 0 ? <div>No devices found</div> :
+                <div className="deviceContainer">
+                {data.map((data: Device) => (
                     <LedCard
-                        key={device.name}
-                        ledStrip={device}
-                        selectDevice={() => navToDevice(device)}
+                        key={data.name}
+                        ledStrip={data}
+                        selectDevice={() => navToDevice(data)}
                     />
                 ))}
-            </div>
+            </div>}
         </div>
     );
 

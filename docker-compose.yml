@@ -30,7 +30,7 @@ services:
     networks:
       - led-hub-network
     volumes:
-      - led-hub-log-data:/app/data/
+      - led-hub-log-data:/app
 
   app-server:
     build: ./hub-server
@@ -46,7 +46,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:-led-hub-db-pass}
       DB_NAME: ${MYSQL_DATABASE:-led-hub}
       SERVER_PORT: 2000
-      LOGGING_SERVICE_ENDPOINT: http://logging-service:8080
+      LOGGING_SERVICE_ENDPOINT: http://logging-service:8080/logs
     ports:
       - '${LED_HUB_APP_PORT:-2000}:2000' 
     networks:
@@ -59,6 +59,8 @@ services:
       args: 
         BACKEND_HOST: app-server
         BACKEND_PORT: 2000
+        LOGGER_HOST: logging-service
+        LOGGER_PORT: 8080
         WEBAPP_PORT: ${WEBAPP_PORT:-80}
     ports:
       - '${LED_HUB_WEBAPP_PORT:-80}:80' 
