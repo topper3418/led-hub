@@ -1,15 +1,19 @@
 // import { useState, useEffect } from 'react'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ColorWheel, { RGB } from '../components/colorWheel';
 import Banner from '../components/banner';
-import { useLedStripHooks } from "./hooks";
+import { useLedStripHooks } from "../ledStrip/hooks.ts";
 import { BACKEND_ROOT_URL } from "../config";
 import '../App.css'
+import { getLogger } from "../logging";
+
+const logger = getLogger('views/ledController');
 // simple webpage
 // has a simple button for on/off 
 // has a slider for brightness
 // has a color picker for color
-const LedController = ({ stripName }: { stripName: string }) => {
+const LedController = () => {
+  const stripName = useParams<{ deviceName: string }>().deviceName;
   const url = BACKEND_ROOT_URL + stripName
   const { state: { data, loading, error }, api } = useLedStripHooks(url);
   const navigate = useNavigate();
@@ -23,14 +27,17 @@ const LedController = ({ stripName }: { stripName: string }) => {
   }
 
   const togglePressed = () => {
+    logger.debugp('toggle pressed');
     api.update({ on: !data.on })
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    logger.debugp('brightness changed', {brightness: e.target.value});
     api.update({ brightness: parseInt(e.target.value) });
   }
 
   const colorChanged = (color: RGB) => {
+    logger.debugp('color changed', {color});
     api.update({ color })
   }
 
