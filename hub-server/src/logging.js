@@ -1,12 +1,12 @@
 const axios = require('axios');
 
-const LOGGING_SERVICE_ENDPOINT = process.env.LOGGING_SERVICE_ENDPOINT || 'http://localhost:8080';
+const LOGGING_SERVICE_ENDPOINT = process.env.LOGGING_SERVICE_ENDPOINT || 'http://localhost:8080/logs';
 
 function getLogger(loggerName) {
   const log = async (level, message, meta = {}, print = false) => {
     try {
-      await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
-        logger: loggerName,
+      await axios.post(LOGGING_SERVICE_ENDPOINT, {
+        logger: `server/${loggerName}`,
         level,
         message,
         meta
