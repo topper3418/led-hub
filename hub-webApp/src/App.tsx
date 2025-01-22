@@ -1,12 +1,8 @@
-// import { Router } from "react-router-dom";
-// import React, { useEffect, useState } from "react";
 import React from "react";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 import LedController from "./views/ledController";
-// import LogView from "./logs";
-// import { LedCard } from "./ledStrip/ledCard";
-// import { Device } from "./types";
+import LogView from "./views/logView";
 import { Devices } from "./views/devices";
 
 
@@ -16,6 +12,7 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/:deviceName" element={<LedController />} />
                 <Route path="/" element={<Devices />} />
+                <Route path="/logview" element={<LogView />} />
             </Routes>
         </Router>
     )

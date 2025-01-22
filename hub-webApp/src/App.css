@@ -6,13 +6,17 @@ body, p, div, h1, h2, a {
   color: white;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   overflow-x: hidden;
   background-color: black;
   color-scheme: dark;
   margin: 0;
   padding: 0;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 div {
@@ -183,8 +187,34 @@ input[type="range"]::-webkit-slider-thumb {
   border-color: yellow;
 }
 
+.fill-height {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 .banner {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* ensures borders are not doubled */
+  border: 1px solid white;   /* table border */
+  background-color: black;
+  color: white;
+}
+
+table th,
+table td {
+  border: 1px solid white;  /* cell borders */
+  padding: 3px;
+}
+
+

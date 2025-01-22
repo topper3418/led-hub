@@ -24,8 +24,6 @@ const Banner: React.FC<BannerProps> = ({ title, children }) => {
       RightElement = React.Children.toArray(children)[1];
     }
   }
-  console.log('rendering banner with chldren', { LeftElement, RightElement })
-
   return (
     <div className="banner">
       {LeftElement}
