@@ -4,4 +4,4 @@ export const SERVER_ROUTE_MODE = import.meta.env.VITE_SERVER_ROUTE_MODE || 'dire
 export const COMPILED_ROOT_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}/`;
 export const BACKEND_ROOT_URL = SERVER_ROUTE_MODE === 'proxy' ? '/api/' : COMPILED_ROOT_URL
 export const LOGGING_URL = import.meta.env.VITE_LOGGING_URL || 'localhost:8080';
-export const LOGGING_SERVICE_ENDPOINT = SERVER_ROUTE_MODE === 'proxy' ? '/logs' : `http://${LOGGING_URL}/logs`;
+export const LOGGING_SERVICE_ENDPOINT = SERVER_ROUTE_MODE === 'proxy' ? '/logs/' : `http://${LOGGING_URL}/logs`;

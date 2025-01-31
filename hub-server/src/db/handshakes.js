@@ -24,7 +24,7 @@ const create = ({ mac, ip, port }) => {
                     logger.errorp('Error querying the database:', { error: err.stack });
                     reject(err);
                 }
-                logger.debugp('results from handshake creation', { results });
+                logger.debug('results from handshake creation', { results });
                 resolve(results);
             });
         });

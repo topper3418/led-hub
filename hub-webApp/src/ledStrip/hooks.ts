@@ -20,7 +20,7 @@ export const useAllStrips = (
 
   useEffect(() => {
     setLoading(true);
-    logger.debugp('fetching data from: ', url);
+    logger.debug('fetching data from: ', url);
     axios.get(url)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {
@@ -34,7 +34,7 @@ export const useAllStrips = (
         return res.data;
       })
       .then((data) => {
-        logger.debugp('got data:', data)
+        logger.debug('got data:', data)
         setData(data)
       })
       .catch((err) => {
@@ -126,7 +126,7 @@ export const useLedStripHooks = (url: string): StripData => {
   // effect that refreshes the data
   useEffect(() => {
     setLoading(true);
-    logger.debugp('fetching data from: ', url);
+    logger.debug('fetching data from: ', url);
     axios.get(url)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {

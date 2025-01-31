@@ -27,17 +27,17 @@ const LedController = () => {
   }
 
   const togglePressed = () => {
-    logger.debugp('toggle pressed');
+    logger.debug('toggle pressed');
     api.update({ on: !data.on })
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    logger.debugp('brightness changed', {brightness: e.target.value});
+    logger.debug('brightness changed', { brightness: e.target.value });
     api.update({ brightness: parseInt(e.target.value) });
   }
 
   const colorChanged = (color: RGB) => {
-    logger.debugp('color changed', {color});
+    logger.debug('color changed', { color });
     api.update({ color })
   }
 

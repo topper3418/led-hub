@@ -121,7 +121,7 @@ const find = ({ mac, name, ip, port }) => {
                 return reject(new Error('No valid search criteria provided'))
             }
             params = [criteria];
-            logger.debugp('running query:', { query, params })
+            logger.debug('running query:', { query, params })
             connection.query(query, params, (err, results) => {
                 if (err) {
                     logger.error('Error finding device:', { error: err.stack });

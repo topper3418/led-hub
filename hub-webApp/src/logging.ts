@@ -10,6 +10,7 @@ enum LogLevel {
 
 export const getLogger = (loggerName: string) => {
   const log = async (level: LogLevel, message: string, meta: any = null, printOut: boolean = false) => {
+    console.log(`logging message ${message} to logger ${loggerName}`)
     try {
       await axios.post(LOGGING_SERVICE_ENDPOINT, {
         logger: `webapp/${loggerName}`,

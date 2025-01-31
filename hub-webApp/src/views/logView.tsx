@@ -6,7 +6,7 @@ import { LOGGING_SERVICE_ENDPOINT } from "../config";
 import axios, { AxiosResponse } from "axios";
 import { formatDateString } from "../util";
 
-const logger = getLogger("views.logView");
+const logger = getLogger("views/logView");
 
 const LogView: React.FC = () => {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ const LogView: React.FC = () => {
     const [limit, setLimit] = useState<number>(100);
     const [includeLoggers, setIncludeLoggers] = useState<string[]>([]);
     const [excludeLoggers, setExcludeLoggers] = useState<string[]>([]);
-    const [search, setSearch] = useState<string>("");
+    const [search, setSearch] = useState<string>(" ");
 
     const logs = useFetchLogs({
         minTime,
@@ -161,7 +161,7 @@ const useFetchLogs = (params: LogQueryParams) => {
     const [error, setError] = useState<string | null>(null);
     const [trigger, setTrigger] = useState<boolean>(false);
     useEffect(() => {
-        logger.debugp(`fetching logs from ${LOGGING_SERVICE_ENDPOINT}`, params);
+        logger.debug(`fetching logs from ${LOGGING_SERVICE_ENDPOINT}`, params);
         setLoading(true);
         axios.get(LOGGING_SERVICE_ENDPOINT, { params })
             .then((res: AxiosResponse) => {
@@ -176,12 +176,12 @@ const useFetchLogs = (params: LogQueryParams) => {
                 return res.data;
             })
             .then((data) => {
-                logger.debugp("got data:", data);
+                logger.debug("got data:", data);
                 setLogs(data);
             })
             .catch((err) => {
                 setError(err.message);
-                logger.errorp(err);
+                logger.errorp("error fetching logs", err);
             })
             .finally(() => {
                 setLoading(false);

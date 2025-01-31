@@ -5,7 +5,7 @@ const logger = getLogger('scheduler/controller');
 
 // ping a strip and get its data, update the database
 const refreshDevice = async (device) => {
-    logger.debugp(`refreshing device "${device.name}"`);
+    logger.debug(`refreshing device "${device.name}"`);
     try {
         await device.refreshState();
     } catch (error) {
