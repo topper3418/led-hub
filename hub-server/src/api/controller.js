@@ -166,11 +166,11 @@ const write = async (req, res, next) => {
 const destroy = async (req, res, next) => {
     const { device } = res.locals;
     try {
-        logger.debug(`attempting to delete device ${device.name}`, {device});
+        logger.debug(`attempting to delete device ${device.name}`, { device });
         db.devices.delete(device);
         logger.infop(`successfully deleted device ${device.name}`)
     } catch (error) {
-        logger.errorp(`error deleting device ${device.name}: ${error.stack}`, { error, device});
+        logger.errorp(`error deleting device ${device.name}: ${error.stack}`, { error, device });
     }
 }
 
