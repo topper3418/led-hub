@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { CSSProperties, useEffect, useState } from "react"
 import Banner from "../components/banner";
 import { useNavigate } from "react-router-dom";
 import { getLogger } from "../logging";
@@ -32,13 +32,72 @@ const LogView: React.FC = () => {
     const tableWrapperStyle = {
         flex: "0 0 800px",
         overflowY: "auto",
-    }
+    } as CSSProperties;
 
     return (
-        <div className="wrapper view column">
+        <div className="wrapper view column gapped">
             <Banner title="Log View">
                 <BackButton />
             </Banner>
+            <div className="row gapped">
+                <label>
+                    Min Time:
+                    <input
+                        type="datetime-local"
+                        value={minTime}
+                        onChange={(e) => setMinTime(e.target.value)}
+                    />
+                </label>
+                <label>
+                    Max Time:
+                    <input
+                        type="datetime-local"
+                        value={maxTime}
+                        onChange={(e) => setMaxTime(e.target.value)}
+                    />
+                </label>
+                <label>
+                    Offset:
+                    <input
+                        type="number"
+                        value={offset}
+                        onChange={(e) => setOffset(parseInt(e.target.value))}
+                    />
+                </label>
+                <label>
+                    Limit:
+                    <input
+                        type="number"
+                        value={limit}
+                        onChange={(e) => setLimit(parseInt(e.target.value))}
+                    />
+                </label>
+                <label>
+                    Include Loggers:
+                    <input
+                        type="text"
+                        value={includeLoggers.join(",")}
+                        onChange={(e) => setIncludeLoggers(e.target.value.split(","))}
+                    />
+                </label>
+                <label>
+                    Exclude Loggers:
+                    <input
+                        type="text"
+                        value={excludeLoggers.join(",")}
+                        onChange={(e) => setExcludeLoggers(e.target.value.split(","))}
+                    />
+                </label>
+                <label>
+                    Search:
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </label>
+                <button onClick={() => logs.refetch()}>Refresh</button>
+            </div>
             <div className="row flex">
                 <div className="column flex" style={tableWrapperStyle}>
                     <table>
@@ -104,7 +163,7 @@ const useFetchLogs = (params: LogQueryParams) => {
     useEffect(() => {
         logger.debugp(`fetching logs from ${LOGGING_SERVICE_ENDPOINT}`, params);
         setLoading(true);
-        axios.get(LOGGING_SERVICE_ENDPOINT)
+        axios.get(LOGGING_SERVICE_ENDPOINT, { params })
             .then((res: AxiosResponse) => {
                 if (res.statusText != "OK") {
                     throw new Error(

@@ -66,6 +66,10 @@ h1, h2, h3 {
   flex-direction: column;
 }
 
+.gapped {
+  gap: 10px;
+}
+
 .wrapper {
   background-color: black;
   display: flex;
