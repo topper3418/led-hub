@@ -1,4 +1,4 @@
-export const formatDateString = (dateTimeString: string) => {
+export const formatDateString = (dateTimeString: string, includeDay: boolean = true) => {
   // Convert string to Date object
   const date = new Date(dateTimeString);
 
@@ -11,5 +11,7 @@ export const formatDateString = (dateTimeString: string) => {
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
   // Return a concise date/time string
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  if (includeDay) {
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  } else return `${hours}:${minutes}:${seconds}`;
 };

@@ -10,9 +10,8 @@ enum LogLevel {
 
 export const getLogger = (loggerName: string) => {
   const log = async (level: LogLevel, message: string, meta: any = null, printOut: boolean = false) => {
-    console.log(`logging message ${message} to logger ${loggerName}`)
     try {
-      await axios.post(LOGGING_SERVICE_ENDPOINT, {
+      await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
         logger: `webapp/${loggerName}`,
         level,
         message,
@@ -20,7 +19,7 @@ export const getLogger = (loggerName: string) => {
       });
       if (printOut) {
         const fmtMessage = `${loggerName} - ${level.toUpperCase()} - ${message}`;
-        const printPackage = Object.keys(meta).length !== 0 ? [fmtMessage, meta] : [fmtMessage];
+        const printPackage = Object.keys(meta || {}).length !== 0 ? [fmtMessage, meta] : [fmtMessage];
         if (level === 'error') {
           console.error(...printPackage);
         } else if (level === 'warn') {

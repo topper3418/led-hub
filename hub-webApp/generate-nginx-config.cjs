@@ -40,7 +40,7 @@ server {
     proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/;
   }
   location /logs/ {
-    proxy_pass http://${LOGGING_HOST}:${LOGGING_PORT}/logs;
+    proxy_pass http://${LOGGING_HOST}:${LOGGING_PORT}/;
   }
 }
 `;
