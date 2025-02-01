@@ -9,6 +9,10 @@ enum LogLevel {
 }
 
 export const getLogger = (loggerName: string) => {
+  // ensure the logger exists in the logging service
+  axios.post(`${LOGGING_SERVICE_ENDPOINT}/loggers`, { name: loggerName })
+    .catch((error) => console.log('Error creating logger:', error));
+  // logging function to wrap in logger methods
   const log = async (level: LogLevel, message: string, meta: any = null, printOut: boolean = false) => {
     try {
       await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {

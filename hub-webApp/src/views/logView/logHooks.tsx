@@ -34,6 +34,7 @@ export interface LogFilters {
         excludeLoggers: {
             add: (loggerId: number) => void;
             remove: (loggerId: number) => void;
+            raw: (loggerIds: number[]) => void;
         };
         search: (search: string) => void;
     };
@@ -75,7 +76,8 @@ export const useFilters = () => {
             limit: setLimit,
             excludeLoggers: {
                 add: addExcludeLogger,
-                remove: removeExcludeLogger
+                remove: removeExcludeLogger,
+                raw: setExcludeLoggers
             },
             search: setSearch
         },
@@ -105,8 +107,7 @@ export const useFetchLogs = (params: LogQueryParams): LogsApi => {
     const [trigger, setTrigger] = useState<boolean>(false);
     useEffect(() => {
         const endpoint = `${LOGGING_SERVICE_ENDPOINT}/logs`;
-        logger.debugp(`fetching logs from ${endpoint}`, { params });
-        console.log(`search param is: [${params.search}]`, 'length=', params.search.length);
+        logger.debug(`fetching logs from ${endpoint}`, { params });
         setLoading(true);
         axios.get(endpoint, {
             params, paramsSerializer: (paramsObj) => {
@@ -133,7 +134,7 @@ export const useFetchLogs = (params: LogQueryParams): LogsApi => {
                 return res.data;
             })
             .then((data) => {
-                logger.debug("got logs:", data);
+                logger.debug("got logs:", { data });
                 setLogs(data);
             })
             .catch((err) => {

@@ -40,7 +40,7 @@ export const useFetchLoggers = (): LoggersApi => {
                 return res.data;
             })
             .then((data) => {
-                logger.debugp("got loggers:", data);
+                logger.debug("got loggers:", data);
                 setLogs(data);
             })
             .catch((err) => {
@@ -67,13 +67,13 @@ export interface SetLoggerLevelApi {
     error: string | null;
 }
 
-export type SetLoggerLevel = (loggerId: number, level: string) => void;
+export type SetLoggerLevel = (loggerId: number, level: string, refreshCallback: () => void) => void;
 
 export const useSetLoggerLevel = (): [SetLoggerLevel, SetLoggerLevelApi] => {
     const [data, setData] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const setLoggerLevel: SetLoggerLevel = (loggerId, level) => {
+    const setLoggerLevel: SetLoggerLevel = (loggerId, level, refreshCallback) => {
         const endpoint = `${LOGGING_SERVICE_ENDPOINT}/loggers`;
         logger.debug(`setting logger level for logger ${loggerId} to ${level}`);
         setLoading(true);
@@ -99,6 +99,7 @@ export const useSetLoggerLevel = (): [SetLoggerLevel, SetLoggerLevelApi] => {
             })
             .finally(() => {
                 setLoading(false);
+                refreshCallback();
             });
     }
     return [setLoggerLevel, { data, loading, error }];
