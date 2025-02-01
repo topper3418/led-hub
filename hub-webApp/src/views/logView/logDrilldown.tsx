@@ -11,7 +11,7 @@ interface LogDrilldownProps {
 
 const logDrilldownStyle: React.CSSProperties = {
     overflowY: "auto",
-    flexGrow: .5,
+    flexGrow: 1,
 }
 
 const LogDrilldown: React.FC<LogDrilldownProps> = ({ logId }) => {

@@ -14,7 +14,6 @@ interface LoggerTableProps {
 
 const loggerWrapperStyle: CSSProperties = {
     overflowY: "auto",
-    flexShrink: .5
 }
 
 const LoggerTable: React.FC<LoggerTableProps> = ({ loggersApi: { data, loading, error }, logFilters, refreshView }) => {

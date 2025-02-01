@@ -4,9 +4,7 @@ import { formatDateString } from "../../util";
 
 const tableWrapperStyle: CSSProperties = {
     overflowY: "auto",
-    flexGrow: 1,
-    maxWidth: "1000px",
-    minWidth: "500px"
+    width: "800px",
 }
 
 interface LogTableProps {
