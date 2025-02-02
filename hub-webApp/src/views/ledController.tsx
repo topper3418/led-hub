@@ -6,6 +6,7 @@ import { useLedStripHooks } from "../ledStrip/hooks.ts";
 import { BACKEND_ROOT_URL } from "../config";
 import '../App.css'
 import { getLogger } from "../logging";
+import { CSSProperties } from "react";
 
 const logger = getLogger('views/ledController');
 // simple webpage
@@ -43,10 +44,6 @@ const LedController = () => {
 
   const displayColor = `rgba(${data?.color.r}, ${data?.color.g}, ${data?.color.b}, ${data?.brightness / 10})`;
 
-  const coloredBackground = {
-    backgroundColor: data.on ? displayColor : 'black',
-  }
-
   const coloredButton = {
     backgroundColor: data.on ? 'black' : displayColor,
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
@@ -56,28 +53,37 @@ const LedController = () => {
 
   const DeleteButton = () => <button onClick={api.delete}>Delete</button>;
 
+  const wrapperStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "stretch",
+    height: "100vh",
+    backgroundColor: data.on ? displayColor : 'black',
+    padding: "10px",
+    gap: "10px"
+  }
+
   return (
-    <div className="wrapper view column bottom" style={coloredBackground}>
+    <div style={wrapperStyle}>
       <Banner title='LED control'>
         <BackButton />
         <DeleteButton />
       </Banner>
-      <div className="spaced column">
-        <div className='center'>
-          <ColorWheel
-            color={data.color}
-            onChange={colorChanged} />
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="10"
-          value={data.brightness}
-          onChange={brightnessChanged} />
-        <button onClick={togglePressed} style={coloredButton}>
-          {data.on ? 'Off' : 'On'}
-        </button>
+      <div className='center'>
+        <ColorWheel
+          color={data.color}
+          onChange={colorChanged} />
       </div>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={data.brightness}
+        onChange={brightnessChanged} />
+      <button onClick={togglePressed} style={coloredButton}>
+        {data.on ? 'Off' : 'On'}
+      </button>
     </div>
   )
 }
