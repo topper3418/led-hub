@@ -1,7 +1,7 @@
 const { getLogger } = require('./logging');
 const axios = require('axios');
 
-const logger = getLogger('ledStrip', 'debug')
+const logger = getLogger('ledStrip')
 
 class LedStripInterface {
     constructor({ name, mac, ip, port }) {

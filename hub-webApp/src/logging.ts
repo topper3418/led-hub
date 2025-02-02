@@ -9,20 +9,21 @@ enum LogLevel {
 }
 
 export const getLogger = (loggerName: string) => {
+  const loggerNameAppended = `webapp/${loggerName}`;
   // ensure the logger exists in the logging service
-  axios.post(`${LOGGING_SERVICE_ENDPOINT}/loggers`, { name: loggerName })
+  axios.post(`${LOGGING_SERVICE_ENDPOINT}/loggers`, { name: loggerNameAppended })
     .catch((error) => console.log('Error creating logger:', error));
   // logging function to wrap in logger methods
   const log = async (level: LogLevel, message: string, meta: any = null, printOut: boolean = false) => {
     try {
       await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
-        logger: `webapp/${loggerName}`,
+        logger: `webapp/${loggerNameAppended}`,
         level,
         message,
         meta
       });
       if (printOut) {
-        const fmtMessage = `${loggerName} - ${level.toUpperCase()} - ${message}`;
+        const fmtMessage = `${loggerNameAppended} - ${level.toUpperCase()} - ${message}`;
         const printPackage = Object.keys(meta || {}).length !== 0 ? [fmtMessage, meta] : [fmtMessage];
         if (level === 'error') {
           console.error(...printPackage);

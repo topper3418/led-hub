@@ -25,7 +25,7 @@ const getDevice = async (req, res, next) => {
         res.status(404).send("Device not found");
         return;
     } else {
-        logger.infop('found device', { device })
+        logger.info('found device', { device })
         res.locals.device = device;
     }
     next();

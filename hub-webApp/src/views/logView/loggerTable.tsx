@@ -43,6 +43,7 @@ const LoggerTable: React.FC<LoggerTableProps> = ({ loggersApi: { data, loading, 
     if (loading) {
         tableStyle.borderColor = "yellow";
     }
+    const sortedData = data?.sort((a, b) => a.name.localeCompare(b.name));
     return (
         <div style={loggerWrapperStyle}>
             <table style={tableStyle}>
@@ -61,7 +62,7 @@ const LoggerTable: React.FC<LoggerTableProps> = ({ loggersApi: { data, loading, 
                 <tbody>
                     {error ? (
                         <tr><td colSpan={4}>Error: {error}</td></tr>
-                    ) : data && data.length > 0 ? data.map((logger) => (
+                    ) : sortedData && sortedData.length > 0 ? sortedData.map((logger) => (
                         <tr key={logger.id}>
                             <td>
                                 <input
