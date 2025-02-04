@@ -62,6 +62,7 @@ services:
         LOGGER_HOST: logging-service
         LOGGER_PORT: 8080
         WEBAPP_PORT: ${WEBAPP_PORT:-80}
+    restart: always
     ports:
       - '${LED_HUB_WEBAPP_PORT:-80}:80' 
     depends_on:
