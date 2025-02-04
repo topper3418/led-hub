@@ -10,7 +10,7 @@ const isMac = (mac) => {
 // gets the device object and attaches it to locals
 const getDevice = async (req, res, next) => {
     const { id } = req.params;
-    logger.debug('searching for device device:', { id });
+    logger.debug('searching for device with id:', { id });
     let device;
     try {
         if (isMac(id)) {
