@@ -3,6 +3,8 @@ const controller = require('./controller')
 const errors = require('./errors')
 
 
+router.route('/all')
+    .post(controller.writeAll)
 router.route('/:id')
     .get(controller.read)
     .post(controller.write)

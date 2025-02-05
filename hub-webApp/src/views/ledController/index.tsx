@@ -1,19 +1,17 @@
-// import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from "react-router-dom";
-import ColorWheel, { RGB } from '../components/colorWheel';
-import Banner from '../components/banner';
-import { useLedStripHooks } from "../ledStrip/hooks.ts";
-import { BACKEND_ROOT_URL } from "../config";
-import '../App.css'
-import { getLogger } from "../logging";
-import { CSSProperties } from "react";
+import Banner from '../../components/banner.tsx';
+import { BACKEND_ROOT_URL } from "../../config.ts";
+import { getLogger } from "../../logging.ts";
+import React, { CSSProperties } from "react";
+import ColorWheel, { RGB } from "../../components/colorWheel";
+import { useLedStripHooks } from "./hooks.ts";
 
 const logger = getLogger('views/ledController');
 // simple webpage
 // has a simple button for on/off 
 // has a slider for brightness
 // has a color picker for color
-const LedController = () => {
+const LedController: React.FC = () => {
   const stripName = useParams<{ deviceName: string }>().deviceName;
   const url = BACKEND_ROOT_URL + stripName
   const { state: { data, loading, error }, api } = useLedStripHooks(url);
@@ -29,7 +27,7 @@ const LedController = () => {
 
   const togglePressed = () => {
     logger.debug('toggle pressed');
-    api.update({ on: !data.on })
+    api.update({ on: !data?.on })
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,10 +40,10 @@ const LedController = () => {
     api.update({ color })
   }
 
-  const displayColor = `rgba(${data?.color.r}, ${data?.color.g}, ${data?.color.b}, ${data?.brightness / 10})`;
+  const displayColor = `rgba(${data?.color.r}, ${data?.color.g}, ${data?.color.b}, ${data?.brightness || 0 / 10})`;
 
   const coloredButton = {
-    backgroundColor: data.on ? 'black' : displayColor,
+    backgroundColor: data?.on ? 'black' : displayColor,
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
@@ -59,30 +57,31 @@ const LedController = () => {
     justifyContent: "center",
     alignItems: "stretch",
     height: "100vh",
-    backgroundColor: data.on ? displayColor : 'black',
+    backgroundColor: data?.on ? displayColor : 'black',
     padding: "10px",
     gap: "10px"
   }
+  console.log('data', data)
 
   return (
     <div style={wrapperStyle}>
-      <Banner title='LED control'>
+      <Banner title={data?.name || "unknown device"}>
         <BackButton />
         <DeleteButton />
       </Banner>
       <div className='center'>
         <ColorWheel
-          color={data.color}
+          color={data?.color as RGB}
           onChange={colorChanged} />
       </div>
       <input
         type="range"
         min="0"
         max="100"
-        value={data.brightness}
+        value={data?.brightness}
         onChange={brightnessChanged} />
       <button onClick={togglePressed} style={coloredButton}>
-        {data.on ? 'Off' : 'On'}
+        {data?.on ? 'Off' : 'On'}
       </button>
     </div>
   )

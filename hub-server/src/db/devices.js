@@ -63,11 +63,9 @@ class Device {
             name: this.name,
             current_ip: this.current_ip,
             current_port: this.current_port,
-            state: {
-                on: this.on,
-                brightness: this.brightness,
-                color: this.color
-            },
+            on: this.on,
+            brightness: this.brightness,
+            color: this.color,
             connected: this.connected
         }
     }

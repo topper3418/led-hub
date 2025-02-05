@@ -122,7 +122,7 @@ const read = async (req, res, next) => {
     const { device } = res.locals;
     try {
         logger.debug(`attemtping to read device: ${device.name}`, device)
-        res.json(device.state)
+        res.json(device)
     } catch (error) {
         logger.error(`${error.name} reading from ${device.name}: ${error.message}`, { error, device })
         res.status(500).json({ error: error.stack, message: 'error fetching from strip' });
@@ -161,6 +161,34 @@ const write = async (req, res, next) => {
     }
 }
 
+const writeAll = async (req, res, next) => {
+    const { color, on, brightness } = req.body;
+    try {
+        const devices = await db.devices.list();
+        const data = [];
+        const writePromises = devices.map(async (device) => {
+            const newState = { color, on, brightness };
+            logger.debug(`attempting to write to device ${device.name}`, { device, newState })
+            if (on === undefined) newState.on = device.on;
+            try {
+                await device.write(newState);
+                data.push(device.state);
+                db.devices.update(device);
+                logger.infop(`successfully wrote to device ${device.name}`, { device, newState })
+                return device.state;
+            } catch (error) {
+                logger.errorp(`error writing to device ${device.name}`, { device, error: error.stack })
+                return { error: error.stack, device: device.name }
+            }
+        })
+        await Promise.all(writePromises);
+        res.json(data);
+    } catch (error) {
+        logger.errorp('error posting to strip', { error: error.stack })
+        res.status(500).json({ error: error.stack, message: 'error posting to strip' });
+    }
+}
+
 // Middleware:
 // - getDevice
 const destroy = async (req, res, next) => {
@@ -183,5 +211,6 @@ module.exports = {
     read: [getDevice, read],
     write: [getDevice, write],
     list,
-    delete: [getDevice, destroy]
+    delete: [getDevice, destroy],
+    writeAll
 };

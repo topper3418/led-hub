@@ -11,7 +11,7 @@ export interface Device {
   current_ip: string;
   on: boolean;
   brightness: number;
-  color: [number, number, number];
+  color: Color;
   connected: boolean;
 }
 

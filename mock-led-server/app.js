@@ -35,16 +35,20 @@ app.use((req, res, next) => {
 });
 
 // Handshake function
-async function handshake() {
+async function handshake(mac, type, ip, name, port) {
     const handshakeData = {
-        mac: 'mockMacAddress',
-        type: 'LedStrip',
-        ip: '192.168.68.54',
-        name: 'mock-led',
-        port: PORT
+        mac,
+        type,
+        ip,
+        name,
+        port
     };
 
+    const SERVER_PORT = 2000;
+    const SERVER_ADDRESS = 'localhost'; // Replace with your server address
     console.log("attempting handshake with data:", handshakeData)
+
+    const HANDSHAKE_ENDPOINT = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`;
 
     try {
         const response = await axios.post(HANDSHAKE_ENDPOINT, handshakeData);

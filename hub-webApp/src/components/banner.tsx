@@ -1,13 +1,14 @@
-import React, { ReactElement } from 'react';
+import React, { CSSProperties, ReactElement } from 'react';
 
 
 interface BannerProps {
   title: string;
   titleElement?: 'h1' | 'h2' | ReactElement;
   children?: React.ReactNode;
+  loading?: boolean;
 }
 
-const Banner: React.FC<BannerProps> = ({ title, children }) => {
+const Banner: React.FC<BannerProps> = ({ title, children, loading }) => {
 
   let LeftElement: React.ReactNode = <div style={{ width: "75px" }}></div>;
   let RightElement: React.ReactNode = <div style={{ width: "75px" }}></div>;
@@ -24,10 +25,13 @@ const Banner: React.FC<BannerProps> = ({ title, children }) => {
       RightElement = React.Children.toArray(children)[1];
     }
   }
+  const headerStyle: CSSProperties = {}
+  if (loading) headerStyle.color = "yellow";
+
   return (
     <div className="banner">
       {LeftElement}
-      <h1>{title}</h1>
+      <h1 style={headerStyle}>{title}</h1>
       {RightElement}
     </div>
   );
