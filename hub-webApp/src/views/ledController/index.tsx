@@ -7,27 +7,22 @@ import ColorWheel, { RGB } from "../../components/colorWheel";
 import { useLedStripHooks } from "./hooks.ts";
 
 const logger = getLogger('views/ledController');
-// simple webpage
-// has a simple button for on/off 
-// has a slider for brightness
-// has a color picker for color
 const LedController: React.FC = () => {
   const stripName = useParams<{ deviceName: string }>().deviceName;
   const url = BACKEND_ROOT_URL + stripName
-  const { state: { data, loading, error }, api } = useLedStripHooks(url);
+  const {
+    fetchState: { data, loading, error },
+    api
+  } = useLedStripHooks(url);
   const navigate = useNavigate();
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
 
   if (error) {
     return <div>Error loading data</div>
   }
 
   const togglePressed = () => {
-    logger.debug('toggle pressed');
-    api.update({ on: !data?.on })
+    logger.debugp('toggle pressed');
+    api.update({ on: !data?.on });
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,11 +56,12 @@ const LedController: React.FC = () => {
     padding: "10px",
     gap: "10px"
   }
-  console.log('data', data)
 
   return (
     <div style={wrapperStyle}>
-      <Banner title={data?.name || "unknown device"}>
+      <Banner
+        loading={loading}
+        title={data?.name || "unknown device"}>
         <BackButton />
         <DeleteButton />
       </Banner>

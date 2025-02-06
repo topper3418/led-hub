@@ -1,115 +1,37 @@
 import { useEffect, useState } from "react";
-import { BACKEND_ROOT_URL } from "../../config";
 import { getLogger } from "../../logging";
 import { Device } from "../../types";
-import axios, { AxiosResponse } from "axios";
-
+import { BACKEND_ROOT_URL } from "../../config";
+import { useFetch } from "../../hooks/useFetch";
+import { usePost } from "../../hooks/usePost";
 const logger = getLogger('views/devices/hooks');
 
-export interface AllLedStripQueryHook {
-    state: {
-        data: Device[];
-        loading: boolean;
-        error: string | undefined;
-    };
-    api: {
-        refetch: () => void;
-    }
-}
-
-export const useAllLedStrips = (
-    url: string
-): AllLedStripQueryHook => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | undefined>(undefined);
-    const [trigger, setTrigger] = useState(false);
-    const [data, setData] = useState<any>(undefined);
-
-    const refetch = () => setTrigger(!trigger);
-
+export const useAllLedStrips = () => {
+    const { state, api } = useFetch<Device[]>(BACKEND_ROOT_URL);
     useEffect(() => {
-        setLoading(true);
-        logger.debug('fetching data from: ', url);
-        axios.get(url)
-            .then((res: AxiosResponse) => {
-                if (res.statusText != 'OK') {
-                    throw new Error(
-                        "Request failed, status: " +
-                        res.status +
-                        " " +
-                        res.statusText
-                    );
-                }
-                return res.data;
-            })
-            .then((data) => {
-                logger.debug('got data:', data)
-                setData(data)
-            })
-            .catch((err) => {
-                setError(err.message);
-                logger.errorp(err);
-            })
-            .finally(() => {
-                setLoading(false);
-                // set timeout to refetch data every 5 seconds
-            });
+        if (state.loading) return;
+        if (state.data) {
+            logger.debug('got data:', state.data);
+        }
+        if (state.error) {
+            logger.errorp(state.error);
+        }
         const interval = setInterval(() => {
-            refetch();
-        }, 5000);
+            api.refetch();
+        }, 500);
         return () => clearInterval(interval);
-    }, [url, trigger]);
-
-    return {
-        state: { data, loading, error },
-        api: { refetch }
-    };
+    }, [state.loading]);
+    return { state, api };
 }
 
-interface SetAllHook {
-    state: {
-        data: Device[];
-        loading: boolean;
-        error: string | undefined;
-    };
-    api: {
-        setAll: (newState: boolean) => void;
-    }
-}
-
-export const useSetAll = (url: string) => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | undefined>(undefined);
-    const [data, setData] = useState<any>(undefined);
-
+export const useSetAll = () => {
+    const { state, api } = usePost<Device[]>(BACKEND_ROOT_URL + 'all');
     const setAll = (newState: boolean) => {
-        setLoading(true);
-        axios.post(url, { on: newState })
-            .then((res: AxiosResponse) => {
-                if (res.statusText != 'OK') {
-                    throw new Error(
-                        "Request failed, status: " +
-                        res.status +
-                        " " +
-                        res.statusText
-                    );
-                }
-                return res.data;
-            })
-            .then((data) => {
-                logger.debug('got data:', data)
-                setData(data)
-            })
-            .catch((err) => {
-                setError(err.message);
-                logger.errorp(err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        api.post({ data: { on: newState } });
     }
-    return {
-        state: { data, loading, error },
-        api: { setAll }
-    };
+    return { state, api: { setAll } };
+}
+
+export const useToggleLedStrip = (name: string) => {
+    return usePost<Device>(BACKEND_ROOT_URL + name);
 }
