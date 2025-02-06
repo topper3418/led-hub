@@ -8,11 +8,10 @@ export interface RGB {
 }
 
 interface ColorWheelProps {
-  color: RGB;
   onChange: (color: RGB) => void;
 }
 
-const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange: setColor }) => {
+const ColorWheel: React.FC<ColorWheelProps> = ({ onChange: setColor }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     const canvas = canvasRef.current;

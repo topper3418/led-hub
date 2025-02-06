@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const useDelete = <T>(
   url: string,

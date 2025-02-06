@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getLogger } from "../../logging";
 import { Device } from "../../types";
 import { BACKEND_ROOT_URL } from "../../config";

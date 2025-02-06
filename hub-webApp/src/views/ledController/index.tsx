@@ -66,9 +66,7 @@ const LedController: React.FC = () => {
         <DeleteButton />
       </Banner>
       <div className='center'>
-        <ColorWheel
-          color={data?.color as RGB}
-          onChange={colorChanged} />
+        <ColorWheel onChange={colorChanged} />
       </div>
       <input
         type="range"
