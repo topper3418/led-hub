@@ -145,7 +145,7 @@ const list = async (req, res, next) => {
 // - getDevice
 const write = async (req, res, next) => {
     const { device } = res.locals;
-    const { color, on, brightness } = req.body;
+    const { data: { color, on, brightness } } = req.body;
     try {
         const newState = { color, on, brightness }
         logger.debug(`attempting to write to device ${device.name}`, { device, newState })
@@ -162,7 +162,7 @@ const write = async (req, res, next) => {
 }
 
 const writeAll = async (req, res, next) => {
-    const { color, on, brightness } = req.body;
+    const { data: { color, on, brightness } } = req.body;
     try {
         const devices = await db.devices.list();
         const data = [];
