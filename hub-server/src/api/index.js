@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const controller = require('./controller')
 const errors = require('./errors')
+const { router: harryPotter } = require('./harryPotter')
 
 
+router.use('/harryPotter', harryPotter)
 router.route('/all')
     .post(controller.writeAll)
 router.route('/:id')
