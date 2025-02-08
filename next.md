@@ -133,7 +133,7 @@
 
 ### Frontend
 
-I have a <couple> main goals for this project.
+I have 3 main goals for this project.
 1) Add a voice control route that would allow users to use siri to send a voice command to a server.
     [ ] add route to the backend
     [ ] create a new microservice in python to interact with the backend
