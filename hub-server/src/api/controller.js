@@ -245,6 +245,37 @@ const nox = async (req, res, next) => {
     }
 }
 
+// sets them all dark and red
+const migraneous = async (req, res, next) => {
+    const color = { r: 255, g: 0, b: 0 };
+    const brightness = 5;
+    const on = true;
+    try {
+        const devices = await db.devices.list();
+        const data = [];
+        const writePromises = devices.map(async (device) => {
+            const newState = { color, on, brightness };
+            logger.debug(`attempting to write to device ${device.name}`, { device, newState })
+            if (on === undefined) newState.on = device.on;
+            try {
+                await device.write(newState);
+                data.push(device.state);
+                db.devices.update(device);
+                logger.infop(`successfully wrote to device ${device.name}`, { device, newState })
+                return device.state;
+            } catch (error) {
+                logger.errorp(`error writing to device ${device.name}`, { device, error: error.stack })
+                return { error: error.stack, device: device.name }
+            }
+        })
+        await Promise.all(writePromises);
+        res.json(data);
+    } catch (error) {
+        logger.errorp('error posting to strip', { error: error.stack })
+        res.status(500).json({ error: error.stack, message: 'error posting to strip' });
+    }
+}
+
 // Middleware:
 // - getDevice
 const destroy = async (req, res, next) => {
@@ -271,6 +302,7 @@ module.exports = {
     writeAll,
     harryPotter: {
         lummos,
-        nox
+        nox,
+        migraneous
     }
 };
