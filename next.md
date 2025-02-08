@@ -1,17 +1,17 @@
-[X] need to make it so its visible when a strip is disconnected
-    [X] need to update all server code to accommodate the port in the data for the device and handshakes.
-        [X] need to troubleshoot why after the port is updated from the handshake it isnt flowing through to the ping requests
-    [X] need to update the strip logic to include its port in the handshake
-[X] need to integrate environment variables in all places
-[X] fix the "back" button on LED control
-[X] need to fix the "click lag" on the ledcards for the on/off
-    [X] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
-    [X] make the button a multi-state to make it more clear
-        [X] figure out the indication issue then this should be good. 
-            [X] the solution might actually be to integrate the hooks for reading and writing to the state
-        [X] now I need to make it so that the text is always legible
-[X] update docker files to use environment variables and have dev and prod builds and such
-[x] deploy and start replicating strips. 
+- [x] need to make it so its visible when a strip is disconnected
+    - [x] need to update all server code to accommodate the port in the data for the device and handshakes.
+        - [x] need to troubleshoot why after the port is updated from the handshake it isnt flowing through to the ping requests
+    - [x] need to update the strip logic to include its port in the handshake
+- [x] need to integrate environment variables in all places
+- [x] fix the "back" button on LED control
+- [x] need to fix the "click lag" on the ledcards for the on/off
+    - [x] I've figured it out, I need to make it so that the "change led" route updates the DB as well. 
+    - [x] make the button a multi-state to make it more clear
+        - [x] figure out the indication issue then this should be good. 
+            - [x] the solution might actually be to integrate the hooks for reading and writing to the state
+        - [x] now I need to make it so that the text is always legible
+- [x] update docker files to use environment variables and have dev and prod builds and such
+- [x] deploy and start replicating strips. 
 
 
 # Congrats on getting to 1.0.0!!!!
