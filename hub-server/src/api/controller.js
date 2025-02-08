@@ -145,6 +145,7 @@ const list = async (req, res, next) => {
 // - getDevice
 const write = async (req, res, next) => {
     const { device } = res.locals;
+    console.log('body', req.body)
     const { data: { color, on, brightness } } = req.body;
     try {
         const newState = { color, on, brightness }

@@ -6,7 +6,7 @@ function getLogger(loggerName) {
   const loggerNameAppended = `server/${loggerName}`;
   // ensure the logger exists in the logging service
   axios.post(`${LOGGING_SERVICE_ENDPOINT}/loggers`, { name: loggerNameAppended })
-    .catch((error) => console.log('Error creating logger:', error));
+    .catch((error) => console.log('Error creating logger:', error.message));
   // logging function to wrap in logger methods
   const log = async (level, message, meta = {}, print = false) => {
     try {
@@ -22,7 +22,8 @@ function getLogger(loggerName) {
         console.log(...printPackage);
       }
     } catch (error) {
-      console.error('Failed to send log:', error);
+      const fmtMessage = `${loggerNameAppended} - ${level.toUpperCase()} - ${message}`;
+      console.error(`Failed to send log: ${error.message}\n${fmtMessage}\n`);
     }
   };
 
