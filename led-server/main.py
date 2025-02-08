@@ -34,11 +34,13 @@ server = Server(connection)
 
 bigQuote = '"""'
 def log_request(req: Request, _):
-    print(f"new request: \n{bigQuote}\n{req}\n{bigQuote}\n\n")
+    # print(f"new request: \n{bigQuote}\n{req}\n{bigQuote}\n\n")
+    print(f'[IN] {req.method} {req.uri}')
 
 
 def log_response(_, res: Response):
-    print(f"returning response: \n{bigQuote}\n{res.render()}\n{bigQuote}\n\n")
+    # print(f"returning response: \n{bigQuote}\n{res.render()}\n{bigQuote}\n\n")
+    print(f'[OUT] {res.code}')
     
 
 def handshake(connection):
@@ -93,6 +95,7 @@ def set_strip(req: Request, res: Response):
     """depending on params, changes the state of the LED strip and returns 
     the state"""
     if 'brightness' in req.body:
+        print("body is:", req.body)
         print('setting brightness')
         ledStrip.setBrightness(int(req.body['brightness']))
     if 'on' in req.body:
