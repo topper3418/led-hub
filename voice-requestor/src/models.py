@@ -32,7 +32,7 @@ class Color(BaseModel):
 class LedState(BaseModel): 
     on: bool | None = None
     brightness: int | None = Field(ge=0, le=255)
-    color: Color = Color(r=0,g=0,b=0)
+    color: Color = Field(default_factory=lambda: Color(r=0,g=0,b=0))
     # connected is optional
     connected: bool | None = None
 
@@ -43,6 +43,7 @@ class DeviceData(BaseModel):
 
 
 class Device(LedState, DeviceData):
+    model_config = { "arbitrary_types_allowed": True }
     
     @property
     def LedState(self) -> LedState:
