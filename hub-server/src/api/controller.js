@@ -190,6 +190,36 @@ const writeAll = async (req, res, next) => {
     }
 }
 
+const writeMany = async (req, res, next) => {
+    const { data: { devices: devices_data } } = req.body;
+    try {
+        const devices = devices_data.map((device_data) => new db.Device({
+            mac: device_data.mac,
+            name: device_data.name,
+            current_ip: device_data.ip,
+            current_port: device_data.port,
+            on: device_data.on,
+            brightness: device_data.brightness,
+            red: device_data.red,
+            green: device_data.green,
+            blue: device_data.blue
+        }));
+        //asynchronously write to all devices using the push method
+        const writePromises = devices.map(async (device) => {
+            try {
+                await device.push();
+                return device.state;
+            } catch (error) {
+                return { error: error.stack, device: device.name }
+            }
+        })
+        const data = await Promise.all(writePromises);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.stack, message: 'error posting to strip' });
+    }
+}
+
 const lummos = async (req, res, next) => {
     const on = true;
     try {
@@ -301,6 +331,7 @@ module.exports = {
     list,
     delete: [getDevice, destroy],
     writeAll,
+    writeMany,
     harryPotter: {
         lummos,
         nox,

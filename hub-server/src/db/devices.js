@@ -93,6 +93,10 @@ class Device {
         const data = await this.interface.set(writeData);
         this.update(data);
     }
+
+    async push() {
+        this.write(this.state);
+    }
 }
 
 // const devicesQueryBuilder = QueryBuilder('devices');

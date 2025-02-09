@@ -7,9 +7,8 @@
 # - write one
 # - add a new route for this on the server but write many
 
-from typing import List, Tuple
+from typing import List
 import requests
-from .models import Device, LedState
 from logging import getLogger
 
 

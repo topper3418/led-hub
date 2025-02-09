@@ -1,9 +1,9 @@
-import src
+from src.integratedClient import IntegratedClient
 import time
 
 
 # initialize client
-client = src.IntegratedClient()
+client = IntegratedClient()
 
 # read all devices
 devices = client.read_all()
