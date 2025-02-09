@@ -1,3 +1,4 @@
+from pprint import pprint
 from src.dispatcher import ThoughtProcess
 from src.logging import getLogger
 
@@ -53,14 +54,16 @@ test_context = [
   },
 ]
 
+def do_command_test(command: str):
+    processed_command = ThoughtProcess(command, test_context).think()
+    pprint(processed_command.model_dump())
 
 if __name__ == "__main__":
-    command = "turn on the kitchen led"
-    ThoughtProcess(command, test_context).think()
-    command = "turn the lights down in the hallway"
-    ThoughtProcess(command, test_context).think()
-    command = "set the bed to a dim blue"
-    ThoughtProcess(command, test_context).think()
-    command = "turn the lights down"
-    ThoughtProcess(command, test_context).think()
-    
+    do_command_test("turn off the kitchen light")
+    do_command_test("dim the couch light")
+    do_command_test("make the fireplace light red")
+    do_command_test("set all lights to a dim red")
+    do_command_test("turn on the bar light")
+    do_command_test("turn off all lights")
+    do_command_test("turn off the lights")
+    do_command_test("turn off everything except the bar and kitchen lights")

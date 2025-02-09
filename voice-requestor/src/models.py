@@ -1,8 +1,6 @@
 from __future__ import annotations
-from typing import List
-from dataclasses import dataclass
-from requests import Response
-from pydantic import BaseModel, Field, PositiveInt
+from typing import Dict, List
+from pydantic import BaseModel, ConfigDict, Field
 
 # this module will provide objects to cleanly parse
 # {
@@ -43,8 +41,20 @@ class DeviceData(BaseModel):
 
 
 class Device(LedState, DeviceData):
-    model_config = { "arbitrary_types_allowed": True }
+    model_config = ConfigDict({"arbitrary_types_allowed": True})
+    color: Color = Field(default_factory=lambda: Color(r=0,g=0,b=0))
     
     @property
     def LedState(self) -> LedState:
         return LedState(on=self.on, brightness=self.brightness, color=self.color, connected=self.connected)
+
+
+class DeviceCommand(BaseModel):
+    device_name: str
+    command: LedState
+
+
+class ProcessedVoiceCommand(BaseModel):
+    device_commands: Dict[str, Device]
+    voice_command: str
+

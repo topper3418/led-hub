@@ -70,7 +70,6 @@ class Device {
         }
     }
 
-
     update({ color, brightness, on, connected, error }) {
         logger.debug(`updating device ${this.name}`, { device: this, newState: { color, brightness, on, connected } });
         if (color != undefined) this.color = color;

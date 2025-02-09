@@ -191,22 +191,35 @@ const writeAll = async (req, res, next) => {
 }
 
 const writeMany = async (req, res, next) => {
+    logger.debug('received request to write many', { body: req.body })
     const { data: { devices: devices_data } } = req.body;
     try {
-        const devices = devices_data.map((device_data) => new db.Device({
-            mac: device_data.mac,
-            name: device_data.name,
-            current_ip: device_data.ip,
-            current_port: device_data.port,
-            on: device_data.on,
-            brightness: device_data.brightness,
-            red: device_data.red,
-            green: device_data.green,
-            blue: device_data.blue
-        }));
+        // wrap in device objects to get some of the needed utility
+        const devices = devices_data.reduce((acc, device_data) => {
+            acc[device_data.name] = new db.Device({
+                mac: device_data.mac,
+                name: device_data.name,
+                current_ip: device_data.ip,
+                current_port: device_data.port,
+                on: device_data.on,
+                brightness: device_data.brightness,
+                red: device_data.red,
+                green: device_data.green,
+                blue: device_data.blue
+            });
+            return acc;
+        }, {});
+
+        // use the names to get all the full devices from the db
+        logger.debug('devices', { devices: Object.values(devices) })
+        const deviceMacs = Object.values(devices).map((device) => device.mac)
+        logger.debug('deviceMacs', { deviceMacs })
+        const dbDevicePromises = deviceMacs.map((mac) => db.devices.find({ mac }))
+        const dbDevices = await Promise.all(dbDevicePromises)
         //asynchronously write to all devices using the push method
-        const writePromises = devices.map(async (device) => {
+        const writePromises = dbDevices.map(async (device) => {
             try {
+                device.update(devices[device.name].state)
                 await device.push();
                 return device.state;
             } catch (error) {
@@ -216,6 +229,7 @@ const writeMany = async (req, res, next) => {
         const data = await Promise.all(writePromises);
         res.json(data);
     } catch (error) {
+        logger.error(`error writing to many: ${error.message}`, { error, devices_data })
         res.status(500).json({ error: error.stack, message: 'error posting to strip' });
     }
 }

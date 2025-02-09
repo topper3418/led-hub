@@ -41,3 +41,10 @@ class Client:
         response_data = response.json()
         logger.info(f'Wrote to {device_name}', {"device": device_name, "payload": data, "response": response_data})
         return response_data
+
+    def write_many(self, data: dict) -> dict:
+        """sends the state to the endpoint that writes to all devices"""
+        response = requests.post(f'{self.endpoint}/many', json=data)
+        response_data = response.json()
+        logger.info('Wrote to all devices', {'commands': data, 'response': response_data})
+        return response_data
