@@ -15,12 +15,16 @@ class Device(BaseModel):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     mac: str
     ip: str
-    name: str
-    connected: bool
+    name: Optional[str] = None
+    connected: bool = False
     port: int
     # linked objects
     room: Optional[Room] = None
     led_strip: Optional[LedStrip] = None
+    # helpers
+    @property
+    def url(self) -> str:
+        return f"http://{self.ip}:{self.port}"
 
 
 class LedStrip(BaseModel):

@@ -4,7 +4,7 @@ from sqlite3 import Cursor
 from src.models import LedStrip
 
 
-def create_led_strip(cursor: Cursor, led_strip: LedStrip) -> LedStrip:
+def create_led_strip(cursor: Cursor, led_strip: LedStrip):
     cursor.execute(
         """
         INSERT INTO led_strips (device_id, on, brightness, red, green, blue)
@@ -13,7 +13,6 @@ def create_led_strip(cursor: Cursor, led_strip: LedStrip) -> LedStrip:
         (led_strip.device_id, led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue),
     )
     led_strip.id = cursor.lastrowid
-    return led_strip
 
 
 def update_led_strip(cursor: Cursor, led_strip: LedStrip):

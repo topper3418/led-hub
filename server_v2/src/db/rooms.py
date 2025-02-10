@@ -3,7 +3,7 @@ from sqlite3 import Cursor
 from src.models import Room
 
 
-def create_room(cursor: Cursor, room: Room) -> Room:
+def create_room(cursor: Cursor, room: Room):
     cursor.execute(
         """
         INSERT INTO rooms (name)
@@ -12,7 +12,6 @@ def create_room(cursor: Cursor, room: Room) -> Room:
         (room.name,),
     )
     room.id = cursor.lastrowid
-    return room
 
 
 def update_room(cursor: Cursor, room: Room):

@@ -7,7 +7,7 @@ from src.models import (
 )
 
 
-def create_device(cursor: Cursor, device: Device) -> Device:
+def create_device(cursor: Cursor, device: Device):
     cursor.execute(
         """
         INSERT INTO devices (mac, ip, name, connected, port)
@@ -16,7 +16,6 @@ def create_device(cursor: Cursor, device: Device) -> Device:
         (device.mac, device.ip, device.name, device.connected, device.port),
     )
     device.id = cursor.lastrowid
-    return device
 
 
 def update_device(cursor: Cursor, device: Device):
@@ -45,6 +44,19 @@ def find_device_by_id(cursor: Cursor, device_id: int) -> Device | None:
         SELECT * FROM devices WHERE id = ?
         """,
         (device_id,),
+    )
+    device = cursor.fetchone()
+    if device:
+        return Device(**device)
+    return None
+
+
+def find_by_mac(cursor: Cursor, mac: str) -> Device | None:
+    cursor.execute(
+        """
+        SELECT * FROM devices WHERE mac = ?
+        """,
+        (mac,),
     )
     device = cursor.fetchone()
     if device:
