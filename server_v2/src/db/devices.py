@@ -72,3 +72,4 @@ def list_devices(cursor: Cursor, room: Optional[int] = None):
     devices = cursor.fetchall()
     if devices:
         return [Device(**device) for device in devices]
+
