@@ -18,16 +18,23 @@ class Device(BaseModel):
     name: Optional[str] = None
     connected: bool = False
     port: int
+    room_id: int
     # linked objects
     room: Optional[Room] = None
-    led_strip: Optional[LedStrip] = None
+    led_strip_state: Optional[LedStripState] = None
     # helpers
     @property
     def url(self) -> str:
         return f"http://{self.ip}:{self.port}"
 
 
-class LedStrip(BaseModel):
+class Color(BaseModel):
+    r: int = Field(ge=0, le=255)
+    g: int = Field(ge=0, le=255)
+    b: int = Field(ge=0, le=255)
+
+
+class LedStripState(BaseModel):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     device_id: int
     on: bool
@@ -38,6 +45,15 @@ class LedStrip(BaseModel):
     # linked objects
     device: Optional[Device] = None
     room: Optional[Room] = None
+    # helpers
+    @property
+    def color(self) -> Color:
+        return Color(r=self.red, g=self.green, b=self.blue)
+    @color.setter
+    def color(self, new_color: Color):
+        self.red = new_color.r
+        self.green = new_color.g
+        self.blue = new_color.b
 
 
 class Room(BaseModel):
@@ -45,4 +61,4 @@ class Room(BaseModel):
     name: str
     # linked objects
     devices: list[Device] = []
-    led_strips: list[LedStrip] = []
+    led_strip_states: list[LedStripState] = []

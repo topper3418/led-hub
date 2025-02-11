@@ -1,10 +1,10 @@
 
 from sqlite3 import Cursor
 
-from src.models import LedStrip
+from src.models import LedStripState
 
 
-def create_led_strip(cursor: Cursor, led_strip: LedStrip):
+def create_led_strip(cursor: Cursor, led_strip: LedStripState):
     cursor.execute(
         """
         INSERT INTO led_strips (device_id, on, brightness, red, green, blue)
@@ -15,7 +15,7 @@ def create_led_strip(cursor: Cursor, led_strip: LedStrip):
     led_strip.id = cursor.lastrowid
 
 
-def update_led_strip(cursor: Cursor, led_strip: LedStrip):
+def update_led_strip(cursor: Cursor, led_strip: LedStripState):
     cursor.execute(
         """
         UPDATE led_strips
@@ -35,7 +35,7 @@ def delete_led_strip(cursor: Cursor, led_strip_id: int):
     )
 
 
-def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStrip | None:
+def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStripState | None:
     cursor.execute(
         """
         SELECT * FROM led_strips WHERE id = ?
@@ -44,11 +44,11 @@ def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStrip | None:
     )
     led_strip = cursor.fetchone()
     if led_strip:
-        return LedStrip(**led_strip)
+        return LedStripState(**led_strip)
     return None
 
 
-def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | None:
+def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStripState | None:
     cursor.execute(
         """
         SELECT * FROM led_strips WHERE device_id = ?
@@ -57,11 +57,11 @@ def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | No
     )
     led_strip = cursor.fetchone()
     if led_strip:
-        return LedStrip(**led_strip)
+        return LedStripState(**led_strip)
     return None
 
 
-def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip]:
+def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStripState]:
     cursor.execute(
         """
         SELECT led_strips.id, led_strips.device_id, led_strips.on, led_strips. brightness, led_strips.red, led_strips.green, led_strips.blue
@@ -73,5 +73,5 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
     )
     led_strips = cursor.fetchall()
     if led_strips:
-        return [LedStrip(**led_strip) for led_strip in led_strips]
+        return [LedStripState(**led_strip) for led_strip in led_strips]
     return []

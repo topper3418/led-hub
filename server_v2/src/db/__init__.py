@@ -3,7 +3,7 @@ from sqlite3 import Connection, Cursor
 from src.models import (
     Device as DeviceModel,
     Room as RoomModel,
-    LedStrip as LedStripModel,
+    LedStripState as LedStripModel,
 )
 import src.config as config
 
@@ -44,10 +44,15 @@ class DatabaseDevicesInterface:
             raise ValueError("Cursor is not set")
         return find_by_mac(self.cursor, mac)
 
-    def find_many(self, room: int | None = None) -> list[DeviceModel] | None:
+    def find_by_name(self, name: str) -> DeviceModel | None:
         if not self.cursor:
             raise ValueError("Cursor is not set")
-        return list_devices(self.cursor, room)
+        return find_by_mac(self.cursor, name)
+
+    def find_many(self, room: int | None = None, connected: bool | None = None) -> list[DeviceModel] | None:
+        if not self.cursor:
+            raise ValueError("Cursor is not set")
+        return list_devices(self.cursor, room, connected)
 
 
 class DatabaseRoomsInterface:
