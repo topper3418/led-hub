@@ -3,6 +3,20 @@ from sqlite3 import Cursor
 from src.models import Room
 
 
+def init_room(cursor: Cursor):
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS `room` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(45) NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE);
+        );
+
+        """
+    )
+
+
 def create_room(cursor: Cursor, room: Room):
     cursor.execute(
         """

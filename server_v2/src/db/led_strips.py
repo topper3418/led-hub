@@ -4,6 +4,29 @@ from sqlite3 import Cursor
 from src.models import LedStripState
 
 
+def init_led_strips(cursor: Cursor):
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS `led_strip` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `device_id` INT NOT NULL,
+            `on` BOOLEAN NULL,
+            `brightness` INT NULL,
+            `red` INT NULL,
+            `green` INT NULL,
+            `blue` INT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE INDEX `device_id_UNIQUE` (`device_id` ASC) VISIBLE,
+            CONSTRAINT `led_strip_device_id`
+            FOREIGN KEY (`device_id`)
+            REFERENCES `devices` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+        );
+        """
+    )
+
+
 def create_led_strip(cursor: Cursor, led_strip: LedStripState):
     cursor.execute(
         """
