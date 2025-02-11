@@ -7,7 +7,7 @@ from src.models import (
 )
 
 
-def init_device(cursor: Cursor):
+def init_devices(cursor: Cursor):
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS `devices` (

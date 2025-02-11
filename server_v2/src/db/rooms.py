@@ -3,7 +3,7 @@ from sqlite3 import Cursor
 from src.models import Room
 
 
-def init_room(cursor: Cursor):
+def init_rooms(cursor: Cursor):
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS `room` (
@@ -12,7 +12,6 @@ def init_room(cursor: Cursor):
             PRIMARY KEY (`id`),
             UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE);
         );
-
         """
     )
 
