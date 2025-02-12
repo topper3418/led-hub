@@ -1,7 +1,7 @@
 
 from sqlite3 import Cursor
 
-from src.models import LedStripState
+from src.models import Device, LedStripState
 
 
 def init_led_strips(cursor: Cursor):
@@ -98,3 +98,24 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
     if led_strips:
         return [LedStripState(**led_strip) for led_strip in led_strips]
     return []
+
+
+def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
+    cursor.execute(
+        """
+        SELECT *
+        FROM led_strips
+        JOIN devices ON led_strips.device_id = devices.id
+        WHERE devices.room_id = ?
+        """,
+        (room_id,),
+    )
+    data = cursor.fetchall()
+    if not data: return []
+    devices = []
+    for row in data:
+        device = Device(**row)
+        device.led_strip_state = LedStripState(**row)
+        devices.append(device)
+    return devices
+    

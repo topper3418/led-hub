@@ -10,7 +10,7 @@ import src.config as config
 from .connection import get_connection
 from .devices import create_device, update_device, delete_device, find_device_by_id, find_by_mac, list_devices, init_devices
 from .rooms import create_room, update_room, delete_room, find_room_by_id, list_rooms, init_rooms
-from .led_strips import create_led_strip, update_led_strip, delete_led_strip, find_led_strip_by_id, find_led_strip_by_device_id, list_led_strips, init_led_strips
+from .led_strips import create_led_strip, list_led_strip_devices, update_led_strip, delete_led_strip, find_led_strip_by_id, find_led_strip_by_device_id, list_led_strips, init_led_strips
 
 
 
@@ -120,6 +120,11 @@ class DatabaseLedStripsInterface:
         if not self.cursor:
             raise ValueError("Cursor is not set")
         return list_led_strips(self.cursor, room_id)
+
+    def find_many_devices(self, room_id: int | None = None) -> list[DeviceModel]:
+        if not self.cursor:
+            raise ValueError("Cursor is not set")
+        return list_led_strip_devices(self.cursor, room_id)
 
 
 class Database:
