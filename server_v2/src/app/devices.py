@@ -108,7 +108,7 @@ def read_device(device_id):
     return jsonify({"data": {"device": device_data}})
 
 
-@devices_bp.put('/<int:device_id/led_strip>')
+@devices_bp.put('/<int:device_id>/led_strip>')
 @data_has('color', optional=True)
 @data_has('brightness', optional=True)
 @data_has('on', optional=True)
@@ -124,7 +124,7 @@ def update_led_strip_state(device_id):
     return update_led_strip()
 
 
-@devices_bp.get('/<int:device_id/led_strip>')
+@devices_bp.get('/<int:device_id>/led_strip>')
 @ensure_not_none('device')
 def get_led_strip_state(device_id):
     logger.debug(f'processing request for led strip data on device id {device_id}')

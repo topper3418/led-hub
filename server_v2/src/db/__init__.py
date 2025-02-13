@@ -152,7 +152,7 @@ class Database:
         self.led_strips.cursor = self.cursor
         return self
 
-    def __exit__(self, _, _, _):
+    def __exit__(self, *_):
         if self.connection:
             self.connection.commit()
         if self.cursor:

@@ -6,22 +6,19 @@ from src.models import Device, LedStrip
 def init_led_strips(cursor: Cursor):
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS `led_strip` (
-            `id` INT NOT NULL AUTO_INCREMENT,
-            `device_id` INT NOT NULL,
+        CREATE TABLE IF NOT EXISTS `led_strips` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `device_id` INT UNIQUE NOT NULL,
             `on` BOOLEAN NULL,
             `brightness` INT NULL,
-            `red` INT NULL,
-            `green` INT NULL,
-            `blue` INT NULL,
+            `red` INTEGER NULL,
+            `green` INTEGER NULL,
+            `blue` INTEGER NULL,
             `num_leds` INT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE INDEX `device_id_UNIQUE` (`device_id` ASC) VISIBLE,
-            CONSTRAINT `led_strip_device_id`
             FOREIGN KEY (`device_id`)
-            REFERENCES `devices` (`id`)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE
+                REFERENCES `devices` (`id`)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
         );
         """
     )

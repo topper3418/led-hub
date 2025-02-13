@@ -6,11 +6,9 @@ from src.models import Room
 def init_rooms(cursor: Cursor):
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS `room` (
-            `id` INT NOT NULL AUTO_INCREMENT,
-            `name` VARCHAR(45) NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE);
+        CREATE TABLE IF NOT EXISTS `rooms` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `name` VARCHAR(45) UNIQUE NULL
         );
         """
     )
