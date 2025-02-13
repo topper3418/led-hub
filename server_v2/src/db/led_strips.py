@@ -1,7 +1,6 @@
-
 from sqlite3 import Cursor
 
-from src.models import Device, LedStripState
+from src.models import Device, LedStrip
 
 
 def init_led_strips(cursor: Cursor):
@@ -15,6 +14,7 @@ def init_led_strips(cursor: Cursor):
             `red` INT NULL,
             `green` INT NULL,
             `blue` INT NULL,
+            `num_leds` INT NULL,
             PRIMARY KEY (`id`),
             UNIQUE INDEX `device_id_UNIQUE` (`device_id` ASC) VISIBLE,
             CONSTRAINT `led_strip_device_id`
@@ -27,25 +27,25 @@ def init_led_strips(cursor: Cursor):
     )
 
 
-def create_led_strip(cursor: Cursor, led_strip: LedStripState):
+def create_led_strip(cursor: Cursor, led_strip: LedStrip):
     cursor.execute(
         """
-        INSERT INTO led_strips (device_id, on, brightness, red, green, blue)
+        INSERT INTO led_strips (device_id, on, brightness, red, green, blue, num_leds)
         VALUES (?, ?, ?, ?, ?, ?)
         """,
-        (led_strip.device_id, led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue),
+        (led_strip.device_id, led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.num_leds),
     )
     led_strip.id = cursor.lastrowid
 
 
-def update_led_strip(cursor: Cursor, led_strip: LedStripState):
+def update_led_strip(cursor: Cursor, led_strip: LedStrip):
     cursor.execute(
         """
         UPDATE led_strips
-        SET on = ?, brightness = ?, red = ?, green = ?, blue = ?
+        SET on = ?, brightness = ?, red = ?, green = ?, blue = ?, num_leds = ?
         WHERE id = ?
         """,
-        (led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.id),
+        (led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.id, led_strip.num_leds),
     )
 
 
@@ -58,7 +58,7 @@ def delete_led_strip(cursor: Cursor, led_strip_id: int):
     )
 
 
-def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStripState | None:
+def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStrip | None:
     cursor.execute(
         """
         SELECT * FROM led_strips WHERE id = ?
@@ -67,11 +67,11 @@ def find_led_strip_by_id(cursor: Cursor, led_strip_id: int) -> LedStripState | N
     )
     led_strip = cursor.fetchone()
     if led_strip:
-        return LedStripState(**led_strip)
+        return LedStrip(**led_strip)
     return None
 
 
-def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStripState | None:
+def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | None:
     cursor.execute(
         """
         SELECT * FROM led_strips WHERE device_id = ?
@@ -80,14 +80,23 @@ def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStripState
     )
     led_strip = cursor.fetchone()
     if led_strip:
-        return LedStripState(**led_strip)
+        return LedStrip(**led_strip)
     return None
 
 
-def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStripState]:
+def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip]:
     cursor.execute(
         """
-        SELECT led_strips.id, led_strips.device_id, led_strips.on, led_strips. brightness, led_strips.red, led_strips.green, led_strips.blue
+        SELECT 
+            led_strips.id, 
+            led_strips.device_id, 
+            led_strips.on, 
+            led_strips.brightness, 
+            led_strips.red, 
+            led_strips.green, 
+            led_strips.blue, 
+            led_strips.num_leds,
+            led_strips.led_pin
         FROM led_strips
         JOIN devices ON led_strips.device_id = devices.id
         WHERE devices.room_id = ?
@@ -96,7 +105,7 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
     )
     led_strips = cursor.fetchall()
     if led_strips:
-        return [LedStripState(**led_strip) for led_strip in led_strips]
+        return [LedStrip(**led_strip) for led_strip in led_strips]
     return []
 
 
@@ -115,7 +124,7 @@ def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
     devices = []
     for row in data:
         device = Device(**row)
-        device.led_strip_state = LedStripState(**row)
+        device.led_strip = LedStrip(**row)
         devices.append(device)
     return devices
     

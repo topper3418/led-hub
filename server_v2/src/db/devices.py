@@ -102,9 +102,6 @@ def find_by_name(cursor: Cursor, name: str) -> Device | None:
     return None
 
 
-def find_from_led_strip(cursor: Cursor)
-
-
 def list_devices(cursor: Cursor, room: Optional[int] = None, connected: Optional[bool] = None):
     query = "SELECT * FROM devices"
     where_clauses = []

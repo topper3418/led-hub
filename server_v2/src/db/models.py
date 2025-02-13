@@ -3,7 +3,7 @@ from typing import Optional
 from src.models import (
     Device as DeviceModel,
     Room as RoomModel,
-    LedStripState as LedStripModel,
+    LedStrip as LedStripModel,
 )
 
 class Device(DeviceModel):

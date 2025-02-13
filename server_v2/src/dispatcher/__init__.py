@@ -15,14 +15,14 @@ import ollama
 from pydantic import BaseModel, create_model
 
 from src.logging import get_logger
-from src.models import Device, LedStripState, Color
+from src.models import Device, LedStrip, Color
 
 
 logger = get_logger(__name__)
 
 
 class ProcessedVoiceCommand(BaseModel):
-    device_commands: Dict[str, LedStripState]
+    device_commands: Dict[str, LedStrip]
     voice_command: str
 
 
@@ -37,7 +37,7 @@ class ThoughtProcess:
         self.command = command
         self.device_list = devices
         self.command_contents: CommandContents | None = None
-        self.device_states: Dict[str, LedStripState] = {device.name: device.led_strip_state for device in devices if device.name and device.led_strip_state}
+        self.device_states: Dict[str, LedStrip] = {device.name: device.led_strip for device in devices if device.name and device.led_strip}
         self.context_object: Dict[str, dict] | None = None
         self.relevant_devices: List[str] | None = None
         self.think

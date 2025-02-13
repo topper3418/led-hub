@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, g
 
 from src.logging import get_logger
 from src.db import Database
-from src.models import LedStripState
+from src.models import LedStrip
 
 from .funcs import update_led_strip
 
@@ -20,8 +20,8 @@ led_strips_bp.before_request(load_led_strip)
 def get_led_strips():
     logger.info('processing request to list led strips')
     room_id = request.args.get('room_id')
-    with Database() as db:
-        devices = db.led_strips.find_many_devices(None if not room_id else int(room_id))
+    db: Database = g.db
+    devices = db.led_strips.find_many_devices(None if not room_id else int(room_id))
     device_data = [device.model_dump() for device in devices or []]
     return jsonify({"data": {"led_strips": device_data}})
 
@@ -38,5 +38,5 @@ def update_led_strip_state(led_strip_id):
 @led_strips_bp.get('/<int:led_strip_id>')
 def read_led_strip_state(led_strip_id):
     logger.debug(f'processing request to read led strip with id {led_strip_id}')
-    led_strip: LedStripState = g.get('led_strip')
+    led_strip: LedStrip = g.get('led_strip')
     return jsonify({"data": led_strip.model_dump()})

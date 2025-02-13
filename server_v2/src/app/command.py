@@ -48,7 +48,7 @@ def process_voice_command():
         if device is None:
             abort(500, "dispatcher made up a device name")
         db.led_strips.update(state)
-        device.led_strip_state = state
+        device.led_strip = state
         devices.append(device)
     success_message = "Successfully processed command and wrote to devices"
     device_data = [device.model_dump() for device in devices]

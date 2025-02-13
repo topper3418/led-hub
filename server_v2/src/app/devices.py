@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, abort, request, jsonify, g
 from pydantic import ValidationError
 
 from src.logging import get_logger
@@ -119,7 +119,21 @@ def update_led_strip_state(device_id):
     # load that device from the db
     db: Database = g.db
     led_strip = db.led_strips.find_by_device_id(device_id)
-    device.led_strip_state = led_strip
+    device.led_strip = led_strip
     g.led_strip = led_strip
     return update_led_strip()
 
+
+@devices_bp.get('/<int:device_id/led_strip>')
+@ensure_not_none('device')
+def get_led_strip_state(device_id):
+    logger.debug(f'processing request for led strip data on device id {device_id}')
+    # load that device from the db
+    db: Database = g.db
+    led_strip = db.led_strips.find_by_device_id(device_id)
+    if led_strip is None:
+        abort(500, f"There was an error loading the led strip data for device id {device_id}")
+    led_strip_data = led_strip.model_dump()
+    logger.debug(f'returning data for led strip on device id {device_id}', led_strip_data)
+    return jsonify({"data": led_strip_data})
+    

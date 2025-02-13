@@ -3,7 +3,7 @@ from sqlite3 import Connection, Cursor
 from src.models import (
     Device as DeviceModel,
     Room as RoomModel,
-    LedStripState as LedStripModel,
+    LedStrip as LedStripModel,
 )
 import src.config as config
 

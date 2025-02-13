@@ -1,10 +1,10 @@
 from flask import jsonify, g
 from src.db import Database
-from src.models import LedStripState
+from src.models import LedStrip
 
 
 def update_led_strip():
-    led_strip: LedStripState = g.get('led_strip')
+    led_strip: LedStrip = g.get('led_strip')
     if g.color is not None:
         led_strip.color = g.color
     if g.brightness is not None:
