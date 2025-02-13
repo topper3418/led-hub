@@ -26,6 +26,8 @@ class Device(BaseModel):
     @property
     def url(self) -> str:
         return f"http://{self.ip}:{self.port}"
+    def create_led_strip_state(self) -> LedStripState:
+        return LedStripState(device_id=self.id)
 
 
 class Color(BaseModel):
@@ -37,7 +39,7 @@ class Color(BaseModel):
 class LedStripState(BaseModel):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     device_id: int
-    on: bool
+    on: bool = False
     brightness: int = Field(0, ge=0, le=255)
     red: int = Field(0, ge=0, le=255)
     green: int = Field(0, ge=0, le=255)

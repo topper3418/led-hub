@@ -47,6 +47,8 @@ def handshake():
         return jsonify({"message": existing_message, "data": existing_device.model_dump()}), 200
     with Database() as db:
         db.devices.create(device)
+        led_strip_state = device.create_led_strip_state()
+        db.led_strips.create(led_strip_state)
     success_message = "Device created"
     model_data = device.model_dump()
     logger.info(success_message, {"data": model_data})
