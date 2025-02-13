@@ -139,7 +139,7 @@ class ThoughtProcess:
         logger.debug('relevant devices', relevant_devices)
         return relevant_devices
 
-    def get_device_commands(self, device_name: str) -> Device:
+    def get_device_commands(self, device_name: str):
         if self.context_object is None:
             raise ValueError('context_object must be set before calling get_commands')
         if self.relevant_devices is None:
