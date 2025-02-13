@@ -1,10 +1,7 @@
-from logging import debug
-from src import app
-from src import Database
+from src import get_app
 
 if __name__ == "__main__":
-    with Database() as db:
-        db.init_db()
+    app = get_app()
 
     app.run(
         port=5000,

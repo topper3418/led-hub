@@ -1,24 +1,22 @@
 from flask import Blueprint, request, jsonify, g
 from pydantic import ValidationError
 
-from src.clients import LedStripClient
 from src.logging import get_logger
 from src.db import Database
 from src.models import Device
 
-from .middleware import ensure_not_none, load_device
+from .middleware import data_has, ensure_not_none, load_device
+from .funcs import update_led_strip
 
 
 logger = get_logger(__name__)
 devices_bp = Blueprint('devices', __name__)
 
 
-@devices_bp.before_request
-def load_device_middleware():
-    return load_device()
+devices_bp.before_request(load_device)
 
 
-@devices_bp.route('/', methods=['GET'])
+@devices_bp.get('/')
 def get_devices():
     logger.info('processing request to list devices')
     room_id = request.args.get('room_id')
@@ -28,7 +26,7 @@ def get_devices():
     return jsonify({"data": {"devices": device_data}})
 
 
-@devices_bp.route('/', methods=['POST'])
+@devices_bp.post('/')
 def handshake():
     body = request.json
     if not body:
@@ -55,7 +53,7 @@ def handshake():
     return jsonify({"message": success_message, "data": model_data}), 201
 
 
-@devices_bp.route('/<int:device_id>', methods=['PUT'])
+@devices_bp.put('/<int:device_id>')
 @ensure_not_none('device')
 def update_device(device_id):
     logger.debug(f'received request to modify device data for device id {device_id}')
@@ -94,7 +92,7 @@ def update_device(device_id):
 
 
 
-@devices_bp.route('/<int:device_id>', methods=['GET'])
+@devices_bp.get('/<int:device_id>')
 @ensure_not_none('device')
 def read_device(device_id):
     logger.debug(f'processing request for data on device id {device_id}')
@@ -107,4 +105,19 @@ def read_device(device_id):
     logger.debug(f'returning value for device "{device.name}', {"device": device_data})
     return jsonify({"data": {"device": device_data}})
 
+
+@devices_bp.put('/<int:device_id/led_strip>')
+@data_has('color', optional=True)
+@data_has('brightness', optional=True)
+@data_has('on', optional=True)
+@ensure_not_none('device')
+def update_led_strip_state(device_id):
+    logger.info(f'updating led strip state for device id {device_id}', {"data", g.data})
+    device: Device = g.device
+    # load that device from the db
+    db: Database = g.db
+    led_strip = db.led_strips.find_by_device_id(device_id)
+    device.led_strip_state = led_strip
+    g.led_strip = led_strip
+    return update_led_strip()
 

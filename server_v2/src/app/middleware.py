@@ -7,6 +7,21 @@ from src.logging import get_logger
 
 logger = get_logger(__name__)
 
+# init func
+def get_db():
+    g.db = Database()
+    g.db.open_connection()
+
+
+# teardown func
+def close_db(exception):
+    if hasattr(g, 'db'):
+        g.db.close_connection()
+    if exception:
+        logger.error('received exception at teardown', {"exception", exception})
+
+
+# route-specific middleware
 
 def ensure_not_none(item_name):
     def decorator(f):
@@ -22,7 +37,7 @@ def ensure_not_none(item_name):
     return decorator
 
 
-def data_has(item_name, mandatory: bool = False):
+def data_has(item_name, optional = False):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -31,7 +46,7 @@ def data_has(item_name, mandatory: bool = False):
                 body = request.json or {}
                 data  = body.get('data', {})
             item = data.get(item_name)
-            if item is None and mandatory:
+            if item is None and not optional:
                 error_message = f"{item_name} is missing from data"
                 logger.error(error_message)
                 return jsonify({"error": error_message}), 401
@@ -40,6 +55,8 @@ def data_has(item_name, mandatory: bool = False):
         return decorated_function
     return decorator
 
+
+# blueprint middleware
 
 def load_device():
     # early returns
@@ -50,8 +67,8 @@ def load_device():
     if device_id is None:
         return 
     # Load the device from the database
-    with Database() as db:
-        device = db.devices.find_by_id(device_id)
+    db: Database = g.db
+    device = db.devices.find_by_id(device_id)
     # Store the device in the global context
     g.device = device
 

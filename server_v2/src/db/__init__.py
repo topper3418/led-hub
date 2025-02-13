@@ -158,5 +158,28 @@ class Database:
         if self.cursor:
             self.cursor.close()
 
+    def open_connection(self):
+        if self.connection is None:
+            self.connection = get_connection(self.connection_path)
+            self.cursor = self.connection.cursor()
+            self.devices.cursor = self.cursor
+            self.rooms.cursor = self.cursor
+            self.led_strips.cursor = self.cursor
+        else:
+            raise RuntimeError("Connection is already open")
+
+    def close_connection(self):
+        if self.connection:
+            self.connection.commit()
+            self.cursor.close() if self.cursor else None
+            self.connection.close()
+            self.connection = None
+            self.cursor = None
+            self.devices.cursor = None
+            self.rooms.cursor = None
+            self.led_strips.cursor = None
+        else:
+            raise RuntimeError("Connection is not open")
+
 
 
