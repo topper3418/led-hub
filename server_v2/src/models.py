@@ -17,8 +17,7 @@ class Device(BaseModel):
     ip: str
     name: Optional[str] = None
     connected: bool = False
-    port: int
-    room_id: int
+    room_id: Optional[int] = None
     # linked objects
     room: Optional[Room] = None
     led_strip: Optional[LedStrip] = None

@@ -5,98 +5,153 @@ from sqlite3 import Cursor
 from src.models import (
     Device,
 )
+from src.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def init_devices(cursor: Cursor):
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS `devices` (
-            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-            `mac` VARCHAR(17) UNIQUE NOT NULL,
-            `name` VARCHAR(45) UNIQUE NULL,
-            `ip` VARCHAR(15) NULL,
-            `port` VARCHAR(6) NULL,
-            `room_id` INTEGER NULL,
-            FOREIGN KEY (`room_id`) 
-                REFERENCES `rooms` (`id`) 
-                ON DELETE SET NULL 
-                ON UPDATE CASCADE
-        );
-        """
-    )
+    logger.info("Initializing devices table")
+    try: 
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS `devices` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                `mac` VARCHAR(17) UNIQUE NOT NULL,
+                `name` VARCHAR(45) UNIQUE NULL,
+                `ip` VARCHAR(15) NULL,
+                `room_id` INTEGER NULL,
+                FOREIGN KEY (`room_id`) 
+                    REFERENCES `rooms` (`id`) 
+                    ON DELETE SET NULL 
+                    ON UPDATE CASCADE
+            );
+            """
+        )
+    except Exception as e:
+        logger.error('Failed to initialize devices table', {'error': str(e)})
+        raise e
 
 
 def create_device(cursor: Cursor, device: Device):
-    cursor.execute(
-        """
-        INSERT INTO devices (mac, ip, name, connected, port)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (device.mac, device.ip, device.name, device.connected, device.port),
-    )
+    logger.info('Creating device', {'device': device.model_dump()})
+    try:
+        cursor.execute(
+            """
+            INSERT INTO devices (mac, ip, name)
+            VALUES (?, ?, ?)
+            """,
+            (device.mac, device.ip, device.name),
+        )
+    except Exception as e:
+        logger.error('Failed to create device', {'device': device.model_dump(), 'error': str(e)})
+        raise e
     device.id = cursor.lastrowid
+    logger.debug('Device created', {'device': device.model_dump()})
 
 
 def update_device(cursor: Cursor, device: Device):
-    cursor.execute(
-        """
-        UPDATE devices
-        SET mac = ?, ip = ?, name = ?, connected = ?, port = ?
-        WHERE id = ?
-        """,
-        (device.mac, device.ip, device.name, device.connected, device.port, device.id),
-    )
+    logger.info('Updating device', {'device': device.model_dump()})
+    try:
+        cursor.execute(
+            """
+            UPDATE devices
+            SET mac = ?, ip = ?, name = ?
+            WHERE id = ?
+            """,
+            (device.mac, device.ip, device.name, device.id),
+        )
+    except Exception as e:
+        logger.error('Failed to update device', {'device': device.model_dump(), 'error': str(e)})
+        raise e
+    logger.debug('Device updated', {'device': device.model_dump()})
 
 
 def delete_device(cursor: Cursor, device_id: int):
-    cursor.execute(
-        """
-        DELETE FROM devices WHERE id = ?
-        """,
-        (device_id,),
-    )
+    logger.info('Deleting device', {'device_id': device_id})
+    try: 
+        cursor.execute(
+            """
+            DELETE FROM devices WHERE id = ?
+            """,
+            (device_id,),
+        )
+    except Exception as e:
+        logger.error('Failed to delete device', {'device_id': device_id, 'error': str(e)})
+        raise e
+    logger.debug('Device deleted', {'device_id': device_id})
 
 
 def find_device_by_id(cursor: Cursor, device_id: int) -> Device | None:
-    cursor.execute(
-        """
-        SELECT * FROM devices WHERE id = ?
-        """,
-        (device_id,),
-    )
-    device = cursor.fetchone()
-    if device:
-        return Device(**device)
-    return None
+    logger.debug('Finding device by id', {'device_id': device_id})
+    try:
+        cursor.execute(
+            """
+            SELECT * FROM devices WHERE id = ?
+            """,
+            (device_id,),
+        )
+        device = cursor.fetchone()
+    except Exception as e:
+        logger.error('Failed to find device by id', {'device_id': device_id, 'error': str(e)})
+        raise e
+    logger.debug('Device found', {'device_data': device})
+    try:
+        if device:
+            return Device(**device)
+        return None
+    except Exception as e:
+        logger.error('Failed to parse device object', {'device_data': device, 'error': str(e)})
+        raise e
 
 
 def find_by_mac(cursor: Cursor, mac: str) -> Device | None:
-    cursor.execute(
-        """
-        SELECT * FROM devices WHERE mac = ?
-        """,
-        (mac,),
-    )
-    device = cursor.fetchone()
-    if device:
-        return Device(**device)
-    return None
+    logger.debug('Finding device by mac', {'mac': mac})
+    try:
+        cursor.execute(
+            """
+            SELECT * FROM devices WHERE mac = ?
+            """,
+            (mac,),
+        )
+        device = cursor.fetchone()
+    except Exception as e:
+        logger.error('Failed to find device by mac', {'mac': mac, 'error': str(e)})
+        raise e
+    logger.debug('Device found', {'device_data': device})
+    try:
+        if device:
+            return Device(**device)
+        return None
+    except Exception as e:
+        logger.error('Failed to parse device object', {'device_data': device, 'error': str(e)})
+        raise e
 
 
 def find_by_name(cursor: Cursor, name: str) -> Device | None:
-    cursor.execute(
-        """
-        SELECT * FROM devices WHERE name = ?
-        """,
-        (name,),
-    )
-    device = cursor.fetchone()
-    if device:
-        return Device(**device)
-    return None
+    logger.debug('Finding device by name', {'name': name})
+    try:
+        cursor.execute(
+            """
+            SELECT * FROM devices WHERE name = ?
+            """,
+            (name,),
+        )
+        device = cursor.fetchone()
+    except Exception as e:
+        logger.error('Failed to find device by name', {'name': name, 'error': str(e)})
+        raise e
+    logger.debug('Device found', {'device_data': device})
+    try:
+        if device:
+            return Device(**device)
+        return None
+    except Exception as e:
+        logger.error('Failed to parse device object', {'device_data': device, 'error': str(e)})
 
 
 def list_devices(cursor: Cursor, room: Optional[int] = None, connected: Optional[bool] = None):
+    logger.debug('Listing devices', {'room': room, 'connected': connected})
     query = "SELECT * FROM devices"
     where_clauses = []
     args = []
@@ -108,8 +163,17 @@ def list_devices(cursor: Cursor, room: Optional[int] = None, connected: Optional
         args.append(connected)
     if where_clauses:
         query = query + " Where " + ", ".join(where_clauses)
-    cursor.execute(query, args)
-    devices = cursor.fetchall()
-    if devices:
-        return [Device(**device) for device in devices]
+    try: 
+        cursor.execute(query, args)
+        devices = cursor.fetchall()
+    except Exception as e:
+        logger.error('Failed to list devices', {'room': room, 'connected': connected, 'query': query, 'error': str(e)})
+        raise e
+    logger.debug('Devices listed', {'devices': devices})
+    try: 
+        if devices:
+            return [Device(**device) for device in devices]
+    except Exception as e:
+        logger.error('Failed to parse devices', {'devices_data': devices, 'error': str(e)})
+        raise e
 
