@@ -26,6 +26,11 @@ def get_led_strips():
     return jsonify({"data": {"led_strips": device_data}})
 
 
+# @led_strips_bp.put('/')
+# def update_many_led_strips():
+
+
+
 @led_strips_bp.put('/<int:led_strip_id>')
 @data_has('color', optional=True)
 @data_has('brightness', optional=True)
