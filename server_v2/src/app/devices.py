@@ -93,7 +93,6 @@ def update_device(device_id):
     return jsonify({"data": {"device": device_data, "message": success_message}})
 
 
-
 @devices_bp.get('/<int:device_id>')
 @ensure_not_none('device')
 def read_device(device_id):
@@ -101,10 +100,10 @@ def read_device(device_id):
     # load the device and state
     device = g.get('device')
     with Database() as db:
-        device.led_strip_state = db.led_strips.find_by_device_id(device_id)
+        device.led_strip = db.led_strips.find_by_device_id(device_id)
     # return the data
     device_data = device.model_dump()
-    logger.debug(f'returning value for device "{device.name}', {"device": device_data})
+    logger.debug(f'returning value for device "{device.name or device.mac}"', {"device": device_data})
     return jsonify({"data": {"device": device_data}})
 
 
