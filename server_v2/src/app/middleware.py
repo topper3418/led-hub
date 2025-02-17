@@ -59,6 +59,7 @@ def data_has(item_name, optional = False):
 # blueprint middleware
 
 def load_device():
+    logger.debug('loading device')
     # early returns
     if request.view_args is None:
         return 

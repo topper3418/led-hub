@@ -116,7 +116,7 @@ def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | No
     except Exception as e:
         logger.error('Failed to find led_strip by device_id', {'device_id': device_id, 'error': str(e)})
         raise e
-    logger.debug('Led_strip found', {'led_strip_data': led_strip.model_dump()})
+    logger.debug('Led_strip found', {'led_strip_data': led_strip})
     try:
         if led_strip:
             return LedStrip(**led_strip)
