@@ -1,6 +1,7 @@
 import time
 import requests
 import random
+from pprint import pprint
 
 from src import config, models
 
@@ -17,8 +18,9 @@ def generate_random_ip():
     return '.'.join(str(random.randint(0, 255)) for _ in range(4))
 
 
-def fake_write(new_device):
-    print('writing to device, but not really', new_device.model_dump())
+def fake_write(led_strip_inst):
+    print('writing to device, but not really')
+    pprint(led_strip_inst.model_dump())
 
 
 def handshake(server_endpoint, mac, ip) -> bool | models.Device:
@@ -68,7 +70,7 @@ def do_handshake() -> models.Device:
 
 
 def get_update(device: models.Device):
-    update_endpoint = SERVER_ENDPOINT + 'devices/' + str(device.id)
+    update_endpoint = SERVER_ENDPOINT + 'devices/' + str(device.id) + '/led_strip'
     # fetch data from server
     response = requests.get(update_endpoint)
     if not response.status_code == 200:
@@ -79,19 +81,18 @@ def get_update(device: models.Device):
         return
     # load data into object
     try:
-        data = response_json.get('data', {})
-        device_data = data.get('device')
-        if not device_data:
+        led_strip_data = response_json.get('data', {})
+        if not led_strip_data:
             raise ValueError('no device data returned')
-        print('got data: ', device_data)
-        new_device = models.Device(**device_data)
-        device.led_strip = new_device.led_strip
+        print('got data: ', led_strip_data)
+        led_strip = models.LedStrip(**led_strip_data)
+        device.led_strip = led_strip
     except Exception as e:
         print('an exception was raised while trying to parse response', e)
         return
     # use that object's data to write to the led strip
     try:
-        fake_write(device)
+        fake_write(led_strip)
     except Exception as e:
         print('an exception was raise dwhile trying to write to device')
 
