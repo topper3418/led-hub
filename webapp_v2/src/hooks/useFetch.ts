@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 export const useFetch = <T>(
   url: string,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig,
+  extract?: string[]
 ) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -27,7 +28,7 @@ export const useFetch = <T>(
         return res.data;
       })
       .then((data) => {
-        setData(data)
+        setData(data?.data)
       })
       .catch((err) => {
         setError(err.message);

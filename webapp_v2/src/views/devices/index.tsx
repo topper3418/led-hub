@@ -26,18 +26,15 @@ export const Devices: React.FC = () => {
         </>)
     }
 
-
     const navToDevice = (data: Device) => {
         navigate(`/${data.name}`);
     }
-    // for determining the state of the allOn button
-    const allOn = devices.data?.every((d: Device) => d.led_strip?.on);
 
     return (
         <div className="wrapper spaced">
             <Banner title="All LEDs" loading={devices.loading}>
                 <></>
-                <button onClick={() => setAll(!allOn)}>{allOn ? "All off" : "All on"}</button>
+                <></>
             </Banner>
             {!devices.loading && devices.data?.length === 0 ? <div>No devices found</div> :
                 <div className="deviceContainer">

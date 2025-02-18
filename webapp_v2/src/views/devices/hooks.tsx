@@ -4,17 +4,20 @@ import { Device } from "../../types";
 import { BACKEND_ROOT_URL } from "../../config";
 import { useFetch } from "../../hooks/useFetch";
 import { usePost } from "../../hooks/usePost";
+
 const logger = getLogger('views/devices/hooks');
 
 export const useAllLedStrips = () => {
-    const { state, api } = useFetch<Device[]>(BACKEND_ROOT_URL);
+    const url = BACKEND_ROOT_URL + "led_strips"
+    const { state, api } = useFetch<Device[]>(url);
+    logger.debug(`rendering led strip hook for url ${url}`)
     useEffect(() => {
         if (state.loading) return;
         if (state.data) {
             logger.debug('got data:', state.data);
         }
         if (state.error) {
-            logger.errorp(state.error);
+            logger.error("error fetching all led strips", { error: state.error });
         }
         const interval = setInterval(() => {
             api.refetch();
