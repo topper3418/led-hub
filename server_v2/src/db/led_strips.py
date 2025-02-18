@@ -127,6 +127,7 @@ def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | No
 
 
 def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip]:
+    logger.debug('listing led strips', {'room_id': room_id})
     try: 
         cursor.execute(
             """
@@ -152,6 +153,7 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
         raise e
     try:
         if led_strips:
+            logger.debug('found data for led strips', {"data": led_strips})
             return [LedStrip(**led_strip) for led_strip in led_strips]
         return []
     except Exception as e:
@@ -164,22 +166,20 @@ def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
     try:
         cursor.execute(
             """
-            SELECT *
-            FROM led_strips
-            JOIN devices ON led_strips.device_id = devices.id
-            WHERE devices.room_id = ?
+            select * from led_strips join devices on led_strips.device_id = devices.id;
             """,
-            (room_id,),
         )
         data = cursor.fetchall()
     except Exception as e:
         logger.error('Failed to list led_strip devices', {'error': str(e)})
         raise e
-    logger.debug('Led_strip devices found', {'led_strip_data': data})
+    logger.debug('Led_strip devices found', {'led_strip_data': [dict(row) for row in data]})
     try:
-        if not data: return []
+        print('---------------WE GOT HERE-------------')
         devices = []
         for row in data:
+            print('------------------ITERATING ROW---------------')
+            logger.debug('row in data', {"row": dict(row)})
             device = Device(**row)
             device.led_strip = LedStrip(**row)
             devices.append(device)

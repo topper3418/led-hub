@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 
 from src.db import Database
 from src.logging import get_logger
@@ -14,6 +15,7 @@ logger = get_logger(__name__)
 
 def get_app():
     app = Flask(__name__)
+    CORS(app)
 
     with Database() as db:
         db.init_db()
