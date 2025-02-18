@@ -17,7 +17,7 @@ export const getLogger = (loggerName: string) => {
   const log = async (level: LogLevel, message: string, meta: any = null, printOut: boolean = false) => {
     try {
       await axios.post(`${LOGGING_SERVICE_ENDPOINT}/logs`, {
-        logger: `webapp/${loggerNameAppended}`,
+        logger: loggerNameAppended,
         level,
         message,
         meta
