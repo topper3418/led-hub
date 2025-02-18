@@ -4,33 +4,35 @@
 import { MultiStateButton } from "../../components/multiStateButton";
 import React from "react";
 import { useToggleLedStrip } from "./hooks";
+import { Device } from "../../types";
 
 interface LedCardInterface {
-  ledStrip: any;
+  device: Device;
   selectDevice: () => void;
   refetch: () => void;
 }
 
-export const LedCard: React.FC<LedCardInterface> = ({ ledStrip, selectDevice, refetch }) => {
-  const { state: toggleState, api } = useToggleLedStrip(ledStrip.name);
+export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refetch }) => {
+  const { state: toggleState, api } = useToggleLedStrip(device.name);
+  console.log("rendering ledCard", device);
 
   let nameClass = "name"
-  if (!ledStrip.connected) nameClass += " disconnected"
+  if (!device.connected) nameClass += " disconnected"
 
   const selectState = (newState: string) => {
     console.log('selectState', newState);
-    api.post({ data: { ...ledStrip, on: newState == 'on' } });
+    api.post({ data: { ...device, on: newState == 'on' } });
     refetch();
   }
 
   return (
     <div className="deviceTile" onClick={selectDevice}>
-      <div className={nameClass}>{ledStrip.name}</div>
+      <div className={nameClass}>{device.name}</div>
       <MultiStateButton
         options={['off', 'on']}
-        clicked={ledStrip.on ? 'on' : 'off'}
+        clicked={device.on ? 'on' : 'off'}
         setClicked={selectState}
-        selectedColor={`rgb(${ledStrip.color.r},${ledStrip.color.g},${ledStrip.color.b})`}
+        selectedColor={`rgb(${device.color.r},${device.color.g},${device.color.b})`}
         loading={toggleState.loading}
       />
     </div>

@@ -30,6 +30,8 @@ export const Devices: React.FC = () => {
         navigate(`/${data.name}`);
     }
 
+    console.log('data:', devices)
+
     return (
         <div className="wrapper spaced">
             <Banner title="All LEDs" loading={devices.loading}>
@@ -41,7 +43,7 @@ export const Devices: React.FC = () => {
                     {devices.data?.map((data: Device) => (
                         <LedCard
                             key={data.name}
-                            ledStrip={data}
+                            device={data.led_strip}
                             selectDevice={() => navToDevice(data)}
                             refetch={refetch}
                         />
