@@ -15,5 +15,7 @@ def get_connection(connection_path: str = DATABASE_PATH):
         logger.error(error)
         raise ValueError(error)
     connection = sqlite3.connect(connection_path)
-    connection.row_factory = sqlite3.Row
+    def dict_factory(cursor, row):
+        return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+    connection.row_factory = dict_factory
     return connection

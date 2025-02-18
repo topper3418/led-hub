@@ -59,7 +59,7 @@ class Logger:
                     pprint(meta)
         except Exception as e:
             fmtMessage = f'{self.loggerName} - {level.value.upper()} - {message}'
-            print(f'Failed to send log: {e}\n{fmtMessage}\n')
+            print(f'Failed to send log: {e}\n\t - {fmtMessage}\n')
 
 
 def get_logger(loggerName) -> Logger:

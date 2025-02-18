@@ -20,6 +20,7 @@ def init_devices(cursor: Cursor):
                 `mac` VARCHAR(17) UNIQUE NOT NULL,
                 `name` VARCHAR(45) UNIQUE NULL,
                 `ip` VARCHAR(15) NULL,
+                `last_ping` TIMESTAMP NULL,
                 `room_id` INTEGER NULL,
                 FOREIGN KEY (`room_id`) 
                     REFERENCES `rooms` (`id`) 
@@ -65,6 +66,23 @@ def update_device(cursor: Cursor, device: Device):
         logger.error('Failed to update device', {'device': device.model_dump(), 'error': str(e)})
         raise e
     logger.debug('Device updated', {'device': device.model_dump()})
+
+
+def record_ping(cursor: Cursor, device_id: int):
+    logger.debug('Recording ping', {'device_id': device_id})
+    try:
+        cursor.execute(
+            """
+            UPDATE devices
+            SET last_ping = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (device_id,),
+        )
+    except Exception as e:
+        logger.error('Failed to record ping', {'device_id': device_id, 'error': str(e)})
+        raise e
+    logger.debug('Ping recorded', {'device_id': device_id})
 
 
 def delete_device(cursor: Cursor, device_id: int):

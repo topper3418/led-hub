@@ -125,14 +125,19 @@ def update_led_strip_state(device_id):
 
 @devices_bp.get('/<int:device_id>/led_strip')
 @ensure_not_none('device')
-def get_led_strip_state(device_id):
+def led_strip_ping(device_id):
     logger.debug(f'processing request for led strip data on device id {device_id}')
     # load that device from the db
     db: Database = g.db
     led_strip = db.led_strips.find_by_device_id(device_id)
     if led_strip is None:
         abort(500, f"There was an error loading the led strip data for device id {device_id}")
+    try:
+        db.devices.ping(device_id)
+    except Exception as e:
+        logger.error(f'Failed to record ping for device id {device_id}', {"error": str(e)})
+        abort(500, f"Failed to record ping for device id {device_id}")
     led_strip_data = led_strip.model_dump()
-    logger.debug(f'returning data for led strip on device id {device_id}', led_strip_data)
+    logger.debug(f'returning data for led strip on device id {device_id}', {"data": led_strip_data})
     return jsonify({"data": led_strip_data})
     
