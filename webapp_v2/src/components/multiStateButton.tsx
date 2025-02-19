@@ -5,12 +5,12 @@ interface MultiStateButtonProps {
   options: string[];
   clicked: string;
   setClicked: (value: string) => void;
-  selectedColor?: string;
+  currentColor?: string;
   loading?: boolean;
 }
 
 export const MultiStateButton: React.FC<MultiStateButtonProps> = (
-  { options, clicked, setClicked, selectedColor, loading }
+  { options, clicked, setClicked, currentColor: selectedColor, loading }
 ) => {
   const newSelectedColor = selectedColor || '#4287f5';
   const selectedStyle = {
