@@ -45,6 +45,7 @@ def data_has(item_name, optional = False):
             if data is None:
                 body = request.json or {}
                 data  = body.get('data', {})
+                g.data = data
             item = data.get(item_name)
             if item is None and not optional:
                 error_message = f"{item_name} is missing from data"

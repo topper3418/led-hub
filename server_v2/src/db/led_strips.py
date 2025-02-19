@@ -50,18 +50,18 @@ def create_led_strip(cursor: Cursor, led_strip: LedStrip):
 
 
 def update_led_strip(cursor: Cursor, led_strip: LedStrip):
-    logger.info('Updating led_strip', {'led_strip': led_strip})
+    logger.info('Updating led_strip', {'led_strip': led_strip.model_dump()})
     try:
         cursor.execute(
             """
             UPDATE led_strips
-            SET on = ?, brightness = ?, red = ?, green = ?, blue = ?, num_leds = ?
+            SET `on` = ?, brightness = ?, red = ?, green = ?, blue = ?, num_leds = ?
             WHERE id = ?
             """,
             (led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.id, led_strip.num_leds),
         )
     except Exception as e:
-        logger.error('Failed to update led_strip', {'led_strip': led_strip, 'error': str(e)})
+        logger.error('Failed to update led_strip', {'led_strip': led_strip.model_dump(), 'error': str(e)})
         raise e
     logger.debug('Led_strip updated', {'led_strip': led_strip.model_dump()})
 

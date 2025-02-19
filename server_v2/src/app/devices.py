@@ -113,7 +113,7 @@ def read_device(device_id):
 @data_has('on', optional=True)
 @ensure_not_none('device')
 def update_led_strip_state(device_id):
-    logger.info(f'updating led strip state for device id {device_id}', {"data", g.data})
+    logger.info(f'updating led strip state for device id {device_id}', {"data": g.data})
     device: Device = g.device
     # load that device from the db
     db: Database = g.db
@@ -132,6 +132,7 @@ def led_strip_ping(device_id):
     led_strip = db.led_strips.find_by_device_id(device_id)
     if led_strip is None:
         abort(500, f"There was an error loading the led strip data for device id {device_id}")
+        return
     try:
         db.devices.ping(device_id)
     except Exception as e:
