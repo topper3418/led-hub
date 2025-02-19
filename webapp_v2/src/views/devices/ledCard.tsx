@@ -16,23 +16,22 @@ export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refe
   const { state: toggleState, api } = useToggleLedStrip(device.name);
   console.log("rendering ledCard", device);
 
-  let nameClass = "name"
-  if (!device.connected) nameClass += " disconnected"
-
   const selectState = (newState: string) => {
     console.log('selectState', newState);
     api.post({ data: { ...device, on: newState == 'on' } });
     refetch();
   }
 
+  const color = `rgb(${device?.led_strip?.color?.r},${device?.led_strip?.color?.g},${device?.led_strip?.color?.b})`;
+
   return (
     <div className="deviceTile" onClick={selectDevice}>
-      <div className={nameClass}>{device.name}</div>
+      <p>{device.name || device.mac}</p>
       <MultiStateButton
         options={['off', 'on']}
-        clicked={device.on ? 'on' : 'off'}
+        clicked={device?.led_strip?.on ? 'on' : 'off'}
         setClicked={selectState}
-        selectedColor={`rgb(${device.color.r},${device.color.g},${device.color.b})`}
+        currentColor={color}
         loading={toggleState.loading}
       />
     </div>

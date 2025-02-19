@@ -9,8 +9,8 @@ import { usePut } from "../../hooks/usePut";
 const logger = getLogger('views/ledController/hooks');
 
 export const useLedStripHooks = (deviceId: number) => {
-    const url = BACKEND_ROOT_URL + deviceId;
-    const { state: fetchState, api: fetchApi } = useFetch<Device>(url);
+    const url = BACKEND_ROOT_URL + "devices/" + deviceId;
+    const { state: fetchState, api: fetchApi } = useFetch<Device>(url, undefined, 'device');
     const { state: updateState, api: updateApi } = usePut<LedStrip>(url + '/led_strip');
     const { state: deleteState, api: deleteApi } = useDelete<LedStrip>(url);
     const update = (newState: Partial<LedStrip>) => {

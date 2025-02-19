@@ -27,7 +27,7 @@ export const Devices: React.FC = () => {
     }
 
     const navToDevice = (data: Device) => {
-        navigate(`/${data.name}`);
+        navigate(`/devices/${data.id}`);
     }
 
     console.log('data:', devices)
@@ -40,11 +40,11 @@ export const Devices: React.FC = () => {
             </Banner>
             {!devices.loading && devices.data?.length === 0 ? <div>No devices found</div> :
                 <div className="deviceContainer">
-                    {devices.data?.map((data: Device) => (
+                    {devices.data?.map((item: Device) => (
                         <LedCard
-                            key={data.name}
-                            device={data.led_strip}
-                            selectDevice={() => navToDevice(data)}
+                            key={item.name}
+                            device={item}
+                            selectDevice={() => navToDevice(item)}
                             refetch={refetch}
                         />
                     ))}

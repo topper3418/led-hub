@@ -10,7 +10,7 @@ const logger = getLogger('views/ledController');
 const LedController: React.FC = () => {
   const deviceId = Number(useParams<{ deviceId: string }>().deviceId)
   const {
-    fetchState: { data, loading, error },
+    fetchState: { data: device, loading, error },
     api
   } = useLedStripHooks(deviceId);
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const LedController: React.FC = () => {
 
   const togglePressed = () => {
     logger.debugp('toggle pressed');
-    api.update({ on: !data?.led_strip?.on });
+    api.update({ on: !device?.led_strip?.on });
   }
 
   const brightnessChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,10 +34,10 @@ const LedController: React.FC = () => {
     api.update({ color })
   }
 
-  const displayColor = `rgba(${data?.led_strip?.color?.r}, ${data?.led_strip?.color?.g}, ${data?.led_strip?.color?.b}, ${data?.led_strip?.brightness || 0 / 10})`;
+  const displayColor = `rgba(${device?.led_strip?.color?.r}, ${device?.led_strip?.color?.g}, ${device?.led_strip?.color?.b}, ${device?.led_strip?.brightness || 0 / 10})`;
 
   const coloredButton = {
-    backgroundColor: data?.led_strip?.on ? 'black' : displayColor,
+    backgroundColor: device?.led_strip?.on ? 'black' : displayColor,
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
@@ -51,16 +51,17 @@ const LedController: React.FC = () => {
     justifyContent: "center",
     alignItems: "stretch",
     height: "100vh",
-    backgroundColor: data?.led_strip?.on ? displayColor : 'black',
+    backgroundColor: device?.led_strip?.on ? displayColor : 'black',
     padding: "10px",
     gap: "10px"
   }
+
 
   return (
     <div style={wrapperStyle}>
       <Banner
         loading={loading}
-        title={data?.name || "unknown device"}>
+        title={device?.name || "unknown device"}>
         <BackButton />
         <DeleteButton />
       </Banner>
@@ -71,10 +72,10 @@ const LedController: React.FC = () => {
         type="range"
         min="0"
         max="100"
-        value={data?.led_strip?.brightness}
+        value={device?.led_strip?.brightness}
         onChange={brightnessChanged} />
       <button onClick={togglePressed} style={coloredButton}>
-        {data?.led_strip?.on ? 'Off' : 'On'}
+        {device?.led_strip?.on ? 'Off' : 'On'}
       </button>
     </div>
   )
