@@ -5,7 +5,7 @@ export const useDelete = <T>(
   url: string,
 ) => {
   const [data, setData] = useState<T | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const del = (config: AxiosRequestConfig) => {

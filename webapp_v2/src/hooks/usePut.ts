@@ -8,17 +8,18 @@ export const usePut = <T>(
   url: string,
 ) => {
   const [data, setData] = useState<T | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const put = (config: AxiosRequestConfig) => {
-    logger.debugp(`posting to ${url}`, config)
+    logger.debugp(`putting to ${url}`, config)
     setLoading(true);
-    axios.post(url, config)
+    axios.put(url, config.data, config)
       .then((res: AxiosResponse) => {
-        if (res.statusText != 'OK') {
+        if (res.status !== 204) {
+          console.log("status", res.status)
           throw new Error(
-            `Post to ${url} failed, status: ` +
+            `Put to ${url} failed, status: ` +
             res.status +
             " " +
             res.statusText

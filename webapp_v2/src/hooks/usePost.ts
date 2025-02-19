@@ -8,13 +8,13 @@ export const usePost = <T>(
   url: string,
 ) => {
   const [data, setData] = useState<T | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const post = (config: AxiosRequestConfig) => {
     logger.debugp(`posting to ${url}`, config)
     setLoading(true);
-    axios.post(url, config)
+    axios.post(url, config.data, config)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {
           throw new Error(

@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 export const useFetch = <T>(
   url: string,
   config?: AxiosRequestConfig,
-  extract?: string[]
+  extract?: string
 ) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState(false);
   const [data, setData] = useState<T | undefined>(undefined);
@@ -28,7 +28,7 @@ export const useFetch = <T>(
         return res.data;
       })
       .then((data) => {
-        setData(data?.data)
+        setData(extract ? data?.data?.[extract] : data);
       })
       .catch((err) => {
         setError(err.message);
