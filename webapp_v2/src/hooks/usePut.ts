@@ -6,15 +6,16 @@ const logger = getLogger('hooks/post')
 
 export const usePut = <T>(
   url: string,
+  config?: AxiosRequestConfig
 ) => {
   const [data, setData] = useState<T | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const put = (config: AxiosRequestConfig) => {
+  const put = (data: { data: T }) => {
     logger.debugp(`putting to ${url}`, config)
     setLoading(true);
-    axios.put(url, config.data, config)
+    axios.put(url, data, config)
       .then((res: AxiosResponse) => {
         if (res.status !== 204) {
           console.log("status", res.status)

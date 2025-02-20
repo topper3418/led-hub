@@ -40,7 +40,7 @@ export const Devices: React.FC = () => {
             </Banner>
             {!devices.loading && devices.data?.length === 0 ? <div>No devices found</div> :
                 <div className="deviceContainer">
-                    {devices.data?.map((item: Device) => (
+                    {devices?.data?.map((item: Device) => (
                         <LedCard
                             key={item.name}
                             device={item}

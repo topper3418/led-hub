@@ -175,11 +175,8 @@ def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
         raise e
     logger.debug('Led_strip devices found', {'led_strip_data': [dict(row) for row in data]})
     try:
-        print('---------------WE GOT HERE-------------')
         devices = []
         for row in data:
-            print('------------------ITERATING ROW---------------')
-            logger.debug('row in data', {"row": dict(row)})
             device = Device(**row)
             device.led_strip = LedStrip(**row)
             devices.append(device)

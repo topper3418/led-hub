@@ -9,7 +9,7 @@ const logger = getLogger('views/devices/hooks');
 
 export const useAllLedStrips = () => {
     const url = BACKEND_ROOT_URL + "led_strips"
-    const { state, api } = useFetch<Device[]>(url);
+    const { state, api } = useFetch<Device[]>(url, undefined, "devices");
     logger.debug(`rendering led strip hook for url ${url}`)
     useEffect(() => {
         if (state.loading) return;

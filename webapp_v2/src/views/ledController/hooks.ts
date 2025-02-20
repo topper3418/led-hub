@@ -15,7 +15,7 @@ export const useLedStripHooks = (deviceId: number) => {
     const { state: deleteState, api: deleteApi } = useDelete<LedStrip>(url);
     const update = (newState: Partial<LedStrip>) => {
         logger.infop('updating state: ', newState);
-        updateApi.put({ data: newState });
+        updateApi.put({ data: { ...newState } });
     }
     // function to delete the strip
     const destroy = () => {

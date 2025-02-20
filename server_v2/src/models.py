@@ -8,15 +8,17 @@
 
 from __future__ import annotations
 from typing import Optional
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
 class Device(BaseModel):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     mac: str
-    ip: str
     name: Optional[str] = None
-    connected: bool = False
+    ip: str
+    last_ping: Optional[datetime] = None
     room_id: Optional[int] = None
     # linked objects
     room: Optional[Room] = None

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify, g, abort
 from pydantic import ValidationError
 
 from src.logging import get_logger
@@ -22,10 +22,21 @@ def get_led_strips():
     logger.info('processing request to list led strips')
     room_id = request.args.get('room_id')
     db: Database = g.db
-    devices = db.led_strips.find_many_devices(None if not room_id else int(room_id))
+    try:
+        devices = db.led_strips.find_many_devices(None if not room_id else int(room_id))
+    except ValidationError as e:
+        errors = e.errors()
+        logger.error('Failed to get devices from db', {"errors": errors})
+        abort(500, errors)
+        return
+    except Exception as e:
+        error_message = "Failed to get devices from db"
+        logger.error(error_message, {"error": str(e)})
+        abort(500, error_message)
+        return
     logger.debug(f'got {len(devices)} devices from db')
     device_data = [device.model_dump() for device in devices or []]
-    payload = {"data": device_data}
+    payload = {"data": {"devices": device_data}}
     logger.debug('returning data for led strips', {"payload": payload})
     return jsonify(payload)
 
