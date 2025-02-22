@@ -5,6 +5,7 @@ import { MultiStateButton } from "../../components/multiStateButton";
 import React from "react";
 import { useToggleLedStrip } from "./hooks";
 import { Device } from "../../types";
+import { intToHex } from "../../util";
 
 interface LedCardInterface {
   device: Device;
@@ -22,16 +23,18 @@ export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refe
     refetch();
   }
 
-  const color = `rgb(${device?.led_strip?.color?.r},${device?.led_strip?.color?.g},${device?.led_strip?.color?.b})`;
+  const { red, green, blue } = device?.led_strip?.color || { red: 255, green: 255, blue: 255 };
+
+  const color = '#' + intToHex(red) + intToHex(green) + intToHex(blue);
 
   return (
-    <div className="flex flex-row border border-slate-100 bg-slate-800 rounded-md justify-between p-2.5" onClick={selectDevice}>
+    <div className="flex flex-row border border-slate-100 bg-slate-850 rounded-md justify-between p-2.5" onClick={selectDevice}>
       <p className="text-slate-100">{device.name || device.mac}</p>
       <MultiStateButton
         options={['off', 'on']}
         clicked={device?.led_strip?.on ? 'on' : 'off'}
         setClicked={selectState}
-        currentColor={color}
+        selectedColor={color}
         loading={toggleState.loading}
       />
     </div>

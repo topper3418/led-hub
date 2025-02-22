@@ -21,7 +21,7 @@ export const useAllLedStrips = () => {
         }
         const interval = setInterval(() => {
             api.refetch();
-        }, 500);
+        }, 10000);
         return () => clearInterval(interval);
     }, [state.loading]);
     return { state, api };

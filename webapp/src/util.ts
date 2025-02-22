@@ -15,3 +15,18 @@ export const formatDateString = (dateTimeString: string, includeDay: boolean = t
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   } else return `${hours}:${minutes}:${seconds}`;
 };
+
+export const intToHex = (value: number) => {
+  // Clamp value to 0-255 range and convert to hex
+  const clamped = Math.min(Math.max(value, 0), 255);
+  return clamped.toString(16).padStart(2, "0").toUpperCase();
+}
+
+// Calculate luminance and return contrasting text color
+export const getContrastColor = (hex: string): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#FFFFFF'; // Black for light bg, white for dark bg
+}

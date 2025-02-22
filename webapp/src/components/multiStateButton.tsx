@@ -1,37 +1,39 @@
 import React, { CSSProperties } from 'react';
-import '../App.css'
+import { getContrastColor } from '../util';
 
 interface MultiStateButtonProps {
   options: string[];
   clicked: string;
   setClicked: (value: string) => void;
-  currentColor?: string;
+  selectedColor?: string;
   loading?: boolean;
 }
 
 export const MultiStateButton: React.FC<MultiStateButtonProps> = (
-  { options, clicked, setClicked, currentColor: selectedColor, loading }
+  { options, clicked, setClicked, selectedColor, loading }
 ) => {
-  const newSelectedColor = selectedColor || '#4287f5';
-  const selectedStyle = {
-    backgroundColor: newSelectedColor,
-    textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
-  };
+  const newSelectedColor = selectedColor || '#FFFFFF';
+  const contrastColor = getContrastColor(newSelectedColor);
+  console.log('contrastColor', contrastColor);
   const containerStyle: CSSProperties = {};
   if (loading) containerStyle.borderColor = 'yellow';
   return (
-    <div className="flex flex-row p-1 border border-slate-200 rounded-sm gap-1" style={containerStyle}>
+    <div className="flex flex-row border border-slate-200 rounded-sm gap-1 bg-slate-700" style={containerStyle}>
       {options.map(option => {
         const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
           event.stopPropagation()
           setClicked(option)
         }
+        const buttonClass = "flex-1 rounded-sm text-slate-100 size-12";
         return (
           <button
-            className="flex-1 p-1 rounded-sm text-slate-100"
+            className={buttonClass}
+            style={(clicked === option ? {
+              backgroundColor: newSelectedColor,
+              color: contrastColor,
+            } : {}) as CSSProperties}
             key={option}
             onClick={onClick}
-            style={option == clicked ? selectedStyle : {}}
           >
             {option}
           </button>
