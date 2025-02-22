@@ -33,7 +33,7 @@ export const Devices: React.FC = () => {
     console.log('data:', devices)
 
     return (
-        <div className="p-2.5 flex flex-col">
+        <div className="p-10 flex flex-col h-full w-full gap-2 bg-slate-900">
             <Banner title="All LEDs" loading={devices.loading}>
                 <></>
                 <></>

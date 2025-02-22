@@ -41,19 +41,23 @@ const LedController: React.FC = () => {
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
-  const BackButton = () => <button onClick={() => navigate("/")}>Back</button>;
-
-  const DeleteButton = () => <button onClick={api.delete}>Delete</button>;
-
   return (
-    <div className="flex flex-col justify-center items-stretch p-2 gap-2">
+    <div className="flex flex-col items-stretch p-2 gap-2 bg-slate-900 h-full place-content-between p-10">
       <Banner
         loading={loading}
         title={device?.name || "unknown device"}>
-        <BackButton />
-        <DeleteButton />
+        <button
+          onClick={() => navigate("/")}
+          className="bg-slate-800 text-slate-100 p-3 rounded-md">
+          Back
+        </button>
+        <button
+          onClick={api.delete}
+          className="bg-slate-800 text-slate-100 p-3 rounded-md">
+          Delete
+        </button>
       </Banner>
-      <div className='center'>
+      <div className='flex flex-row justify-center items-center'>
         <ColorWheel onChange={colorChanged} />
       </div>
       <input
@@ -62,7 +66,7 @@ const LedController: React.FC = () => {
         max="100"
         value={device?.led_strip?.brightness}
         onChange={brightnessChanged} />
-      <button onClick={togglePressed} style={coloredButton}>
+      <button onClick={togglePressed} className="bg-slate-800 text-slate-100 p-3 rounded-md" style={coloredButton}>
         {device?.led_strip?.on ? 'Off' : 'On'}
       </button>
     </div>

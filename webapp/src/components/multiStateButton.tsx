@@ -20,7 +20,7 @@ export const MultiStateButton: React.FC<MultiStateButtonProps> = (
   const containerStyle: CSSProperties = {};
   if (loading) containerStyle.borderColor = 'yellow';
   return (
-    <div className="flex flex-row p-1 border gap-1" style={containerStyle}>
+    <div className="flex flex-row p-1 border border-slate-200 rounded-sm gap-1" style={containerStyle}>
       {options.map(option => {
         const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
           event.stopPropagation()
@@ -28,6 +28,7 @@ export const MultiStateButton: React.FC<MultiStateButtonProps> = (
         }
         return (
           <button
+            className="flex-1 p-1 rounded-sm text-slate-100"
             key={option}
             onClick={onClick}
             style={option == clicked ? selectedStyle : {}}

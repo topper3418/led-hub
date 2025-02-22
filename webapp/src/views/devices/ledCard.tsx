@@ -25,8 +25,8 @@ export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refe
   const color = `rgb(${device?.led_strip?.color?.r},${device?.led_strip?.color?.g},${device?.led_strip?.color?.b})`;
 
   return (
-    <div className="flex flex-row border justify-between p-1" onClick={selectDevice}>
-      <p>{device.name || device.mac}</p>
+    <div className="flex flex-row border border-slate-100 bg-slate-800 rounded-md justify-between p-2.5" onClick={selectDevice}>
+      <p className="text-slate-100">{device.name || device.mac}</p>
       <MultiStateButton
         options={['off', 'on']}
         clicked={device?.led_strip?.on ? 'on' : 'off'}

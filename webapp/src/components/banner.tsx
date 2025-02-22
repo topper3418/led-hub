@@ -29,9 +29,9 @@ const Banner: React.FC<BannerProps> = ({ title, children, loading }) => {
   if (loading) headerStyle.color = "yellow";
 
   return (
-    <div className={"flex flex-row space-between p-10"}>
+    <div id="banner-wrapper" className={"flex flex-row place-content-between w-full mb-10"}>
       {LeftElement}
-      <h1 style={headerStyle}>{title}</h1>
+      <h1 className='text-slate-100 text-2xl'>{title}</h1>
       {RightElement}
     </div>
   );
