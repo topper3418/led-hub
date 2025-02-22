@@ -41,10 +41,10 @@ class LedStrip(BaseModel):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     device_id: int
     on: bool = False
-    brightness: int = Field(0, ge=0, le=255)
-    red: int = Field(0, ge=0, le=255)
-    green: int = Field(0, ge=0, le=255)
-    blue: int = Field(0, ge=0, le=255)
+    brightness: int = Field(255, ge=0, le=255)
+    red: int = Field(255, ge=0, le=255)
+    green: int = Field(255, ge=0, le=255)
+    blue: int = Field(255, ge=0, le=255)
     num_leds: int = Field(10, ge=0)
     # linked objects
     device: Optional[Device] = None
