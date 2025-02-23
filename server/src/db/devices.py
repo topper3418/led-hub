@@ -2,6 +2,7 @@ from typing import Optional
 
 from sqlite3 import Cursor
 
+from src.db.util import read_sql_init_file
 from src.models import (
     Device,
 )
@@ -12,23 +13,9 @@ logger = get_logger(__name__)
 
 def init_devices(cursor: Cursor):
     logger.info("Initializing devices table")
+    init_query = read_sql_init_file("devices")
     try: 
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS `devices` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                `mac` VARCHAR(17) UNIQUE NOT NULL,
-                `name` VARCHAR(45) UNIQUE NULL,
-                `ip` VARCHAR(15) NULL,
-                `last_ping` TIMESTAMP NULL,
-                `room_id` INTEGER NULL,
-                FOREIGN KEY (`room_id`) 
-                    REFERENCES `rooms` (`id`) 
-                    ON DELETE SET NULL 
-                    ON UPDATE CASCADE
-            );
-            """
-        )
+        cursor.execute(init_query)
     except Exception as e:
         logger.error('Failed to initialize devices table', {'error': str(e)})
         raise e

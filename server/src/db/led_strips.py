@@ -1,5 +1,6 @@
 from sqlite3 import Cursor
 
+from src.db.util import read_sql_init_file
 from src.models import Device, LedStrip
 from src.logging import get_logger
 
@@ -8,25 +9,9 @@ logger = get_logger(__name__)
 
 def init_led_strips(cursor: Cursor):
     logger.info("Initializing led_strips table")
+    init_query = read_sql_init_file("led_strips")
     try:
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS `led_strips` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                `device_id` INT UNIQUE NOT NULL,
-                `on` BOOLEAN NULL,
-                `brightness` INT NULL,
-                `red` INTEGER NULL,
-                `green` INTEGER NULL,
-                `blue` INTEGER NULL,
-                `num_leds` INT NULL,
-                FOREIGN KEY (`device_id`)
-                    REFERENCES `devices` (`id`)
-                    ON DELETE CASCADE
-                    ON UPDATE CASCADE
-            );
-            """
-        )
+        cursor.execute(init_query)
     except Exception as e:
         logger.error('Failed to initialize led_strips table', {'error': str(e)})
         raise e

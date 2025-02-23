@@ -1,5 +1,6 @@
 from sqlite3 import Cursor
 
+from src.db.util import read_sql_init_file
 from src.models import Room
 from src.logging import get_logger
 
@@ -8,15 +9,9 @@ logger = get_logger(__name__)
 
 def init_rooms(cursor: Cursor):
     logger.info("Initializing rooms table")
+    init_query = read_sql_init_file("rooms")
     try:
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS `rooms` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                `name` VARCHAR(45) UNIQUE NULL
-            );
-            """
-        )
+        cursor.execute(init_query)
     except Exception as e:
         logger.error('Failed to initialize rooms table', {'error': str(e)})
         raise e
