@@ -40,7 +40,7 @@ export const Devices: React.FC = () => {
                 {!devices.loading && devices.data?.length === 0 ? <div>No devices found</div> :
                     devices.data?.map((item: Device) => (
                         <LedCard
-                            key={item.name}
+                            key={item.id}
                             device={item}
                             selectDevice={() => navToDevice(item)}
                             refetch={refetch}

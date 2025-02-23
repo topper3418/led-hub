@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { getLogger } from "../../logging";
-import { Device } from "../../types";
+import { Device, LedStrip } from "../../types";
 import { BACKEND_ROOT_URL } from "../../config";
 import { useFetch } from "../../hooks/useFetch";
 import { usePost } from "../../hooks/usePost";
+import { usePut } from "../../hooks/usePut";
 
 const logger = getLogger('views/devices/hooks');
 
@@ -21,7 +22,7 @@ export const useAllLedStrips = () => {
         }
         const interval = setInterval(() => {
             api.refetch();
-        }, 10000);
+        }, 5000);
         return () => clearInterval(interval);
     }, [state.loading]);
     return { state, api };
@@ -35,6 +36,6 @@ export const useSetAll = () => {
     return { state, api: { setAll } };
 }
 
-export const useToggleLedStrip = (name: string) => {
-    return usePost<Device>(BACKEND_ROOT_URL + name);
+export const useToggleLedStrip = (deviceId: number) => {
+    return usePut<LedStrip>(BACKEND_ROOT_URL + 'devices/' + deviceId + '/led_strip');
 }

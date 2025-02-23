@@ -102,7 +102,7 @@ def read_device(device_id):
     with Database() as db:
         device.led_strip = db.led_strips.find_by_device_id(device_id)
     # return the data
-    device_data = device.model_dump()
+    device_data = device.model_dump_json()
     logger.debug(f'returning value for device "{device.name or device.mac}"', {"device": device_data})
     return jsonify({"data": {"device": device_data}})
 
@@ -118,6 +118,9 @@ def update_led_strip_state(device_id):
     # load that device from the db
     db: Database = g.db
     led_strip = db.led_strips.find_by_device_id(device_id)
+    if led_strip is None:
+        abort(500, f"There was an error loading the led strip data for device id {device_id}")
+    logger.debug(f'loaded led strip for device id {device_id}', {"led_strip": led_strip.model_dump()})
     device.led_strip = led_strip
     g.led_strip = led_strip
     return update_led_strip()

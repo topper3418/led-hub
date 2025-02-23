@@ -13,20 +13,25 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
-class Device(BaseModel):
+class BaseModelWithDateTime(BaseModel):
+    def model_dump(self, *args, **kwargs):
+        data = super().model_dump(*args, **kwargs)
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.isoformat()
+        return data
+
+
+class Device(BaseModelWithDateTime):
     id: Optional[int] = Field(None, description="Auto-incremented primary key")
     mac: str
     name: Optional[str] = None
     ip: str
-    last_ping: Optional[datetime] = None
+    last_ping: Optional[datetime] = datetime.now()
     room_id: Optional[int] = None
     # linked objects
     room: Optional[Room] = None
     led_strip: Optional[LedStrip] = None
-    # helpers
-    @property
-    def url(self) -> str:
-        return f"http://{self.ip}:{self.port}"
     def create_led_strip_state(self) -> LedStrip:
         return LedStrip(device_id=self.id)
 

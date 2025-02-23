@@ -43,12 +43,9 @@ def data_has(item_name, optional = False):
         def decorated_function(*args, **kwargs):
             data = g.get('data')
             if data is None:
-                print('data is none')
                 body = request.json or {}
-                print('body', body)
                 data  = body.get('data', {})
                 g.data = data
-            print('data', data)
             item = data.get(item_name)
             if item is None and not optional:
                 error_message = f"{item_name} is missing from data"

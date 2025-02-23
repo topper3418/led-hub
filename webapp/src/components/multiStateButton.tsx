@@ -14,7 +14,6 @@ export const MultiStateButton: React.FC<MultiStateButtonProps> = (
 ) => {
   const newSelectedColor = selectedColor || '#FFFFFF';
   const contrastColor = getContrastColor(newSelectedColor);
-  console.log('contrastColor', contrastColor);
   const containerStyle: CSSProperties = {};
   if (loading) containerStyle.borderColor = 'yellow';
   return (
