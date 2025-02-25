@@ -22,7 +22,7 @@ export const useAllLedStrips = () => {
         }
         const interval = setInterval(() => {
             api.refetch();
-        }, 5000);
+        }, 500);
         return () => clearInterval(interval);
     }, [state.loading]);
     return { state, api };
@@ -37,5 +37,5 @@ export const useSetAll = () => {
 }
 
 export const useToggleLedStrip = (deviceId: number) => {
-    return usePut<LedStrip>(BACKEND_ROOT_URL + 'devices/' + deviceId + '/led_strip');
+    return usePut<LedStrip, { led_strip: LedStrip }>(BACKEND_ROOT_URL + 'devices/' + deviceId + '/led_strip');
 }

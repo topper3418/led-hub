@@ -34,6 +34,10 @@ class Device(BaseModelWithDateTime):
     led_strip: Optional[LedStrip] = None
     def create_led_strip_state(self) -> LedStrip:
         return LedStrip(device_id=self.id)
+    # util
+    @property
+    def identifier(self) -> str:
+        return self.name or self.mac
 
 
 class Color(BaseModel):

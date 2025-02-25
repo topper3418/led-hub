@@ -32,7 +32,7 @@ export const Devices: React.FC = () => {
 
     return (
         <div className="p-10 flex flex-col h-full w-full gap-2 bg-slate-900">
-            <Banner title="All LEDs" loading={devices.loading}>
+            <Banner title="LED Hub" loading={devices.loading}>
                 <></>
                 <></>
             </Banner>
@@ -42,6 +42,7 @@ export const Devices: React.FC = () => {
                         <LedCard
                             key={item.id}
                             device={item}
+                            loading={devices.loading}
                             selectDevice={() => navToDevice(item)}
                             refetch={refetch}
                         />

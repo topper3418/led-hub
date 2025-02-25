@@ -61,6 +61,7 @@ def update_device(device_id):
     logger.debug(f'received request to modify device data for device id {device_id}')
     # load the device
     device: Device = g.get('device')
+    db: Database = g.db
     # parse the data
     body = request.json or {}
     data = body.get('data')
@@ -76,16 +77,15 @@ def update_device(device_id):
     # update the room if given
     room_id = data.get('room_id')
     if room_id:
-        with Database() as db:
-            room = db.rooms.find_by_id(room_id)
+        room = db.rooms.find_by_id(room_id)
         if room is None:
             error_message = f"No room found with id {room_id}"
             logger.error(error_message)
             return jsonify({"error": error_message }), 404
         device.room_id = room_id
     # update the database
-    with Database() as db:
-        db.devices.update(device)
+    db.devices.update(device)
+    db.commit()
     # return the data
     device_data = device.model_dump()
     success_message = "successfully updated device"
@@ -99,8 +99,9 @@ def read_device(device_id):
     logger.debug(f'processing request for data on device id {device_id}')
     # load the device and state
     device = g.get('device')
-    with Database() as db:
-        device.led_strip = db.led_strips.find_by_device_id(device_id)
+    db: Database = g.db
+    device.led_strip = db.led_strips.find_by_device_id(device_id)
+    db.commit()
     # return the data
     device_data = device.model_dump_json()
     logger.debug(f'returning value for device "{device.name or device.mac}"', {"device": device_data})
@@ -108,7 +109,9 @@ def read_device(device_id):
 
 
 @devices_bp.put('/<int:device_id>/led_strip')
-@data_has('color', optional=True)
+@data_has('red', optional=True)
+@data_has('green', optional=True)
+@data_has('blue', optional=True)
 @data_has('brightness', optional=True)
 @data_has('on', optional=True)
 @ensure_not_none('device')
@@ -119,6 +122,7 @@ def update_led_strip_state(device_id):
     db: Database = g.db
     led_strip = db.led_strips.find_by_device_id(device_id)
     if led_strip is None:
+        logger.error(f"there was an error loading the led strip data for device {device.identifier}", {"device": device.model_dump()})
         abort(500, f"There was an error loading the led strip data for device id {device_id}")
     logger.debug(f'loaded led strip for device id {device_id}', {"led_strip": led_strip.model_dump()})
     device.led_strip = led_strip

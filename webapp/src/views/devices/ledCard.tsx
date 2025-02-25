@@ -2,13 +2,14 @@
 
 // import { useState, useEffect } from "react";
 import { MultiStateButton } from "../../components/multiStateButton";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useToggleLedStrip } from "./hooks";
 import { Device } from "../../types";
 import { intToHex } from "../../util";
 
 interface LedCardInterface {
   device: Device;
+  loading: boolean;
   selectDevice: () => void;
   refetch: () => void;
 }
@@ -19,18 +20,33 @@ enum ConnectedStateEnum {
   DEAD = "DEAD",
 }
 
-export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refetch }) => {
+export const LedCard: React.FC<LedCardInterface> = (
+  { device, loading, selectDevice, refetch }
+) => {
   const { state: toggleState, api } = useToggleLedStrip(device.id);
+  const [bufferState, setBufferState] = useState(device.led_strip?.on);
 
+  // callback for the multi state button
   const selectState = (newState: string) => {
-    console.log('selectState', newState);
     api.put({ data: { ...device, on: newState == 'on' } });
     refetch();
   }
 
-  const { red, green, blue } = device?.led_strip?.color || { red: 255, green: 255, blue: 255 };
+  useEffect(() => {
+    if (!loading) setBufferState(device.led_strip?.on);
+  }, [loading])
 
+  useEffect(() => {
+    if (!toggleState.loading && toggleState.data) {
+      setBufferState(toggleState.data?.led_strip?.on);
+    }
+  }, [toggleState.loading])
+
+  // color for the button
+  const { red, green, blue } = device?.led_strip?.color || { red: 255, green: 255, blue: 255 };
   const color = '#' + intToHex(red) + intToHex(green) + intToHex(blue);
+
+  // connectivity health
   const lastPing = new Date(device.last_ping + "+00:00")
   const now = Date.now()
   const pingDwell = (now - lastPing.getTime()) / 1000
@@ -57,7 +73,7 @@ export const LedCard: React.FC<LedCardInterface> = ({ device, selectDevice, refe
       </div>
       <MultiStateButton
         options={['off', 'on']}
-        clicked={device?.led_strip?.on ? 'on' : 'off'}
+        clicked={bufferState ? 'on' : 'off'}
         setClicked={selectState}
         selectedColor={color}
         loading={toggleState.loading}

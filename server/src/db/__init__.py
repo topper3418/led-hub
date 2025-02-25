@@ -175,7 +175,7 @@ class Database:
 
     def close_connection(self):
         if self.connection:
-            self.connection.commit()
+            self.commit()
             self.cursor.close() if self.cursor else None
             self.connection.close()
             self.connection = None
@@ -183,6 +183,13 @@ class Database:
             self.devices.cursor = None
             self.rooms.cursor = None
             self.led_strips.cursor = None
+        else:
+            raise RuntimeError("Connection is not open")
+
+    def commit(self):
+        if self.connection:
+            print('committing changes')
+            self.connection.commit()
         else:
             raise RuntimeError("Connection is not open")
 

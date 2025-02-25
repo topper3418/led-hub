@@ -12,7 +12,7 @@ export const usePost = <T>(
   const [error, setError] = useState<string | undefined>(undefined);
 
   const post = (config: AxiosRequestConfig) => {
-    logger.debugp(`posting to ${url}`, config)
+    logger.debug(`posting to ${url}`, config)
     setLoading(true);
     axios.post(url, config.data, config)
       .then((res: AxiosResponse) => {
@@ -27,7 +27,7 @@ export const usePost = <T>(
         return res.data;
       })
       .then((data) => {
-        setData(data)
+        setData(data.data)
       })
       .catch((err) => {
         setError(err.message);
