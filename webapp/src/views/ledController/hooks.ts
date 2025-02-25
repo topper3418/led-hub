@@ -5,13 +5,14 @@ import { useDelete } from "../../hooks/useDelete";
 import { useEffect } from "react";
 import { BACKEND_ROOT_URL } from "../../config";
 import { usePut } from "../../hooks/usePut";
+import { NavigateFunction } from "react-router-dom";
 
 const logger = getLogger('views/ledController/hooks');
 
-export const useLedStripHooks = (deviceId: number) => {
+export const useLedStripHooks = (deviceId: number, navigate: NavigateFunction) => {
     const url = BACKEND_ROOT_URL + "devices/" + deviceId;
     const { state: fetchState, api: fetchApi } = useFetch<Device>(url, undefined, 'device');
-    const { state: updateState, api: updateApi } = usePut<LedStrip>(url + '/led_strip');
+    const { state: updateState, api: updateApi } = usePut<LedStrip, { led_strip: LedStrip }>(url + '/led_strip');
     const { state: deleteState, api: deleteApi } = useDelete<LedStrip>(url);
     const update = (newState: Partial<LedStrip>) => {
         logger.infop('updating state: ', newState);
@@ -21,6 +22,7 @@ export const useLedStripHooks = (deviceId: number) => {
     const destroy = () => {
         logger.infop('deleting device')
         deleteApi.del({});
+        navigate('/');
     }
     useEffect(() => {
         if (updateState.loading) return;

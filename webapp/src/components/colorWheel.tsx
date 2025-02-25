@@ -2,9 +2,9 @@ import React, { useRef, useEffect } from 'react';
 
 
 export interface RGB {
-  r: number;
-  g: number;
-  b: number;
+  red: number;
+  green: number;
+  blue: number;
 }
 
 interface ColorWheelProps {
@@ -29,8 +29,8 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ onChange: setColor }) => {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         const { data } = ctx.getImageData(x, y, 1, 1);
-        const [r, g, b] = data;
-        setColor({ r, g, b });
+        const [red, green, blue] = data;
+        setColor({ red, green, blue });
       }
     }
   };

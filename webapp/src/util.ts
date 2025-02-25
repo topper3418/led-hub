@@ -1,3 +1,5 @@
+import { Device } from "./types";
+
 export const formatDateString = (dateTimeString: string, includeDay: boolean = true) => {
   // Convert string to Date object
   const date = new Date(dateTimeString);
@@ -29,4 +31,8 @@ export const getContrastColor = (hex: string): string => {
   const b = parseInt(hex.slice(5, 7), 16);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.5 ? '#000000' : '#FFFFFF'; // Black for light bg, white for dark bg
+}
+
+export const getDeviceIdentifier = (device: Device): string => {
+  return device.name || device.mac || "Unknown Device";
 }

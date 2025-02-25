@@ -101,11 +101,22 @@ def read_device(device_id):
     device = g.get('device')
     db: Database = g.db
     device.led_strip = db.led_strips.find_by_device_id(device_id)
-    db.commit()
     # return the data
-    device_data = device.model_dump_json()
+    device_data = device.model_dump()
     logger.debug(f'returning value for device "{device.name or device.mac}"', {"device": device_data})
     return jsonify({"data": {"device": device_data}})
+
+
+@devices_bp.delete('/<int:device_id>')
+@ensure_not_none('device')
+def delete_device(device_id):
+    logger.info(f'deleting device with id {device_id}')
+    device: Device = g.get('device')
+    db: Database = g.db
+    db.devices.delete(device_id)
+    success_message = f"successfully deleted device with id {device_id}"
+    logger.debug(success_message)
+    return jsonify({"message": success_message})
 
 
 @devices_bp.put('/<int:device_id>/led_strip')
