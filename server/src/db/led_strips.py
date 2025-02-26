@@ -117,13 +117,12 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
         SELECT 
             led_strips.id, 
             led_strips.device_id, 
-            led_strips.on, 
+            led_strips.[on], 
             led_strips.brightness, 
             led_strips.red, 
             led_strips.green, 
             led_strips.blue, 
-            led_strips.num_leds,
-            led_strips.led_pin
+            led_strips.num_leds
         FROM led_strips
         JOIN devices ON led_strips.device_id = devices.id
     """
@@ -135,8 +134,10 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
         where_clauses.append("devices.room_id = ?")
         args.append(room_id)
     try: 
+        query = query + " WHERE " + " AND ".join(where_clauses)
+        logger.debug('Executing query', {'query': query, 'args': args})
         cursor.execute(
-            query + " WHERE " + " AND ".join(where_clauses),
+            query,
             args,
         )
         led_strips = cursor.fetchall()
@@ -155,11 +156,17 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
 
 def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
     logger.debug('Listing led_strip devices', {'room_id': room_id})
+    query = "select * from led_strips join devices on led_strips.device_id = devices.id"
+    args = []
+    if room_id == 0:
+        query = query + " where devices.room_id IS NULL;"
+    elif room_id:
+        query = query + " where devices.room_id = ?;"
+        args.append(room_id)
     try:
         cursor.execute(
-            """
-            select * from led_strips join devices on led_strips.device_id = devices.id;
-            """,
+            query,
+            args
         )
         data = cursor.fetchall()
     except Exception as e:

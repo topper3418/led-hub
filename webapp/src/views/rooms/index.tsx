@@ -1,18 +1,19 @@
 import React, { CSSProperties } from "react";
 import Banner from "../../components/banner";
 import { useNavigate } from "react-router-dom";
-import { useAddRoom, useAllRooms } from "./hooks";
+import { useAddRoom, useRoomHooks } from "./hooks";
 import { Room } from "../../types";
 import { RoomCard } from "./roomCard";
 
 
 const Rooms: React.FC = () => {
     const navigate = useNavigate();
-    const { rooms, api: fetchApi } = useAllRooms();
+    const { rooms, miscRoom, api: fetchApi } = useRoomHooks();
     const { state: addState, addGenericRoom } = useAddRoom();
     const navToRoom = (room: Room) => {
         navigate('/' + room.id)
     }
+    const numMiscLedStrips = miscRoom.data?.led_strips?.length || 0;
     return (
         <div className="p-10 flex flex-col h-full w-full gap-2 bg-slate-900">
             <Banner title="Rooms">
@@ -37,6 +38,11 @@ const Rooms: React.FC = () => {
                             selectDevice={() => navToRoom(item)}
                         />
                     ))}
+                {miscRoom.data && numMiscLedStrips > 0 && <RoomCard
+                    key={0}
+                    room={miscRoom.data}
+                    selectDevice={() => navToRoom(miscRoom.data as Room)}
+                />}
             </div>
         </div>
     )

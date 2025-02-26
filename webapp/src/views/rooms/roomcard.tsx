@@ -12,9 +12,10 @@ interface RoomCardInterface {
 export const RoomCard: React.FC<RoomCardInterface> = (
   { room, selectDevice }
 ) => {
-  const { state: fetchState, api: fetchApi } = useGetRoom(room.id);
+  const { state: roomState, api: fetchApi } = useGetRoom(room.id);
   const { state: toggleState, setRoom } = useWriteToRoom(room.id);
   const [bufferState, setBufferState] = useState(false);
+  const [numLedStrips, setNumLedStrips] = useState(0);
 
   // callback for the multi state button
   const selectState = (newState: string) => {
@@ -22,12 +23,13 @@ export const RoomCard: React.FC<RoomCardInterface> = (
   }
 
   useEffect(() => {
-    if (!fetchState.loading) {
-      const ledStrips = fetchState.data?.led_strips;
+    if (!roomState.loading) {
+      const ledStrips = roomState.data?.led_strips;
       const allOn = ledStrips?.every((led_strip: LedStrip) => led_strip.on) || false;
       setBufferState(allOn);
+      setNumLedStrips(ledStrips?.length)
     }
-  }, [fetchState.loading])
+  }, [roomState.loading])
 
   useEffect(() => {
     if (!toggleState.loading && toggleState.data) {
@@ -42,7 +44,7 @@ export const RoomCard: React.FC<RoomCardInterface> = (
         <p className="text-slate-100">{room.name}</p>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-slate-400 text-xs text-center">
-            {'connection: '}
+            {`lights: ${numLedStrips}`}
           </p>
         </div>
       </div>

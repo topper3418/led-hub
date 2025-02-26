@@ -3,6 +3,7 @@ from flask import g, jsonify, request
 
 from src.db import Database
 from src.logging import get_logger
+from src.models import Room
 
 
 logger = get_logger(__name__)
@@ -82,11 +83,15 @@ def load_room():
         return 
     # Extract device_id from the URL if present
     room_id = request.view_args.get('room_id')
+    logger.debug('room id', {'room_id': room_id})
     if room_id is None:
         return 
+    if int(room_id) == 0:
+        g.room = Room(name="Misc")
+        return
     # Load the device from the database
     db: Database = g.db
-    room = db.devices.find_by_id(room_id)
+    room = db.rooms.find_by_id(room_id)
     # Store the device in the global context
     g.room = room
 

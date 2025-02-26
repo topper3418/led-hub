@@ -74,4 +74,4 @@ class Room(BaseModel):
     name: str
     # linked objects
     devices: list[Device] = []
-    led_strip_states: list[LedStrip] = []
+    led_strips: list[LedStrip] = []

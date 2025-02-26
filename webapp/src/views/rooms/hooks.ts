@@ -10,23 +10,41 @@ import { usePut } from "../../hooks/usePut";
 const logger = getLogger('views/rooms/hooks');
 
 
-export const useAllRooms = () => {
+export const useRoomHooks = () => {
     const url = BACKEND_ROOT_URL + "rooms";
-    const { state, api } = useFetch<Room[]>(url, undefined, "rooms");
+    const { state: roomsState, api: roomsApi } = useFetch<Room[]>(url, undefined, "rooms");
+    const { state: miscRoomState, api: miscRoomApi } = useFetch<Room>(url + "/0", undefined, "devices")
     useEffect(() => {
-        if (state.loading) return;
-        if (state.data) {
-            logger.debug('got data:', state.data);
+        if (roomsState.loading) return;
+        if (roomsState.data) {
+            logger.debug('got room data:', roomsState.data);
         }
-        if (state.error) {
-            logger.error("error fetching all led strips", { error: state.error });
+        if (roomsState.error) {
+            logger.error("error fetching all led strips", { error: roomsState.error });
         }
         const interval = setInterval(() => {
-            api.refetch();
+            roomsApi.refetch();
         }, 500);
         return () => clearInterval(interval);
-    }, [state.loading]);
-    return { rooms: state, api };
+    }, [roomsState.loading]);
+    useEffect(() => {
+        if (miscRoomState.loading) return;
+        if (miscRoomState.data) {
+            logger.debug('got misc data:', miscRoomState.data);
+        }
+        if (miscRoomState.error) {
+            logger.error("error fetching all led strips", { error: miscRoomState.error });
+        }
+        const interval = setInterval(() => {
+            miscRoomApi.refetch();
+        }, 500);
+        return () => clearInterval(interval);
+    }, [miscRoomState.loading])
+    const refetch = () => {
+        roomsApi.refetch();
+        miscRoomApi.refetch();
+    }
+    return { rooms: roomsState, miscRoom: miscRoomState, api: { refetch } };
 }
 
 
