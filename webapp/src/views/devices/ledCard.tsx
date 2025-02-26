@@ -5,7 +5,7 @@ import { MultiStateButton } from "../../components/multiStateButton";
 import React, { useEffect, useState } from "react";
 import { useToggleLedStrip } from "./hooks";
 import { Device } from "../../types";
-import { intToHex } from "../../util";
+import { intToHex, getLedColor } from "../../util";
 
 interface LedCardInterface {
   device: Device;
@@ -43,7 +43,8 @@ export const LedCard: React.FC<LedCardInterface> = (
   }, [toggleState.loading])
 
   // color for the button
-  const { red, green, blue } = device?.led_strip?.color || { red: 255, green: 255, blue: 255 };
+  const { red, green, blue } = getLedColor(device.led_strip);
+  console.log(`color for ${device.name}: ${red}, ${green}, ${blue}`);
   const color = '#' + intToHex(red) + intToHex(green) + intToHex(blue);
 
   // connectivity health

@@ -1,4 +1,4 @@
-import { Device } from "./types";
+import { Device, LedStrip, Color } from "./types";
 
 export const formatDateString = (dateTimeString: string, includeDay: boolean = true) => {
   // Convert string to Date object
@@ -35,4 +35,26 @@ export const getContrastColor = (hex: string): string => {
 
 export const getDeviceIdentifier = (device: Device): string => {
   return device.name || device.mac || "Unknown Device";
+}
+
+export const getLedColor = (ledStrip: LedStrip | undefined): Color => {
+  console.log('processing color for led strip:', ledStrip);
+  console.log('green is:', ledStrip?.green);
+  // check if led strip is undefined
+  if (!ledStrip) {
+    return {
+      red: 255,
+      green: 255,
+      blue: 255
+    } as Color;
+  }
+  // make sure red, green, and blue are all present
+  if (ledStrip.red === undefined || ledStrip.green === undefined || ledStrip.blue === undefined) {
+    throw new Error('led strip color is missing a component');
+  }
+  return {
+    red: ledStrip.red,
+    green: ledStrip.green,
+    blue: ledStrip.blue
+  } as Color;
 }

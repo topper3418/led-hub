@@ -1,14 +1,9 @@
 import React, { useRef, useEffect } from 'react';
+import { Color } from '../types';
 
-
-export interface RGB {
-  red: number;
-  green: number;
-  blue: number;
-}
 
 interface ColorWheelProps {
-  onChange: (color: RGB) => void;
+  onChange: (color: Color) => void;
 }
 
 const ColorWheel: React.FC<ColorWheelProps> = ({ onChange: setColor }) => {
