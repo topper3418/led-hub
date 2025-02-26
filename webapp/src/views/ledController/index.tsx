@@ -32,10 +32,10 @@ const LedController: React.FC = () => {
 
   const colorChanged = (color: RGB) => {
     logger.debug('color changed', { color });
-    api.update({ color })
+    api.update({ ...color })
   }
 
-  const displayColor = `rgba(${device?.led_strip?.color?.red}, ${device?.led_strip?.color?.green}, ${device?.led_strip?.color?.blue}, ${device?.led_strip?.brightness || 0 / 10})`;
+  const displayColor = `rgba(${device?.led_strip?.red}, ${device?.led_strip?.green}, ${device?.led_strip?.blue}, ${device?.led_strip?.brightness || 0 / 10})`;
 
   const coloredButton = {
     backgroundColor: device?.led_strip?.on ? 'black' : displayColor,

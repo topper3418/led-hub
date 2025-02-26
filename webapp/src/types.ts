@@ -16,7 +16,9 @@ export interface Color {
 
 export interface LedStrip {
   id?: number;
-  color?: Color;
+  red?: number;
+  green?: number;
+  blue?: number;
   on?: boolean;
   brightness?: number;
 }
