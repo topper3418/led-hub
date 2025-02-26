@@ -27,7 +27,7 @@ export interface Room {
   id: number;
   name: string;
   devices?: Device[];
-  ledStrips?: LedStrip;
+  led_strips?: LedStrip[];
 }
 
 export interface fetchStripResponse {

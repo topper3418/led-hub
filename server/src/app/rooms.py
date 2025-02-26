@@ -25,16 +25,23 @@ def list_rooms():
 
 
 @rooms_bp.post('/')
-@data_has('name')
+@data_has('name', optional=True)
 def create_room():
     logger.info('processing create room request', {'room_data': g.data})
+    db: Database = g.db
     try:
-        room = Room(name=g.data['name'])
+        if not g.data.get('name'):
+            all_rooms = db.rooms.find_many() or []
+            room_ids = [room.id or 0 for room in all_rooms]
+            max_id = max(room_ids or [0])
+            name = f"Room {max_id + 1}"
+        else:
+            name = g.data['name']
+        room = Room(name=name)
     except ValidationError as e:
         error_message = "Error parsing room data"
         logger.error(error_message, {"error": e.errors()})
         return jsonify({"error": error_message, "details": e.errors()}), 400
-    db: Database = g.db
     db.rooms.create(room)
     success_message = "Room created"
     model_data = room.model_dump()
@@ -47,9 +54,11 @@ def create_room():
 def get_room(room_id):
     logger.info('processing get room request', {'room_id': room_id})
     room = g.room
+    room.devices = g.db.devices.find_many(room_id)
     room_data = room.model_dump()
     logger.debug('room data', {"data": room_data})
     return jsonify({"data": room_data})
+
 
 @rooms_bp.put('/<int:room_id>')
 @ensure_not_none('room')
@@ -75,4 +84,36 @@ def delete_room(room_id):
     success_message = "Room deleted"
     logger.info(success_message)
     return jsonify({"message": success_message}), 200
+
+
+@rooms_bp.put('/<int:room_id>/led_strips')
+@data_has('red', optional=True)
+@data_has('green', optional=True)
+@data_has('blue', optional=True)
+@data_has('brightness', optional=True)
+@data_has('on', optional=True)
+@ensure_not_none('room')
+def update_led_strips(room_id):
+    logger.info('processing update led strips request', {'room_id': room_id, 'data': g.data})
+    room = g.room
+    db: Database = g.db
+    devices = db.led_strips.find_many_devices(room_id)
+    for device in devices:
+        led_strip = device.led_strip
+        if led_strip is None:
+            raise ValueError(f"Device {device.id} has no led strip")
+        if g.data.get('red') is not None:
+            led_strip.red = g.data['red']
+        if g.data.get('green') is not None:
+            led_strip.green = g.data['green']
+        if g.data.get('blue') is not None:
+            led_strip.blue = g.data['blue']
+        if g.data.get('brightness') is not None:
+            led_strip.brightness = g.data['brightness']
+        if g.data.get('on') is not None:
+            led_strip.on = g.data['on']
+        db.led_strips.update(led_strip)
+    success_message = "Led strips updated"
+    logger.info(success_message)
+    return jsonify({"data": g.data}), 200
 

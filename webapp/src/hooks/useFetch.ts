@@ -28,7 +28,7 @@ export const useFetch = <T>(
         return res.data;
       })
       .then((data) => {
-        setData(extract ? data?.data?.[extract] : data);
+        setData(extract ? data?.data?.[extract] : data?.data);
       })
       .catch((err) => {
         setError(err.message);
