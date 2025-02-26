@@ -160,7 +160,9 @@ def list_devices(cursor: Cursor, room: Optional[int] = None, connected: Optional
     query = "SELECT * FROM devices"
     where_clauses = []
     args = []
-    if room is not None:
+    if room == 0: # room_id=0 means no room
+        where_clauses.append("room_id IS NULL")
+    elif room is not None:
         where_clauses.append("room_id = ?")
         args.append(room)
     if connected is not None:

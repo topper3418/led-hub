@@ -113,24 +113,31 @@ def find_led_strip_by_device_id(cursor: Cursor, device_id: int) -> LedStrip | No
 
 def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip]:
     logger.debug('listing led strips', {'room_id': room_id})
+    query = """
+        SELECT 
+            led_strips.id, 
+            led_strips.device_id, 
+            led_strips.on, 
+            led_strips.brightness, 
+            led_strips.red, 
+            led_strips.green, 
+            led_strips.blue, 
+            led_strips.num_leds,
+            led_strips.led_pin
+        FROM led_strips
+        JOIN devices ON led_strips.device_id = devices.id
+    """
+    where_clauses = []
+    args = []
+    if room_id == 0: # room_id=0 means no room
+        where_clauses.append("devices.room_id IS NULL")
+    elif room_id:
+        where_clauses.append("devices.room_id = ?")
+        args.append(room_id)
     try: 
         cursor.execute(
-            """
-            SELECT 
-                led_strips.id, 
-                led_strips.device_id, 
-                led_strips.on, 
-                led_strips.brightness, 
-                led_strips.red, 
-                led_strips.green, 
-                led_strips.blue, 
-                led_strips.num_leds,
-                led_strips.led_pin
-            FROM led_strips
-            JOIN devices ON led_strips.device_id = devices.id
-            WHERE devices.room_id = ?
-            """,
-            (room_id,),
+            query + " WHERE " + " AND ".join(where_clauses),
+            args,
         )
         led_strips = cursor.fetchall()
     except Exception as e:

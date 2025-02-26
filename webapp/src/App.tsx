@@ -5,16 +5,16 @@ import LedController from "./views/ledController";
 import { Devices } from "./views/devices";
 import DeviceConfigurator from "./views/ledController/configurator";
 
-
+// the interior of a room is the new main view
 const App: React.FC = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/devices/:deviceId/config" element={<DeviceConfigurator />} />
-                <Route path="/devices/:deviceId" element={<LedController />} />
-                <Route path="/rooms/:roomId" element={<Devices />} />
-                <Route path="/rooms" element={<p>Implement this</p>} />
-                <Route path="/" element={<Devices />} />
+                <Route path="/:roomId/devices/:deviceId/config" element={<DeviceConfigurator />} />
+                <Route path="/:roomId/devices/:deviceId" element={<LedController />} />
+                <Route path="/:roomId/config" element={<p>Implement this</p>} />
+                <Route path="/:roomId/" element={<Devices />} />
+                <Route path="/" element={<p>Implement this</p>} />
             </Routes>
         </Router>
     )
