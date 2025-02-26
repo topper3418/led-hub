@@ -4,6 +4,7 @@ from flask_cors import CORS
 from src.db import Database
 from src.logging import get_logger
 
+from .rooms import rooms_bp
 from .devices import devices_bp
 from .led_strips import led_strips_bp
 from .command import command_bp
@@ -22,6 +23,7 @@ def get_app():
 
     app.before_request(get_db)
 
+    app.register_blueprint(rooms_bp, url_prefix='/rooms')
     app.register_blueprint(devices_bp, url_prefix='/devices')
     app.register_blueprint(led_strips_bp, url_prefix='/led_strips')
     app.register_blueprint(command_bp, url_prefix='/command')

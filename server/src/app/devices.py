@@ -20,8 +20,8 @@ devices_bp.before_request(load_device)
 def get_devices():
     logger.info('processing request to list devices')
     room_id = request.args.get('room_id')
-    with Database() as db:
-        devices = db.devices.find_many(None if not room_id else int(room_id))
+    db: Database = g.db
+    devices = db.devices.find_many(None if not room_id else int(room_id))
     device_data = [device.model_dump() for device in devices or []]
     return jsonify({"data": {"devices": device_data}})
 

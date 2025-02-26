@@ -83,7 +83,9 @@ class DatabaseRoomsInterface:
     def find_by_id(self, room_id: int) -> RoomModel | None:
         if not self.cursor:
             raise ValueError("Cursor is not set")
-        return find_room_by_id(self.cursor, room_id)
+        room = find_room_by_id(self.cursor, room_id)
+        romm.led_strips = list_led_strips(self.cursor, room_id)
+        return room
 
     def find_many(self) -> list[RoomModel]:
         if not self.cursor:

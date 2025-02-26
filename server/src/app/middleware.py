@@ -75,6 +75,23 @@ def load_device():
     g.device = device
 
 
+def load_room():
+    logger.debug('loading room')
+    # early returns
+    if request.view_args is None:
+        return 
+    # Extract device_id from the URL if present
+    room_id = request.view_args.get('room_id')
+    if room_id is None:
+        return 
+    # Load the device from the database
+    db: Database = g.db
+    room = db.devices.find_by_id(room_id)
+    # Store the device in the global context
+    g.room = room
+
+
+
 def load_led_strip():
     # early returns
     if request.view_args is None:
