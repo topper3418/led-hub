@@ -28,10 +28,10 @@ const DeviceConfigurator: React.FC = () => {
     useEffect(() => {
         if (fetchState.loading) return;
         if (fetchState.data) {
-            setName(fetchState.data.name);
+            setName(fetchState.data.name || "");
+            setRoomId(fetchState.data.room_id || 0);
         }
     }, [fetchState.loading])
-
 
     const deviceData = {
         ...fetchState.data,
@@ -79,12 +79,12 @@ const DeviceConfigurator: React.FC = () => {
                     <select
                         className='bg-slate-800 text-slate-100 p-3 h-12 rounded-md'
                         style={{ appearance: 'none' }}
+                        value={roomId}
                         onChange={(e) => {
-                            const room_id = e.target.value;
-                            setRoomId(Number(room_id));
+                            setRoomId(Number(e.target.value));
                         }} >
                         <option value={0}>Select a room &#x25BC;</option>
-                        {roomsState.data?.map((room: Room) => (
+                        {roomsState.data !== undefined && roomsState.data?.map((room: Room) => (
                             <option key={room.id} value={room.id}>{room.name}</option>
                         ))}
                     </select>

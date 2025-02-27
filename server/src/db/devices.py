@@ -44,10 +44,10 @@ def update_device(cursor: Cursor, device: Device):
         cursor.execute(
             """
             UPDATE devices
-            SET mac = ?, ip = ?, name = ?
+            SET mac = ?, ip = ?, name = ?, room_id = ?
             WHERE id = ?
             """,
-            (device.mac, device.ip, device.name, device.id),
+            (device.mac, device.ip, device.name, device.room_id, device.id),
         )
     except Exception as e:
         logger.error('Failed to update device', {'device': device.model_dump(), 'error': str(e)})

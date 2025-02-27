@@ -20,14 +20,15 @@ export const RoomCard: React.FC<RoomCardInterface> = (
   // callback for the multi state button
   const selectState = (newState: string) => {
     setRoom({ data: { ...room, on: newState == 'on' } });
+    setBufferState(newState == 'on');
   }
 
   useEffect(() => {
     if (!roomState.loading) {
-      const devces = roomState.data?.led_strips || [];
-      const allOn = devces?.every((ledStrip: LedStrip) => ledStrip.on) || false;
+      const devices = roomState.data?.devices || [];
+      const allOn = devices.length > 0 ? devices?.every((device: Device) => device.led_strip?.on) || false : false;
       setBufferState(allOn);
-      setNumLedStrips(devces?.length)
+      setNumLedStrips(devices?.length)
     }
   }, [roomState.loading])
 

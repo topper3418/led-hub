@@ -43,8 +43,6 @@ const LedController: React.FC = () => {
     textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
   }
 
-  console.log('device', device);
-
   return (
     <div className="flex flex-col items-stretch p-2 gap-2 bg-slate-900 h-full place-content-between p-10">
       <Banner

@@ -17,16 +17,13 @@ const Rooms: React.FC = () => {
         navigate('/' + room.id)
     }
     const toggleMiscRoom = (newState: string) => {
-        console.log('toggling misc room', newState)
         setBufferState(newState == 'on');
         setMiscRoom({ data: { ...miscRoom.data, on: newState == 'on' } });
     }
     useEffect(() => {
         if (!miscRoom.loading) {
             const devces = miscRoom.data?.devices || [];
-            console.log('got misc room data:', miscRoom.data)
             const allOn = devces?.every((device: Device) => device?.led_strip?.on) || false;
-            console.log('setting buffer state to', allOn)
             setBufferState(allOn);
             setNumMiscLedStrips(devces?.length)
         }
@@ -48,7 +45,7 @@ const Rooms: React.FC = () => {
                 </button>
             </Banner>
             <div className="flex flex-col gap-2 items-stretch overflow-y-auto">
-                {rooms.data?.length === 0 ? <div>No rooms found</div> :
+                {rooms.data?.length !== 0 &&
                     rooms.data?.map((item: Room) => (
                         <RoomCard
                             key={item.id}

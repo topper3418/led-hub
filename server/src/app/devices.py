@@ -56,26 +56,23 @@ def handshake():
 
 @devices_bp.put('/<int:device_id>')
 @ensure_not_none('device')
+@data_has('room_id', optional=True)
+@data_has('name', optional=True)
 def update_device(device_id):
     logger.debug(f'received request to modify device data for device id {device_id}')
     # load the device
     device: Device = g.get('device')
     db: Database = g.db
     # parse the data
-    body = request.json or {}
-    data = body.get('data')
-    if not data: 
-        error_message = "No data provided"
-        logger.error(error_message)
-        return jsonify({"error": error_message}), 400
-    logger.info(f'processing request to update device with mac {device.mac}', {"device": device.model_dump(), "body": body})
+    logger.info(f'processing request to update device with mac {device.mac}', {"device": device.model_dump(), "body": g.get('data')})
     # update the name if given
-    name = data.get('name')
+    name = g.get('name')
     if name:
         device.name = name
     # update the room if given
-    room_id = data.get('room_id')
+    room_id = g.get('room_id')
     if room_id:
+        logger.debug(f'updating room for device id {device_id} to room id {room_id}')
         room = db.rooms.find_by_id(room_id)
         if room is None:
             error_message = f"No room found with id {room_id}"
@@ -83,8 +80,8 @@ def update_device(device_id):
             return jsonify({"error": error_message }), 404
         device.room_id = room_id
     # update the database
+    logger.debug('updating device in database', {"device": device.model_dump()})
     db.devices.update(device)
-    db.commit()
     # return the data
     device_data = device.model_dump()
     success_message = "successfully updated device"

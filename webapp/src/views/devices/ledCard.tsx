@@ -44,7 +44,6 @@ export const LedCard: React.FC<LedCardInterface> = (
 
   // color for the button
   const { red, green, blue } = getLedColor(device.led_strip);
-  console.log(`color for ${device.name}: ${red}, ${green}, ${blue}`);
   const color = '#' + intToHex(red) + intToHex(green) + intToHex(blue);
 
   // connectivity health

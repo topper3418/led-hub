@@ -38,8 +38,6 @@ export const getDeviceIdentifier = (device: Device): string => {
 }
 
 export const getLedColor = (ledStrip: LedStrip | undefined): Color => {
-  console.log('processing color for led strip:', ledStrip);
-  console.log('green is:', ledStrip?.green);
   // check if led strip is undefined
   if (!ledStrip) {
     return {
