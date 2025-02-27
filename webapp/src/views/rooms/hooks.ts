@@ -12,15 +12,21 @@ const logger = getLogger('views/rooms/hooks');
 
 export const useRoomHooks = () => {
     const url = BACKEND_ROOT_URL + "rooms";
-    const { state: roomsState, api: roomsApi } = useFetch<Room[]>(url, undefined, "rooms");
-    const { state: miscRoomState, api: miscRoomApi } = useFetch<Room>(url + "/0", undefined, "devices")
+    const { state: roomsState, api: roomsApi } = useFetch<Room[]>(url, {
+        params: { include: ['led_strip_devices'] }
+    }, "rooms");
+    const miscRoomUrlBase = BACKEND_ROOT_URL + "rooms/0";
+    const params = new URLSearchParams();
+    params.append('include', 'led_strip_devices');
+    const miscRoomUrl = miscRoomUrlBase + "?" + params.toString();
+    const { state: miscRoomState, api: miscRoomApi } = useFetch<Room>(miscRoomUrl, undefined, "room")
     useEffect(() => {
         if (roomsState.loading) return;
         if (roomsState.data) {
             logger.debug('got room data:', roomsState.data);
         }
         if (roomsState.error) {
-            logger.error("error fetching all led strips", { error: roomsState.error });
+            logger.error("error fetching all rooms", { error: roomsState.error });
         }
         const interval = setInterval(() => {
             roomsApi.refetch();
@@ -28,12 +34,15 @@ export const useRoomHooks = () => {
         return () => clearInterval(interval);
     }, [roomsState.loading]);
     useEffect(() => {
-        if (miscRoomState.loading) return;
+        if (miscRoomState.loading) {
+            logger.debug('loading misc room data from url:', miscRoomUrl);
+            return;
+        }
         if (miscRoomState.data) {
             logger.debug('got misc data:', miscRoomState.data);
         }
         if (miscRoomState.error) {
-            logger.error("error fetching all led strips", { error: miscRoomState.error });
+            logger.error("error fetching misc led strips", { error: miscRoomState.error });
         }
         const interval = setInterval(() => {
             miscRoomApi.refetch();
@@ -49,8 +58,9 @@ export const useRoomHooks = () => {
 
 
 export const useGetRoom = (roomId: number) => {
-    const url = BACKEND_ROOT_URL + "rooms/" + roomId
-    return useFetch<Room>(url)
+    const baseUrl = BACKEND_ROOT_URL + "rooms/" + roomId
+    const url = baseUrl + "?" + new URLSearchParams({ include: 'led_strip_devices' }).toString();
+    return useFetch<Room>(url, undefined, "room");
 }
 
 

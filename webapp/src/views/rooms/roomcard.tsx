@@ -1,6 +1,6 @@
 import { MultiStateButton } from "../../components/multiStateButton";
 import React, { useEffect, useState } from "react";
-import { Room, LedStrip, Color } from "../../types";
+import { Room, LedStrip, Color, Device } from "../../types";
 import { intToHex, getLedColor } from "../../util";
 import { useGetRoom, useWriteToRoom } from "./hooks";
 
@@ -24,10 +24,10 @@ export const RoomCard: React.FC<RoomCardInterface> = (
 
   useEffect(() => {
     if (!roomState.loading) {
-      const ledStrips = roomState.data?.led_strips;
-      const allOn = ledStrips?.every((led_strip: LedStrip) => led_strip.on) || false;
+      const devces = roomState.data?.led_strips || [];
+      const allOn = devces?.every((ledStrip: LedStrip) => ledStrip.on) || false;
       setBufferState(allOn);
-      setNumLedStrips(ledStrips?.length)
+      setNumLedStrips(devces?.length)
     }
   }, [roomState.loading])
 
@@ -37,11 +37,37 @@ export const RoomCard: React.FC<RoomCardInterface> = (
     }
   }, [toggleState.loading])
 
-  // color for the button
   return (
-    <div className="flex flex-row border border-slate-100 bg-slate-850 rounded-md justify-between p-2.5" onClick={selectDevice}>
+    <RoomCardElement
+      roomName={room.name || 'Unnamed Room'}
+      numLedStrips={numLedStrips}
+      bufferState={bufferState}
+      loading={toggleState.loading}
+      selectState={bufferState ? 'on' : 'off'}
+      selectCallback={selectDevice}
+      toggleCallback={selectState}
+    />
+  )
+};
+
+
+interface RoomCardElementInterface {
+  roomName: string;
+  numLedStrips: number;
+  bufferState: boolean;
+  loading: boolean;
+  selectState: string;
+  selectCallback: () => void;
+  toggleCallback: (newState: string) => void;
+}
+
+export const RoomCardElement: React.FC<RoomCardElementInterface> = (
+  { roomName, numLedStrips, bufferState, loading, selectCallback, toggleCallback }
+) => {
+  return (
+    <div className="flex flex-row border border-slate-100 bg-slate-850 rounded-md justify-between p-2.5" onClick={selectCallback}>
       <div className="flex flex-col justify-between gap-1">
-        <p className="text-slate-100">{room.name}</p>
+        <p className="text-slate-100">{roomName}</p>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-slate-400 text-xs text-center">
             {`lights: ${numLedStrips}`}
@@ -51,12 +77,12 @@ export const RoomCard: React.FC<RoomCardInterface> = (
       <MultiStateButton
         options={['off', 'on']}
         clicked={bufferState ? 'on' : 'off'}
-        setClicked={selectState}
+        setClicked={toggleCallback}
         selectedColor={"#FFFFFF"}
-        loading={toggleState.loading}
+        loading={loading}
       />
     </div>
   );
-};
+}
 
 

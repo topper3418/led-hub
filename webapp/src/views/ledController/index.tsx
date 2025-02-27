@@ -2,9 +2,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Banner from '../../components/banner.tsx';
 import { getLogger } from "../../logging.ts";
 import React, { CSSProperties } from "react";
-import ColorWheel, { RGB } from "../../components/colorWheel";
+import ColorWheel from "../../components/colorWheel";
 import { useLedStripHooks } from "./hooks.ts";
 import { getDeviceIdentifier } from "../../util.ts";
+import { Color } from "../../types.ts";
 
 
 const logger = getLogger('views/ledController');
@@ -30,7 +31,7 @@ const LedController: React.FC = () => {
     api.update({ brightness: parseInt(e.target.value) });
   }
 
-  const colorChanged = (color: RGB) => {
+  const colorChanged = (color: Color) => {
     logger.debug('color changed', { color });
     api.update({ ...color })
   }
@@ -50,12 +51,12 @@ const LedController: React.FC = () => {
         loading={loading}
         title={device ? getDeviceIdentifier(device) : "Loading..."}>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/" + (device?.room_id || 0))}
           className="bg-slate-800 text-slate-100 p-3 rounded-md">
           Back
         </button>
         <button
-          onClick={() => navigate(`/devices/${deviceId}/config`)}
+          onClick={() => navigate(`/${device?.room_id}/devices/${deviceId}/config`)}
           className="bg-slate-800 text-slate-100 p-3 rounded-md h-12">
           <span className="text-4xl leading-none relative" style={{
             lineHeight: 0,

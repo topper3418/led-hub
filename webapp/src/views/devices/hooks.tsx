@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getLogger } from "../../logging";
-import { Device, LedStrip } from "../../types";
+import { Device, LedStrip, Room } from "../../types";
 import { BACKEND_ROOT_URL } from "../../config";
 import { useFetch } from "../../hooks/useFetch";
 import { usePost } from "../../hooks/usePost";
@@ -8,9 +8,10 @@ import { usePut } from "../../hooks/usePut";
 
 const logger = getLogger('views/devices/hooks');
 
-export const useAllLedStrips = () => {
-    const url = BACKEND_ROOT_URL + "led_strips"
-    const { state, api } = useFetch<Device[]>(url, undefined, "devices");
+export const useFetchRoom = (roomId: string) => {
+    const baseUrl = BACKEND_ROOT_URL + "rooms/" + roomId;
+    const url = baseUrl + "?include=led_strip_devices";
+    const { state, api } = useFetch<Room>(url, undefined, "room");
     logger.debug(`rendering led strip hook for url ${url}`)
     useEffect(() => {
         if (state.loading) return;

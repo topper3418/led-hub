@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, g
+from flask import Blueprint, jsonify, g, request
 from pydantic import ValidationError
 
 from src.logging import get_logger
@@ -52,12 +52,18 @@ def create_room():
 @rooms_bp.get('/<int:room_id>')
 @ensure_not_none('room')
 def get_room(room_id):
-    logger.info('processing get room request', {'room_id': room_id})
     room = g.room
-    room.devices = g.db.devices.find_many(room_id)
+    include = request.args.get('include') or ""
+    logger.info('processing get room request', {'room_id': room_id, 'include': include})
+    if 'led_strip_devices' in include:
+        room.devices = [device.model_dump() for device in g.db.led_strips.find_many_devices(room_id) or []]
+    elif 'led_strips' in include:
+        room.led_strips = [led_strip.model_dump() for led_strip in g.db.led_strips.find_many(room_id) or []]
+    if 'devices' in include:
+        room.devices = [device.model_dump() for device in g.db.devices.find_many(room_id) or []]
     room_data = room.model_dump()
     logger.debug('room data', {"data": room_data})
-    return jsonify({"data": room_data})
+    return jsonify({"data": {"room": room_data}})
 
 
 @rooms_bp.put('/<int:room_id>')
@@ -100,6 +106,7 @@ def update_led_strips(room_id):
     devices = db.led_strips.find_many_devices(room_id)
     for device in devices:
         led_strip = device.led_strip
+        logger.debug("led strip before update", {"led_strip": led_strip.model_dump()})
         if led_strip is None:
             raise ValueError(f"Device {device.id} has no led strip")
         if g.data.get('red') is not None:
@@ -111,7 +118,9 @@ def update_led_strips(room_id):
         if g.data.get('brightness') is not None:
             led_strip.brightness = g.data['brightness']
         if g.data.get('on') is not None:
+            logger.debug('on is not none', {'on': g.data['on']})
             led_strip.on = g.data['on']
+        logger.debug("led strip after update", {"led_strip": led_strip.model_dump()})
         db.led_strips.update(led_strip)
     success_message = "Led strips updated"
     logger.info(success_message)

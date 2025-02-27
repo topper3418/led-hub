@@ -39,16 +39,15 @@ def handshake():
         error_message = "Error parsing device data"
         logger.error(error_message, {"error": e.errors()})
         return jsonify({"error": error_message, "details": e.errors()}), 400
-    with Database() as db:
-        existing_device = db.devices.find_by_mac(device.mac)
+    db: Database = g.db
+    existing_device = db.devices.find_by_mac(device.mac)
     if existing_device:
         existing_message = "Device already exists"
         logger.debug(existing_message)
         return jsonify({"message": existing_message, "data": existing_device.model_dump()}), 200
-    with Database() as db:
-        db.devices.create(device)
-        led_strip_state = device.create_led_strip_state()
-        db.led_strips.create(led_strip_state)
+    db.devices.create(device)
+    led_strip_state = device.create_led_strip_state()
+    db.led_strips.create(led_strip_state)
     success_message = "Device created"
     model_data = device.model_dump()
     logger.info(success_message, {"data": model_data})

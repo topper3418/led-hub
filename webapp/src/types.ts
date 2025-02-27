@@ -4,6 +4,7 @@ export interface Device {
   mac: string;
   name: string;
   current_ip: string;
+  room_id: number;
   last_ping: string;
   led_strip: LedStrip;
 }
