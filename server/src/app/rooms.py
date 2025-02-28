@@ -78,9 +78,11 @@ def get_room(room_id):
 def update_room(room_id):
     logger.info('processing update room request', {'room_id': room_id, 'room_data': g.data})
     room = g.room
+    logger.debug('room before update', {'room': room.model_dump()})
     room.name = g.data['name']
     db: Database = g.db
     db.rooms.update(room)
+    logger.debug('room after update', {'room': room.model_dump()})
     success_message = "Room updated"
     model_data = room.model_dump()
     logger.info(success_message, {"data": model_data})

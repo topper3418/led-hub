@@ -31,4 +31,10 @@ EOF
     fi
 }
 
+alias mock="python mock-led-client.py"
+
+alias comm="python test_command.py"
+alias comm2="python test_command2.py"
+alias comm3="python test_command3.py"
+
 echo 'done'

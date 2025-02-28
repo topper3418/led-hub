@@ -14,6 +14,7 @@ from typing import Dict, List
 import ollama
 from pydantic import BaseModel, create_model
 
+from src.dispatcher.client import get_client
 from src.logging import get_logger
 from src.models import Device, LedStrip, Color
 
@@ -37,10 +38,10 @@ class ThoughtProcess:
         self.command = command
         self.device_list = devices
         self.command_contents: CommandContents | None = None
-        self.device_states: Dict[str, LedStrip] = {device.name: device.led_strip for device in devices if device.name and device.led_strip}
+        self.device_dict: Dict[str, Device] = {device.name: device for device in devices if device.name and device.led_strip}
         self.context_object: Dict[str, dict] | None = None
         self.relevant_devices: List[str] | None = None
-        self.think
+        self.client = get_client()
 
     def think(self):
         logger.info(f'processing command "{self.command}"', {"context": [device.model_dump() for device in self.device_list]})
@@ -49,26 +50,30 @@ class ThoughtProcess:
         self.relevant_devices = self.get_relevant_devices()
         for device in self.relevant_devices:
             self.get_device_commands(device)
-        logger.info(f'commands processed and states set', {"recommendations": {device_name: device_state.model_dump() for device_name, device_state in self.device_states.items()}})
+        logger.info(f'commands processed and states set', {"recommendations": {device_name: device_state.model_dump() for device_name, device_state in self.device_dict.items()}})
     
     # this function takes in a command and decides what it is doing to the lights, 
     # whether it is turning them on or off, changing the brightness, or changing the color
     def get_command_contents(self) -> CommandContents: 
-        response = ollama.chat(
+        response = self.client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": f"the user will give you a command to process. your job is to determine which features of the command are present. the features are: on/off, brightness, and color. you will need to determine which of these features are present in the command."
+                    "content": f"""the user will give you a command to process. your job is to determine which features of the command are present. the features are: on/off, brightness, and color. you will need to determine which of these features are present in the command.
+                    desired output:
+    {CommandContents.model_json_schema()}
+                    """
+
                 },
                 {
                     "role": "user",
                     "content": f"command: {self.command}"
                 }
             ],
-            model='llama3.2',
-            format=CommandContents.model_json_schema()
+            model='grok-2-latest',
+            response_format={"type": "json_object"}
         )
-        assessment = response.message.content
+        assessment = response.choices[0].message.content
         assessment = json.loads(assessment or "{}")
         command_contents = CommandContents(**assessment)
         logger.debug('command contents assessed', command_contents.model_dump())
@@ -79,12 +84,14 @@ class ThoughtProcess:
     def get_context_object(self) -> Dict[str, dict]:
         if self.command_contents is None:
             raise ValueError('assessment must be set before calling get_relevant_lights')
-        if self.device_states is None:
+        if self.device_dict is None:
             raise ValueError('devices must be set before calling get_relevant_lights')
         # construct an object like 
         # [
         #     {
         #         "<device name>": {
+        #             "id": <device id>,
+        #             "room": <room name>,
         #             "on": <on value>, -- if relevant
         #             "brightness": <brightness value>, -- if relevant
         #             "color": <color value> -- if relevant
@@ -92,14 +99,18 @@ class ThoughtProcess:
         #     }
         # ]
         context_struct = {}
-        for device_name, device_state in self.device_states.items():
-            temp_dict = {}
+        for device_name, device in self.device_dict.items():
+            if device.led_strip is None: continue
+            temp_dict = {
+                "id": device.id,
+                "room": device.room.name,
+            }
             if self.command_contents.on_or_off:
-                temp_dict['on'] = device_state.on
+                temp_dict['on'] = device.led_strip.on
             if self.command_contents.brightness:
-                temp_dict['brightness'] = device_state.brightness
+                temp_dict['brightness'] = device.led_strip.brightness
             if self.command_contents.color:
-                temp_dict['color'] = device_state.color.model_dump()
+                temp_dict['color'] = device.led_strip.color.model_dump()
             context_struct[device_name] = temp_dict
         logger.debug('context object', context_struct)
         return context_struct
@@ -108,32 +119,35 @@ class ThoughtProcess:
     def get_relevant_devices(self) -> List[str]:
         if self.context_object is None:
             raise ValueError('context_object must be set before calling get_relevant_devices')
-        if self.device_states is None:
+        if self.device_dict is None:
             raise ValueError('devices must be set before calling get_relevant_devices')
         class DevicesRelevance(BaseModel):
             pass
         # loop through the devices to add to the devicesRelevance class,
         # which will be used to force the output from the model
-        fields = { name: (bool, ...) for name in self.device_states.keys() }
+        fields = { name: (bool, ...) for name in self.device_dict.keys() }
         DevicesRelevance = create_model('DevicesRelevance', **fields)
-        response = ollama.chat(
+        response = self.client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": f"the user will give you a command to process. your job is to determine which devices are relevant to the command. you will respond by marking the irrelevant devices as false and the relevant devices as true. bias toward marking devices not relevant unless they seem to be called out directly."
+                    "content": f"""the user will give you a command to process. your job is to determine which devices are relevant to the command. you will respond by marking the irrelevant devices as false and the relevant devices as true. bias toward marking devices not relevant unless they seem to be called out directly.
+                    desired output:
+    {DevicesRelevance.model_json_schema()}
+                    """
                 },
                 {
                     "role": "user",
                     "content": f"command: {self.command}"
                 }
             ],
-            model='llama3.2',
-            format=DevicesRelevance.model_json_schema()
+            model='grok-2-latest',
+            response_format={"type": "json_object"}
         )
-        relevancy = response.message.content
+        relevancy = response.choices[0].message.content
         relevancy = json.loads(relevancy or "{}")
         relevant_devices = []
-        for device in self.device_states.keys():
+        for device in self.device_dict.keys():
             if relevancy.get(device):
                 relevant_devices.append(device)
         logger.debug('relevant devices', relevant_devices)
@@ -144,7 +158,7 @@ class ThoughtProcess:
             raise ValueError('context_object must be set before calling get_commands')
         if self.relevant_devices is None:
             raise ValueError('relevant_devices must be set before calling get_commands')
-        if self.device_states is None:
+        if self.device_dict is None:
             raise ValueError('devices must be set before calling get_commands')
         if device_name not in self.relevant_devices:
             raise ValueError(f'{device_name} must be in relevant_devices before calling get_commands')
@@ -166,35 +180,38 @@ class ThoughtProcess:
         DeviceCommands = create_model('DeviceCommands', **fields)
         # get the relevant device from the context object
         device_for_context = self.context_object[device_name]
-        response = ollama.chat(
+        response = self.client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
                     "content": f"""the user will give you a command to process. your job is to tweak the settings of the device to match the user's command. this is the current state of the device: 
                     {device_for_context}
 
-                    your job is to give the new state of the device based on the command."""
+                    your job is to give the new state of the device based on the command.
+                    desired output: 
+    {DeviceCommands.model_json_schema()}
+                    """
                 },
                 {
                     "role": "user",
                     "content": f"command: {self.command}"
                 }
             ],
-            model='llama3.2',
-            format=DeviceCommands.model_json_schema()
+            model='grok-2-latest',
+            response_format={"type": "json_object"}
         )
-        commands = response.message.content
+        commands = response.choices[0].message.content
         logger.debug('raw commands', commands)
         commands = json.loads(commands or "{}")
         # update the device state and return it
         if commands.get('on'):
-            self.device_states[device_name].on = commands.get('on')
+            self.device_dict[device_name].led_strip.on = commands.get('on')
         if commands.get('brightness'):
-            self.device_states[device_name].brightness = commands.get('on')
+            self.device_dict[device_name].led_strip.brightness = commands.get('on')
         if commands.get('color'):
             color = commands.get('color')
-            self.device_states[device_name].red = color.get('red')
-            self.device_states[device_name].green = color.get('green')
-            self.device_states[device_name].blue = color.get('blue')
+            self.device_dict[device_name].led_strip.red = color.get('red')
+            self.device_dict[device_name].led_strip.green = color.get('green')
+            self.device_dict[device_name].led_strip.blue = color.get('blue')
 
 

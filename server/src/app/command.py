@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, request, jsonify, g
 from pydantic import ValidationError
 
-from src.dispatcher import ThoughtProcess
+from src.dispatcher import get_new_states
 from src.logging import get_logger
 from src.db import Database
 from src.models import Device, Room
@@ -21,11 +21,8 @@ def process_voice_command():
     command = g.get('command')
     # get the devices and their current state
     db: Database = g.db
-    rooms = db.rooms.find_many()
-    if not rooms:
-        rooms = [Room(id=0, name="misc")]
-    for room in rooms:
-        room.devices = db.led_strips.find_many_devices(room.id)
+    results = get_new_states(db, command)
+    return jsonify(results)
     
 
 
