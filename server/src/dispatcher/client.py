@@ -2,6 +2,7 @@ import os
 
 from openai import OpenAI
 
+
 def get_client():
     api_key = os.getenv("XAI_API_KEY")
     if not api_key:
