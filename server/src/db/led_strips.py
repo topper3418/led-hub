@@ -123,7 +123,7 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
             led_strips.green, 
             led_strips.blue, 
             led_strips.num_leds,
-            led_strip.led_pin
+            led_strips.led_pin
         FROM led_strips
         JOIN devices ON led_strips.device_id = devices.id
     """

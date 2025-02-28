@@ -60,7 +60,7 @@ def handshake():
 @data_has('num_leds', optional=True)
 @data_has('led_pin', optional=True)
 def update_device(device_id):
-    logger.debug(f'received request to modify device data for device id {device_id}')
+    logger.debug(f'received request to modify device data for device id {device_id}', {"data": g.get('data')})
     # load the device
     device: Device = g.get('device')
     db: Database = g.db
@@ -68,7 +68,9 @@ def update_device(device_id):
     logger.info(f'processing request to update device with mac {device.mac}', {"device": device.model_dump(), "body": g.get('data')})
     # update the name if given
     name = g.get('name')
+    logger.debug('updating device name', {"name": name})
     if name:
+        logger.debug(f'setting name for device to {name}')
         device.name = name
     # update the room if given
     room_id = g.get('room_id')
