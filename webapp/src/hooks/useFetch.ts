@@ -1,6 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 
+import { getLogger } from "../logging";
+
+const logger = getLogger("hooks/useFetch");
+
 export const useFetch = <T>(
   url: string,
   config?: AxiosRequestConfig,
@@ -15,6 +19,7 @@ export const useFetch = <T>(
 
   useEffect(() => {
     setLoading(true);
+    logger.debug(`fetching data from url: ${url}`)
     axios.get(url, config)
       .then((res: AxiosResponse) => {
         if (res.statusText != 'OK') {
@@ -28,6 +33,7 @@ export const useFetch = <T>(
         return res.data;
       })
       .then((data) => {
+        logger.debug(`got data from url: ${url}`, { data });
         setData(extract ? data?.data?.[extract] : data?.data);
       })
       .catch((err) => {

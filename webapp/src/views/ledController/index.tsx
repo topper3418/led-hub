@@ -40,7 +40,7 @@ const LedController: React.FC = () => {
 
   const coloredButton = {
     backgroundColor: device?.led_strip?.on ? 'black' : displayColor,
-    textShadow: '1px 1px 2px black, 0 0 25px black, 0 0 5px black'
+    color: device?.led_strip?.on ? displayColor : 'black'
   }
 
   return (
@@ -73,7 +73,10 @@ const LedController: React.FC = () => {
         max="100"
         value={device?.led_strip?.brightness}
         onChange={brightnessChanged} />
-      <button onClick={togglePressed} className="bg-slate-800 text-slate-100 p-3 rounded-md" style={coloredButton}>
+      <button
+        onClick={togglePressed}
+        className="bg-slate-800 text-slate-100 p-3 rounded-md"
+        style={coloredButton}>
         {device?.led_strip?.on ? 'Off' : 'On'}
       </button>
     </div>

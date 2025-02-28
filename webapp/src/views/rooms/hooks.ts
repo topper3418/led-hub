@@ -15,11 +15,11 @@ export const useRoomHooks = () => {
     const { state: roomsState, api: roomsApi } = useFetch<Room[]>(url, {
         params: { include: ['led_strip_devices'] }
     }, "rooms");
-    const miscRoomUrlBase = BACKEND_ROOT_URL + "rooms/0";
-    const params = new URLSearchParams();
-    params.append('include', 'led_strip_devices');
-    const miscRoomUrl = miscRoomUrlBase + "?" + params.toString();
-    const { state: miscRoomState, api: miscRoomApi } = useFetch<Room>(miscRoomUrl, undefined, "room")
+    // const miscRoomUrlBase = BACKEND_ROOT_URL + "rooms/0";
+    // const params = new URLSearchParams();
+    // params.append('include', 'led_strip_devices');
+    // const miscRoomUrl = miscRoomUrlBase + "?" + params.toString();
+    const { state: miscRoomState, api: miscRoomApi } = useGetRoom(0);
     useEffect(() => {
         if (roomsState.loading) return;
         if (roomsState.data) {
@@ -35,7 +35,6 @@ export const useRoomHooks = () => {
     }, [roomsState.loading]);
     useEffect(() => {
         if (miscRoomState.loading) {
-            logger.debug('loading misc room data from url:', miscRoomUrl);
             return;
         }
         if (miscRoomState.data) {
@@ -58,8 +57,8 @@ export const useRoomHooks = () => {
 
 
 export const useGetRoom = (roomId: number) => {
-    const baseUrl = BACKEND_ROOT_URL + "rooms/" + roomId
-    const url = baseUrl + "?" + new URLSearchParams({ include: 'led_strip_devices' }).toString();
+    const url = BACKEND_ROOT_URL + "rooms/" + roomId + "?include=led_strip_devices";
+    console.log("fetching room from url:", url);
     return useFetch<Room>(url, undefined, "room");
 }
 

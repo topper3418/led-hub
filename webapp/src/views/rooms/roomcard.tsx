@@ -26,6 +26,7 @@ export const RoomCard: React.FC<RoomCardInterface> = (
   useEffect(() => {
     if (!roomState.loading) {
       const devices = roomState.data?.devices || [];
+      console.log('devices:', devices);
       const allOn = devices.length > 0 ? devices?.every((device: Device) => device.led_strip?.on) || false : false;
       setBufferState(allOn);
       setNumLedStrips(devices?.length)

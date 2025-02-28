@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, jsonify, g, request
 from pydantic import ValidationError
 
@@ -53,13 +55,17 @@ def create_room():
 @ensure_not_none('room')
 def get_room(room_id):
     room = g.room
-    include = request.args.get('include') or ""
+    logger.debug('include is', {'include': request.args.get('include')})
+    include = [include_arg.strip() for include_arg in (request.args.get('include') or "").strip('[]').split(',')]
     logger.info('processing get room request', {'room_id': room_id, 'include': include})
     if 'led_strip_devices' in include:
+        logger.debug('getting led strip devices')
         room.devices = [device.model_dump() for device in g.db.led_strips.find_many_devices(room_id) or []]
     elif 'led_strips' in include:
+        logger.debug('getting led strips')
         room.led_strips = [led_strip.model_dump() for led_strip in g.db.led_strips.find_many(room_id) or []]
     if 'devices' in include:
+        logger.debug('getting devices')
         room.devices = [device.model_dump() for device in g.db.devices.find_many(room_id) or []]
     room_data = room.model_dump()
     logger.debug('room data', {"data": room_data})
