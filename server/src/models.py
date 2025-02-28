@@ -55,6 +55,7 @@ class LedStrip(BaseModel):
     green: int = Field(255, ge=0, le=255)
     blue: int = Field(255, ge=0, le=255)
     num_leds: int = Field(10, ge=0)
+    led_pin: int = Field(16, ge=0)
     # linked objects
     device: Optional[Device] = None
     room: Optional[Room] = None

@@ -16,6 +16,7 @@ const DeviceConfigurator: React.FC = () => {
     const [name, setName] = React.useState<string>("");
     const [roomId, setRoomId] = React.useState<number>(0);
     const [numLeds, setNumLeds] = React.useState<number>(0);
+    const [ledPin, setLedPin] = React.useState<number>(16);
     const navigate = useNavigate();
 
     const { state: fetchState, api: fetchApi } = useFetch<Device>(url, undefined, 'device');
@@ -32,6 +33,7 @@ const DeviceConfigurator: React.FC = () => {
             setName(fetchState.data.name || "");
             setRoomId(fetchState.data.room_id || 0);
             setNumLeds(fetchState.data.led_strip?.num_leds || 0);
+            setLedPin(fetchState.data.led_strip?.led_pin || 16);
         }
     }, [fetchState.loading])
 
@@ -39,7 +41,8 @@ const DeviceConfigurator: React.FC = () => {
         ...fetchState.data,
         name,
         room_id: roomId,
-        num_leds: numLeds
+        num_leds: numLeds,
+        led_pin: ledPin
     } as Device;
 
     const save = () => {
@@ -96,6 +99,12 @@ const DeviceConfigurator: React.FC = () => {
                         placeholder="Num LEDs"
                         value={numLeds}
                         onChange={(e) => setNumLeds(Number(e.target.value))}
+                        className="bg-slate-800 text-slate-100 p-3 rounded-md" />
+                    <input
+                        type="number"
+                        placeholder="LED Pin"
+                        value={ledPin}
+                        onChange={(e) => setLedPin(Number(e.target.value))}
                         className="bg-slate-800 text-slate-100 p-3 rounded-md" />
                 </div>
                 <button

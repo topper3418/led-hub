@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `led_strips` (
     `green` INTEGER NULL,
     `blue` INTEGER NULL,
     `num_leds` INT NULL,
+    `led_pin` INT NULL,
     FOREIGN KEY (`device_id`)
         REFERENCES `devices` (`id`)
         ON DELETE CASCADE

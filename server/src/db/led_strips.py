@@ -22,10 +22,10 @@ def create_led_strip(cursor: Cursor, led_strip: LedStrip):
     try: 
         cursor.execute(
             """
-            INSERT INTO led_strips (device_id, "on", brightness, red, green, blue, num_leds)
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO led_strips (device_id, "on", brightness, red, green, blue, num_leds, led_pin)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             """,
-            (led_strip.device_id, led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.num_leds),
+            (led_strip.device_id, led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.num_leds, led_strip.led_pin),
         )
     except Exception as e:
         logger.error('Failed to create led_strip', {'led_strip': led_strip, 'error': str(e)})
@@ -40,10 +40,10 @@ def update_led_strip(cursor: Cursor, led_strip: LedStrip):
         cursor.execute(
             """
             UPDATE led_strips
-            SET `on` = ?, brightness = ?, red = ?, green = ?, blue = ?, num_leds = ?
+            SET `on` = ?, brightness = ?, red = ?, green = ?, blue = ?, num_leds = ?, led_pin = ?
             WHERE id = ?
             """,
-            (led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.num_leds, led_strip.id),
+            (led_strip.on, led_strip.brightness, led_strip.red, led_strip.green, led_strip.blue, led_strip.num_leds, led_strip.led_pin, led_strip.id),
         )
     except Exception as e:
         logger.error('Failed to update led_strip', {'led_strip': led_strip.model_dump(), 'error': str(e)})
@@ -122,7 +122,8 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
             led_strips.red, 
             led_strips.green, 
             led_strips.blue, 
-            led_strips.num_leds
+            led_strips.num_leds,
+            led_strip.led_pin
         FROM led_strips
         JOIN devices ON led_strips.device_id = devices.id
     """

@@ -59,6 +59,7 @@ def handshake():
 @data_has('room_id', optional=True)
 @data_has('name', optional=True)
 @data_has('num_leds', optional=True)
+@data_has('led_pin', optional=True)
 def update_device(device_id):
     logger.debug(f'received request to modify device data for device id {device_id}')
     # load the device
@@ -85,14 +86,18 @@ def update_device(device_id):
     db.devices.update(device)
     # if number of leds is given, update the led strip
     num_leds = g.get('num_leds')
-    if num_leds is not None:
+    led_pin = g.get('led_pin')
+    if num_leds is not None or led_pin is not None:
         logger.debug(f'updating led strip for device id {device_id} to have {num_leds} leds')
         led_strip = db.led_strips.find_by_device_id(device_id)
         if led_strip is None:
             error_message = f"No led strip found for device id {device_id}"
             logger.error(error_message)
             return jsonify({"error": error_message}), 500
-        led_strip.num_leds = num_leds
+        if num_leds is not None:
+            led_strip.num_leds = num_leds
+        if led_pin is not None:
+            led_strip.led_pin = led_pin
         db.led_strips.update(led_strip)
     # return the data
     device_data = device.model_dump()
