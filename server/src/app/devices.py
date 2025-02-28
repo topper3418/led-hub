@@ -27,11 +27,10 @@ def get_devices():
 
 
 @devices_bp.post('/')
+@data_has('mac')
+@data_has('ip')
 def handshake():
-    body = request.json
-    if not body:
-        return jsonify({"error": "No data provided"}), 400
-    device_data = body.get('data')
+    device_data = g.get('data')
     logger.info('processing handshake request', {'device_data': device_data})
     try:
         device = Device(**device_data)

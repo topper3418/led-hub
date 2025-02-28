@@ -1,13 +1,12 @@
 from machine import Pin
 import neopixel
-from config import LED_PIN
 
 
 class Color:
     def __init__(self, color_data: dict):
-        self.r = color_data.get('r', 0)
-        self.g = color_data.get('g', 0)
-        self.b = color_data.get('b', 0)
+        self.r = color_data.get('red', 0)
+        self.g = color_data.get('green', 0)
+        self.b = color_data.get('blue', 0)
 
 
 class LedStripState:
@@ -17,17 +16,18 @@ class LedStripState:
         self.brightness = led_strip_data.get('brightness', 0)
         self.num_leds = led_strip_data.get('num_leds', 10)
         self.color = Color(led_strip_data)
-        self.writer = neopixel.NeoPixel(Pin(LED_PIN), self.num_leds)
+        self.led_pin = led_strip_data.get('led_pin', 16)
+        self.writer = neopixel.NeoPixel(Pin(self.led_pin), self.num_leds)
 
     def render(self):
         """returns a tuple to write to the led_strip pixels"""
         if not self.on:
-            return (0,.0,0)
+            return (0,0,0)
         multiplier = float(self.brightness)/255
         return (
-            self.color.r * multiplier,
-            self.color.g * multiplier,
-            self.color.b * multiplier,
+            int(self.color.r * multiplier),
+            int(self.color.g * multiplier),
+            int(self.color.b * multiplier),
         )
 
     def __repr__(self):
@@ -40,7 +40,7 @@ class Device:
         self.port = device_data.get('port')
         self.ip = device_data.get('ip')
         self.name = device_data.get('name')
-        self.led_strip = LedStripState(device_data.get('led_strip', {}))
+        self.led_strip = LedStripState(device_data.get('led_strip', {}) or {})
 
     def write(self):
         color_data = self.led_strip.render()

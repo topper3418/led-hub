@@ -28,10 +28,11 @@ def handshake(connection, server_endpoint) -> bool | Device:
             print('handshake failed')
             return False
         res_json = res.json()
+        data = res_json.get('data') 
         if error := res_json.get('error'):
             print(f'received error: {error}')
             return False
-        device = Device(res_json.get('data'))
+        device = Device(data)
         print(f'received response:\n', res_json)
         device.write()
         return device

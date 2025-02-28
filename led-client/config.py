@@ -1,6 +1,3 @@
-# device-specific
-LED_PIN = 16
-
 # wifi config
 SSID = "the way of the wamel"
 PASSWORD = 'Maisie129'
