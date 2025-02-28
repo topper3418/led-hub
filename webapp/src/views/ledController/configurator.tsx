@@ -15,6 +15,7 @@ const DeviceConfigurator: React.FC = () => {
     const url = BACKEND_ROOT_URL + "devices/" + deviceId;
     const [name, setName] = React.useState<string>("");
     const [roomId, setRoomId] = React.useState<number>(0);
+    const [numLeds, setNumLeds] = React.useState<number>(0);
     const navigate = useNavigate();
 
     const { state: fetchState, api: fetchApi } = useFetch<Device>(url, undefined, 'device');
@@ -30,13 +31,15 @@ const DeviceConfigurator: React.FC = () => {
         if (fetchState.data) {
             setName(fetchState.data.name || "");
             setRoomId(fetchState.data.room_id || 0);
+            setNumLeds(fetchState.data.led_strip?.num_leds || 0);
         }
     }, [fetchState.loading])
 
     const deviceData = {
         ...fetchState.data,
         name,
-        room_id: roomId
+        room_id: roomId,
+        num_leds: numLeds
     } as Device;
 
     const save = () => {
@@ -88,6 +91,12 @@ const DeviceConfigurator: React.FC = () => {
                             <option key={room.id} value={room.id}>{room.name}</option>
                         ))}
                     </select>
+                    <input
+                        type="number"
+                        placeholder="Num LEDs"
+                        value={numLeds}
+                        onChange={(e) => setNumLeds(Number(e.target.value))}
+                        className="bg-slate-800 text-slate-100 p-3 rounded-md" />
                 </div>
                 <button
                     onClick={save}

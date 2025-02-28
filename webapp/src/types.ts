@@ -22,6 +22,7 @@ export interface LedStrip {
   blue?: number;
   on?: boolean;
   brightness?: number;
+  num_leds?: number;
 }
 
 export interface Room {
