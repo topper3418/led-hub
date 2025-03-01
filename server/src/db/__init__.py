@@ -130,10 +130,10 @@ class DatabaseLedStripsInterface:
             raise ValueError("Cursor is not set")
         return list_led_strips(self.cursor, room_id)
 
-    def find_many_devices(self, room_id: int | None = None) -> list[DeviceModel]:
+    def find_many_devices(self, room_id: int | None = None, include_room_data: bool=False) -> list[DeviceModel]:
         if not self.cursor:
             raise ValueError("Cursor is not set")
-        return list_led_strip_devices(self.cursor, room_id)
+        return list_led_strip_devices(self.cursor, room_id, include_room_data)
 
 
 class Database:

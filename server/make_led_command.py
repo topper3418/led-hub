@@ -1,26 +1,22 @@
 import sys
 import json
-from src.dispatcher.client import get_client
-from src.models import LedStrip
+from typing import Optional
+import pydantic
+from src.dispatcher.client import GrokChatClient
+from src.models import Color, LedStrip
 
 def make_led_command(command: str) -> LedStrip:
-    client = get_client()
+    client = GrokChatClient()
     system_prompt = f"""
 You are an LED strip. I will send you a command to change your state. Your state must be represented by the following model: 
 {LedStrip.model_json_schema()}
 """
-    completion = client.chat.completions.create(
-        model="grok-2-latest",
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": command
-            },
-        ],
+    client.history.append({
+        "role": "system",
+        "content": system_prompt
+    })
+    completion = client.chat(
+        content=command
     )
     response_string = completion.choices[0].message.content
     if response_string is None:
@@ -29,8 +25,58 @@ You are an LED strip. I will send you a command to change your state. Your state
     return LedStrip(**response)
 
 
-def exrapolate_command(command: str) -> str:
-    pass
+class LedStripCommand(pydantic.BaseModel):
+    on: Optional[bool]
+    brightness: Optional[int]
+    color: Optional[Color]
+
+
+class LedCommandResponse(pydantic.BaseModel):
+    deviceId: int
+    command: LedStripCommand
+    reason: str
+
+
+class CommandResponseList(pydantic.BaseModel):
+    commands: list[LedCommandResponse]
+    errors: list[str]
+
+
+class ContextCommandProcessor:
+    def __init__(self):
+        self.client = GrokChatClient()
+        self.response_schema = CommandResponseList.model_json_schema()
+        self.context = "IMPLEMENT THIS"
+        self.client.history.append({
+            "role": "system",
+            "content": f"""
+You are an IOT hub in charge of managing LED strips. You will receive a JSON 
+object representing the current state of all devices. Your outpur should 
+conform to the following json schema:
+{self.response_schema}
+
+a few notes: 
+ - do NOT include commands for LED strips that the user did not ask for you 
+   to manipulate
+   - For example: if I ask you to dim the lights in the kitchen, do not 
+   include any lights in the bedroom in your response
+ - do NOT include data in your response for components of device state 
+   that the use did not ask for you to manipulate. 
+   - For example: if I ask you to dim the lights in the kitchen, do not 
+     include the current state of the kitchen lights in your response
+ - with each response, include a reason for the command you are sending. Be 
+   concise but complete
+   - For example: if I ask you to dim the lights in the kitchen, you might 
+     say "dimming the lights in the kitchen to 50% brightness"
+            """
+        })
+        self.command: str = ""
+        self.response: CommandResponseList = None
+
+    def process_command(self, command: str) -> CommandResponseList:
+        self.command = command
+        self.response = self.client.chat(content=command)
+        return self.response
 
 
 if __name__ == "__main__":
@@ -38,5 +84,5 @@ if __name__ == "__main__":
         print("Usage: python make_led_command.py \"command\"")
         sys.exit(1)
     command = sys.argv[1]
-    response = make_led_command(command)
-    print(response)
+    response = interpret_command(command)
+    # print(response)

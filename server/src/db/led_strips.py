@@ -155,7 +155,7 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
         raise e
 
 
-def list_led_strip_devices(cursor, room_id: int | None) -> list[Device]:
+def list_led_strip_devices(cursor, room_id: int | None, include_room_data: bool=False) -> list[Device]:
     logger.debug('Listing led_strip devices', {'room_id': room_id})
     query = "select * from led_strips join devices on led_strips.device_id = devices.id"
     args = []
