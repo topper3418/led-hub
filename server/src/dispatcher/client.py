@@ -35,11 +35,12 @@ class GrokChatClient(ChatClient):
     def chat(self, content: str, role: str = 'user') -> str:
         self.history.append({
             "content": content,
-            "role": role
+            "role": role,
         })
         response = self._client.chat.completions.create(
             model="grok-2-latest",
-            messages=self.history
+            messages=self.history,
+            response_format={ "type": "json_object" }
         )
         message = response.choices[0].message
         self.history.append(message)

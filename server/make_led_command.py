@@ -1,7 +1,9 @@
 import sys
 import json
+from pprint import pprint
 from typing import Optional
 import pydantic
+from src.db import Database
 from src.dispatcher.client import GrokChatClient
 from src.models import Color, LedStrip
 
@@ -28,7 +30,9 @@ You are an LED strip. I will send you a command to change your state. Your state
 class LedStripCommand(pydantic.BaseModel):
     on: Optional[bool]
     brightness: Optional[int]
-    color: Optional[Color]
+    red: Optional[int]
+    green: Optional[int]
+    blue: Optional[int]
 
 
 class LedCommandResponse(pydantic.BaseModel):
@@ -42,11 +46,22 @@ class CommandResponseList(pydantic.BaseModel):
     errors: list[str]
 
 
+def get_full_led_strip_context():
+    with Database() as db:
+        devices = db.led_strips.find_many_devices()
+        rooms = db.rooms.find_many()
+        room_dict = {str(room.id): room for room in rooms}
+        for device in devices:
+            device.room = room_dict[str(device.room_id)]
+    return [device.model_dump() for device in devices]
+
+
 class ContextCommandProcessor:
     def __init__(self):
         self.client = GrokChatClient()
+        self.response_str = ""
         self.response_schema = CommandResponseList.model_json_schema()
-        self.context = "IMPLEMENT THIS"
+        self.context = get_full_led_strip_context()
         self.client.history.append({
             "role": "system",
             "content": f"""
@@ -68,6 +83,12 @@ a few notes:
    concise but complete
    - For example: if I ask you to dim the lights in the kitchen, you might 
      say "dimming the lights in the kitchen to 50% brightness"
+
+Here is the context in which the user's command should be interpreted
+
+{self.context}
+
+Now prepare yourself for the command
             """
         })
         self.command: str = ""
@@ -75,7 +96,9 @@ a few notes:
 
     def process_command(self, command: str) -> CommandResponseList:
         self.command = command
-        self.response = self.client.chat(content=command)
+        self.response_str = response_str = self.client.chat(content=command)
+        print('got response: \n', response_str)
+        self.response = json.loads(response_str)
         return self.response
 
 
@@ -84,5 +107,9 @@ if __name__ == "__main__":
         print("Usage: python make_led_command.py \"command\"")
         sys.exit(1)
     command = sys.argv[1]
-    response = interpret_command(command)
+    processor = ContextCommandProcessor()
+    pprint(processor.context)
+    print("COMMAND:", command)
+    command_response = processor.process_command(command)
+    pprint(command_response)
     # print(response)
