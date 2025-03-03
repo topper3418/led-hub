@@ -1,7 +1,6 @@
 import { MultiStateButton } from "../../components/multiStateButton";
 import React, { useEffect, useState } from "react";
-import { Room, LedStrip, Color, Device } from "../../types";
-import { intToHex, getLedColor } from "../../util";
+import { Room, Device } from "../../types";
 import { useGetRoom, useWriteToRoom } from "./hooks";
 
 interface RoomCardInterface {
@@ -12,7 +11,7 @@ interface RoomCardInterface {
 export const RoomCard: React.FC<RoomCardInterface> = (
   { room, selectDevice }
 ) => {
-  const { state: roomState, api: fetchApi } = useGetRoom(room.id);
+  const { state: roomState } = useGetRoom(room.id);
   const { state: toggleState, setRoom } = useWriteToRoom(room.id);
   const [bufferState, setBufferState] = useState(false);
   const [numLedStrips, setNumLedStrips] = useState(0);

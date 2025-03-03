@@ -1,7 +1,6 @@
 import React, { CSSProperties, useEffect } from 'react';
 import Banner from '../../components/banner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLedStripHooks } from './hooks';
 import { getDeviceIdentifier } from '../../util';
 import { Device, LedStrip, Room } from '../../types';
 import { usePut } from '../../hooks/usePut';
@@ -19,10 +18,10 @@ const DeviceConfigurator: React.FC = () => {
     const [ledPin, setLedPin] = React.useState<number>(16);
     const navigate = useNavigate();
 
-    const { state: fetchState, api: fetchApi } = useFetch<Device>(url, undefined, 'device');
-    const { state: roomsState, api: roomsApi } = useFetch<Room[]>(BACKEND_ROOT_URL + 'rooms', undefined, 'rooms');
-    const { state: deleteState, api: deleteApi } = useDelete<LedStrip>(url);
-    const { state: updateState, api: updateApi } = usePut<Device, { device: LedStrip }>(url);
+    const { state: fetchState } = useFetch<Device>(url, undefined, 'device');
+    const { state: roomsState } = useFetch<Room[]>(BACKEND_ROOT_URL + 'rooms', undefined, 'rooms');
+    const { api: deleteApi } = useDelete<LedStrip>(url);
+    const { api: updateApi } = usePut<Device, { device: LedStrip }>(url);
 
     const deviceName = getDeviceIdentifier(fetchState.data || {} as Device)
     const title = `Configure ${deviceName}`

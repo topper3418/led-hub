@@ -2,15 +2,15 @@ import React, { CSSProperties, useEffect, useState } from "react";
 import Banner from "../../components/banner";
 import { useNavigate } from "react-router-dom";
 import { useAddRoom, useRoomHooks, useWriteToRoom } from "./hooks";
-import { Device, LedStrip, Room } from "../../types";
+import { Device, Room } from "../../types";
 import { RoomCard, RoomCardElement } from "./roomCard";
 
 
 const Rooms: React.FC = () => {
     const navigate = useNavigate();
-    const { rooms, miscRoom, api: fetchApi } = useRoomHooks();
-    const { state: addState, addGenericRoom } = useAddRoom();
-    const { state: writeMiscState, setRoom: setMiscRoom } = useWriteToRoom(0);
+    const { rooms, miscRoom } = useRoomHooks();
+    const { addGenericRoom } = useAddRoom();
+    const { setRoom: setMiscRoom } = useWriteToRoom(0);
     const [bufferState, setBufferState] = useState(false);
     const [numMiscLedStrips, setNumMiscLedStrips] = useState(0);
     const navToRoom = (room: Room) => {

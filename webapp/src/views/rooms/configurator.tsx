@@ -1,7 +1,6 @@
 import React, { CSSProperties, useEffect } from 'react';
 import Banner from '../../components/banner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getDeviceIdentifier } from '../../util';
 import { Device, LedStrip, Room } from '../../types';
 import { usePut } from '../../hooks/usePut';
 import { useDelete } from '../../hooks/useDelete';
@@ -15,9 +14,9 @@ const RoomConfigurator: React.FC = () => {
     const [name, setName] = React.useState<string>("");
     const navigate = useNavigate();
 
-    const { state: fetchState, api: fetchApi } = useFetch<Room>(url, undefined, 'room');
-    const { state: deleteState, api: deleteApi } = useDelete<Room>(url);
-    const { state: updateState, api: updateApi } = usePut<Device, { device: LedStrip }>(url);
+    const { state: fetchState } = useFetch<Room>(url, undefined, 'room');
+    const { api: deleteApi } = useDelete<Room>(url);
+    const { api: updateApi } = usePut<Device, { device: LedStrip }>(url);
 
     const title = `Configure ${fetchState.data?.name || 'Unnamed Room'}`;
 
