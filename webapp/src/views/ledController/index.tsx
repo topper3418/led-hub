@@ -70,7 +70,7 @@ const LedController: React.FC = () => {
       <input
         type="range"
         min="0"
-        max="100"
+        max="255"
         value={device?.led_strip?.brightness}
         onChange={brightnessChanged} />
       <button
