@@ -1,14 +1,10 @@
-from flask import Blueprint, abort, request, jsonify, g
-from pydantic import ValidationError
+from flask import Blueprint, jsonify, g
 
-from src.dispatcher import get_new_states
 from src.dispatcher.contextCommandProcessor import ContextCommandProcessor, get_full_led_strip_context
 from src.logging import get_logger
 from src.db import Database
-from src.models import Device, Room
 
-from .middleware import data_has, ensure_not_none, load_device
-from .funcs import update_led_strip
+from .middleware import data_has
 
 
 logger = get_logger(__name__)
@@ -33,14 +29,17 @@ def process_voice_command():
         if led_strip is None:
             response.errors.append(f"Device with id {command.device_id} not found")
             continue
-        if command.command.on is not None:
-            led_strip.on = command.command.on
-        if command.command.brightness is not None:
-            led_strip.brightness = command.command.brightness
-        if command.command.color is not None:
-            led_strip.red, led_strip.green, led_strip.blue = command.command.color
+        if command.set_on is not None:
+            led_strip.on = command.set_on
+        if command.set_brightness is not None:
+            led_strip.brightness = command.set_brightness
+        if command.set_color is not None:
+            led_strip.red, led_strip.green, led_strip.blue = command.set_color
         db.led_strips.update(led_strip)
-    return jsonify(response.model_dump())
+    # return the response
+    response_data = response.model_dump()
+    logger.debug('processed command', {'response': response_data})
+    return jsonify(response_data)
     
     
 

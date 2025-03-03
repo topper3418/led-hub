@@ -5,26 +5,17 @@ import pydantic
 
 from src.db import Database
 from src.dispatcher.client import GrokChatClient
+from src.logging import get_logger
 
-
-class LedStripCommand(pydantic.BaseModel):
-    on: Optional[bool]
-    brightness: Optional[int]
-    red: Optional[int]
-    green: Optional[int]
-    blue: Optional[int]
-
-    @property
-    def color(self) -> Optional[tuple[int, int, int]]:
-        if self.red is not None and self.green is not None and self.blue is not None:
-            return self.red, self.green, self.blue
-        return None
+logger = get_logger(__name__)
 
 
 class LedCommandResponse(pydantic.BaseModel):
     device_id: int
-    command: LedStripCommand
-    reason: str
+    set_brightness: Optional[int] = None
+    set_color: Optional[tuple[int, int, int]] = None
+    set_on: Optional[bool] = None
+    errors: list[str]
 
 
 class CommandResponseList(pydantic.BaseModel):
@@ -48,7 +39,7 @@ def get_full_led_strip_context_independent():
 
 response_schema_template = """
 You are an IOT hub in charge of managing LED strips. You will receive a JSON 
-object representing the current state of all devices. Your outpur should 
+object representing the current state of all devices. Your output should 
 conform to the following json schema:
 
 {response_schema}
@@ -61,11 +52,28 @@ a few notes:
  - do NOT include data in your response for components of device state 
    that the use did not ask for you to manipulate. 
    - For example: if I ask you to dim the lights in the kitchen, do not 
-     include the current state of the kitchen lights in your response
- - with each response, include a reason for the command you are sending. Be 
-   concise but complete
-   - For example: if I ask you to dim the lights in the kitchen, you might 
-     say "dimming the lights in the kitchen to 50% brightness"
+     include the current state (on or off) of the kitchen lights in your response
+   - The model I am using to parse your response has default values for the state, 
+     so you need not even include them in your response if not being changed.
+   - just to clarify, if the color is being changed, include all three components
+     of the color (red, gren, blue) in the response
+ - if you encounter an error, add a string to the errors list in the response
+ - unless otherwise specified, always assume the user intends for the lights to 
+   end up on when they ask to set brightness or color
+ - if the user asks for a vague variety of colors, make each light a unique color
+   - for example, if the user asks for a bunch of different hues of blue, make each
+     light a different hue of blue, do not duplicate the rgb value at all in the 
+     response.
+   - of course, if the user is specific about colors they may want to make them 
+     consistent. Do your best.
+
+special commands:
+ - lumos: turn on all lights in the living room and kitchen if not on already. if on
+   already, increase the brightness of all the lights by 75 (capped at 255 of course)
+ - lumos maxima: turn on all lights in the living room and kitchen and set brightness
+   to 255
+ - nox: turn off all lights in the living room and kitchen if not off already
+ - migraine mode: turn on all lights to 50 brightness and set them to red
 
 Here is the context in which the user's command should be interpreted
 
@@ -92,6 +100,7 @@ class ContextCommandProcessor:
         self.response: CommandResponseList | None = None
 
     def process_command(self, command: str) -> CommandResponseList:
+        logger.info('processing command', {'command': command, 'context': self.context})
         self.command = command
         retries = 3
         while retries > 0:
@@ -104,6 +113,7 @@ class ContextCommandProcessor:
                 })
                 response_obj = json.loads(response_str)
                 self.response = CommandResponseList(**response_obj)
+                logger.info('processed command', {'response': self.response_str, 'command': command})
                 return self.response
             except pydantic.ValidationError as e:
                 retries -= 1
