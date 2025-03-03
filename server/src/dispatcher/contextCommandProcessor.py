@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import List, Optional
 
 import pydantic
 
@@ -14,9 +14,15 @@ class LedStripCommand(pydantic.BaseModel):
     green: Optional[int]
     blue: Optional[int]
 
+    @property
+    def color(self) -> Optional[tuple[int, int, int]]:
+        if self.red is not None and self.green is not None and self.blue is not None:
+            return self.red, self.green, self.blue
+        return None
+
 
 class LedCommandResponse(pydantic.BaseModel):
-    deviceId: int
+    device_id: int
     command: LedStripCommand
     reason: str
 
@@ -26,14 +32,18 @@ class CommandResponseList(pydantic.BaseModel):
     errors: list[str]
 
 
-def get_full_led_strip_context():
-    with Database() as db:
-        devices = db.led_strips.find_many_devices()
-        rooms = db.rooms.find_many()
-        room_dict = {str(room.id): room for room in rooms}
-        for device in devices:
-            device.room = room_dict[str(device.room_id)]
+def get_full_led_strip_context(db: Database):
+    devices = db.led_strips.find_many_devices()
+    rooms = db.rooms.find_many()
+    room_dict = {str(room.id): room for room in rooms}
+    for device in devices:
+        device.room = room_dict[str(device.room_id)]
     return [device.model_dump() for device in devices]
+
+
+def get_full_led_strip_context_independent():
+    with Database() as db:
+        return get_full_led_strip_context(db)
 
 
 response_schema_template = """
@@ -66,11 +76,11 @@ Now prepare yourself for the command
 
 
 class ContextCommandProcessor:
-    def __init__(self):
+    def __init__(self, context: Optional[List[dict]] = None):
         self.client = GrokChatClient()
         self.response_str = ""
         self.response_schema = CommandResponseList.model_json_schema()
-        self.context = get_full_led_strip_context()
+        self.context = context or get_full_led_strip_context_independent()
         self.client.history.append({
             "role": "system",
             "content": response_schema_template.format(
