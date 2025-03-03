@@ -11,7 +11,7 @@ interface RoomCardInterface {
 export const RoomCard: React.FC<RoomCardInterface> = (
   { room, selectDevice }
 ) => {
-  const { state: roomState } = useGetRoom(room.id);
+  const { state: roomState, api: roomStateApi } = useGetRoom(room.id);
   const { state: toggleState, setRoom } = useWriteToRoom(room.id);
   const [bufferState, setBufferState] = useState(false);
   const [numLedStrips, setNumLedStrips] = useState(0);
@@ -23,9 +23,8 @@ export const RoomCard: React.FC<RoomCardInterface> = (
   }
 
   useEffect(() => {
-    if (!roomState.loading) {
+    if (!roomState.loading && roomState.data) {
       const devices = roomState.data?.devices || [];
-      console.log('devices:', devices);
       const allOn = devices.length > 0 ? devices?.every((device: Device) => device.led_strip?.on) || false : false;
       setBufferState(allOn);
       setNumLedStrips(devices?.length)
@@ -34,7 +33,7 @@ export const RoomCard: React.FC<RoomCardInterface> = (
 
   useEffect(() => {
     if (!toggleState.loading && toggleState.data) {
-      setBufferState(toggleState.data?.data?.on || false);
+      roomStateApi.refetch();
     }
   }, [toggleState.loading])
 

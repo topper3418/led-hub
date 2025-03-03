@@ -58,7 +58,6 @@ export const useRoomHooks = () => {
 
 export const useGetRoom = (roomId: number) => {
     const url = BACKEND_ROOT_URL + "rooms/" + roomId + "?include=led_strip_devices";
-    console.log("fetching room from url:", url);
     return useFetch<Room>(url, undefined, "room");
 }
 
