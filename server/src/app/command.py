@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 command_bp = Blueprint('command', __name__)
 
 
-@command_bp.route('/')
+@command_bp.post('/')
 @data_has('command')
 def process_voice_command():
     command = g.get('command')
