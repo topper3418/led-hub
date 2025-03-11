@@ -8,10 +8,10 @@ from networkConnection import NetworkConnection
 from boardLed import BoardLed
 from handshake import handshake
 from models import Device, LedStripState
+from request import fetch_data
 
 from config import (SSID, 
-                    PASSWORD,
-                    SERVER_ENDPOINT)
+                    PASSWORD)
 
 
 # gpio 
@@ -22,7 +22,7 @@ connection = NetworkConnection(SSID, PASSWORD, pending=boardLed.toggle, complete
 
 
 def do_handshake() -> Device:
-    handshake_endpoint = SERVER_ENDPOINT + 'devices/'
+    handshake_endpoint = 'devices/'
     while not (device := handshake(connection, handshake_endpoint)):
         time.sleep(1)
         boardLed.toggle()
@@ -34,11 +34,10 @@ def do_handshake() -> Device:
 
 def get_update(device: Device):
     boardLed.turn_on()
-    update_endpoint = SERVER_ENDPOINT + '/devices/' + str(device.id) + '/led_strip'
+    update_endpoint = '/devices/' + str(device.id) + '/led_strip'
     # fetch data from server
     try:
-        response = requests.get(update_endpoint)
-        response_json = response.json()
+        response_json = fetch_data(update_endpoint)
         if (error := response_json.get('error')):
             print('error returned:', error)
             return
