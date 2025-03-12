@@ -12,7 +12,7 @@ services:
       - led-hub-log-data:/app/data
 
   server:
-    build: ./hub-server
+    build: ./server
     container_name: led-hub-server
     restart: always
     environment:
@@ -25,7 +25,7 @@ services:
 
   webapp:
     build:
-      context: ./hub-webapp
+      context: ./webapp
       args: 
         BACKEND_HOST: server
         BACKEND_PORT: 2000
