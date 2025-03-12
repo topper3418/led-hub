@@ -16,6 +16,7 @@ services:
     container_name: led-hub-server
     restart: always
     environment:
+      LOGGING_SERVICE_ENDPOINT: logging-service:8080/logs
       SERVER_PORT: 2000
     networks:
       - led-hub-network
