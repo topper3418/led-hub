@@ -6,6 +6,8 @@ services:
     restart: always
     environment:
       PORT: 8080
+    ports:
+      - '8080:8080' 
     networks:
       - led-hub-network
     volumes:
@@ -15,8 +17,10 @@ services:
     build: ./server
     container_name: led-hub-server
     restart: always
+    ports:
+      - '${LED_HUB_BACKEND_PORT:-2000}:2000' 
     environment:
-      LOGGING_SERVICE_ENDPOINT: logging-service:8080/logs
+      LOGGING_SERVICE_ENDPOINT: http://logging-service:8080
       SERVER_PORT: 2000
     networks:
       - led-hub-network

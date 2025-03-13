@@ -42,6 +42,7 @@ def data_has(item_name, optional = False):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            logger.debug(f'checking data has {item_name}')
             data = g.get('data')
             if data is None:
                 body = request.json or {}

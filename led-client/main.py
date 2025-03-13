@@ -24,7 +24,7 @@ connection = NetworkConnection(SSID, PASSWORD, pending=boardLed.toggle, complete
 def do_handshake() -> Device:
     handshake_endpoint = 'devices/'
     while not (device := handshake(connection, handshake_endpoint)):
-        time.sleep(1)
+        time.sleep(.5)
         boardLed.toggle()
     if not isinstance(device, Device):
         raise Exception('something went wrong and no device was returned. Aborting.')
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         # Then just keep getting updates
         while True:
             get_update(device)
-            time.sleep(.25)
+            time.sleep(1)
     except KeyboardInterrupt:
         machine.reset()
 
