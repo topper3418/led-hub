@@ -37,7 +37,8 @@ struct Device: Identifiable, Codable {
     let id: Int?
     var name: String?
     var mac: String?
-    var lastPing: String? // Matches "last_ping" from backend
+    var lastPing: String?
+    var roomId: Int? // Added
     var ledStrip: LedStrip?
     
     var identifiableId: Int {
@@ -47,6 +48,7 @@ struct Device: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id, name, mac
         case lastPing = "last_ping"
+        case roomId = "room_id"
         case ledStrip = "led_strip"
     }
 }
@@ -57,4 +59,12 @@ struct LedStrip: Codable {
     var green: Int?
     var blue: Int?
     var brightness: Int?
+    var numLeds: Int?
+    var ledPin: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case on, red, green, blue, brightness
+        case numLeds = "num_leds"
+        case ledPin = "led_pin"
+    }
 }

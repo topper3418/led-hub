@@ -7,10 +7,10 @@
 
 import Foundation
 
-class APIService: ObservableObject {
+class RoomService: ObservableObject {
     private let baseURL = "http://opperudHome.local/api/"
     
-    func fetchRooms() async throws -> [Room] {
+    func fetchAll() async throws -> [Room] {
         let urlString = "\(baseURL)rooms"
         guard let url = URL(string: urlString) else {
             print("Invalid URL: \(urlString)")
@@ -36,7 +36,7 @@ class APIService: ObservableObject {
         return roomsResponse.data.rooms
     }
 
-    func fetchRoom(id: Int) async throws -> Room {
+    func fetchOne(id: Int) async throws -> Room {
         let urlString = "\(baseURL)rooms/\(id)?include=led_strip_devices"
         guard let url = URL(string: urlString) else {
             print("Invalid URL: \(urlString)")
@@ -69,7 +69,7 @@ class APIService: ObservableObject {
         return roomResponse.data.room
     }
     
-    func updateRoom(_ room: Room) async throws {
+    func update(_ room: Room) async throws {
         let roomId = room.id ?? 0
         let url = URL(string: "\(baseURL)rooms/\(roomId)/led_strips")!
         var request = URLRequest(url: url)
@@ -79,7 +79,7 @@ class APIService: ObservableObject {
         let (_, _) = try await URLSession.shared.data(for: request)
     }
     
-    func updateLedStrips(roomId: Int, on: Bool) async throws {
+    func setRoom(roomId: Int, on: Bool) async throws {
         let url = URL(string: "\(baseURL)rooms/\(roomId)/led_strips")!
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -103,20 +103,25 @@ class APIService: ObservableObject {
         }
     }
     
-    func deleteRoom(id: Int) async throws {
+    func delete(id: Int) async throws {
         let url = URL(string: "\(baseURL)rooms/\(id)")!
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         let (_, _) = try await URLSession.shared.data(for: request)
     }
     
-    func addRoom() async throws -> Room {
+    func add() async throws -> Room {
         let url = URL(string: "\(baseURL)rooms")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode([String: String]())
         let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONDecoder().decode(Room.self, from: data)
+        // Decode response with "data" wrapper
+        struct AddRoomResponse: Codable {
+            let data: Room
+        }
+        let addRoomResponse = try JSONDecoder().decode(AddRoomResponse.self, from: data)
+        return addRoomResponse.data
     }
 }
