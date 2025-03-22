@@ -8,10 +8,10 @@ from networkConnection import NetworkConnection
 from boardLed import BoardLed
 from handshake import handshake
 from models import Device, LedStripState
+from request import fetch_data
 
 from config import (SSID, 
-                    PASSWORD,
-                    SERVER_ENDPOINT)
+                    PASSWORD)
 
 
 # gpio 
@@ -22,9 +22,9 @@ connection = NetworkConnection(SSID, PASSWORD, pending=boardLed.toggle, complete
 
 
 def do_handshake() -> Device:
-    handshake_endpoint = SERVER_ENDPOINT + 'devices/'
+    handshake_endpoint = 'devices/'
     while not (device := handshake(connection, handshake_endpoint)):
-        time.sleep(1)
+        time.sleep(.5)
         boardLed.toggle()
     if not isinstance(device, Device):
         raise Exception('something went wrong and no device was returned. Aborting.')
@@ -34,11 +34,10 @@ def do_handshake() -> Device:
 
 def get_update(device: Device):
     boardLed.turn_on()
-    update_endpoint = SERVER_ENDPOINT + '/devices/' + str(device.id) + '/led_strip'
+    update_endpoint = '/devices/' + str(device.id) + '/led_strip'
     # fetch data from server
     try:
-        response = requests.get(update_endpoint)
-        response_json = response.json()
+        response_json = fetch_data(update_endpoint)
         if (error := response_json.get('error')):
             print('error returned:', error)
             return
@@ -49,6 +48,7 @@ def get_update(device: Device):
     try:
         data = response_json.get('data')
         new_state = LedStripState(data)
+        print("got update from server:\n", new_state)
         device.led_strip = new_state
     except Exception as e:
         print('an exception was raised while trying to parse response')
@@ -57,7 +57,7 @@ def get_update(device: Device):
     try:
         device.write()
     except Exception as e:
-        print('an exception was raise dwhile trying to write to device')
+        print('an exception was raised while trying to write to device')
     boardLed.turn_off()
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         # Then just keep getting updates
         while True:
             get_update(device)
-            time.sleep(.25)
+            time.sleep(1)
     except KeyboardInterrupt:
         machine.reset()
 

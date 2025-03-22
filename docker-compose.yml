@@ -1,23 +1,4 @@
 services:
-  mysql:
-    image: mysql:latest
-    container_name: led-hub-db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-led-hub-db-root-pass}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-led-hub}
-      MYSQL_USER: ${MYSQL_USER:-led-hub-server}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-led-hub-db-pass}
-    ports:
-      - '${LED_HUB_DB_PORT:-3306}:3306' 
-    volumes:
-      - led-hub-data:/var/lib/mysql
-    networks:
-      - led-hub-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      retries: 10
 
   logging-service:
     build: ./logging-service
@@ -25,48 +6,42 @@ services:
     restart: always
     environment:
       PORT: 8080
-    ports: 
-      - '${LED_HUB_LOGGER_PORT:-8080}:8080' 
+    ports:
+      - '8080:8080' 
     networks:
       - led-hub-network
     volumes:
       - led-hub-log-data:/app/data
 
-  app-server:
-    build: ./hub-server
+  server:
+    build: ./server
     container_name: led-hub-server
     restart: always
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: ${MYSQL_USER:-led-hub-server}
-      DB_PASSWORD: ${MYSQL_PASSWORD:-led-hub-db-pass}
-      DB_NAME: ${MYSQL_DATABASE:-led-hub}
-      SERVER_PORT: 2000
-      LOGGING_SERVICE_ENDPOINT: http://logging-service:8080
     ports:
-      - '${LED_HUB_APP_PORT:-2000}:2000' 
+      - '${LED_HUB_BACKEND_PORT:-2000}:2000' 
+    environment:
+      LOGGING_SERVICE_ENDPOINT: http://logging-service:8080
+      SERVER_PORT: 2000
     networks:
       - led-hub-network
+    volumes:
+      - led-hub-data:/app/data
     platform: linux/amd64
 
   webapp:
     build:
-      context: ./hub-webapp
+      context: ./webapp
       args: 
-        BACKEND_HOST: app-server
+        BACKEND_HOST: server
         BACKEND_PORT: 2000
         LOGGER_HOST: logging-service
         LOGGER_PORT: 8080
-        WEBAPP_PORT: ${WEBAPP_PORT:-80}
+        WEBAPP_PORT: 80
     restart: always
     ports:
       - '${LED_HUB_WEBAPP_PORT:-80}:80' 
     depends_on:
-      - app-server
+      - server
     networks:
       - led-hub-network
 
