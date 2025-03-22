@@ -73,7 +73,7 @@ def update_many_led_strips():
 @data_has('brightness', optional=True)
 @data_has('on', optional=True)
 def update_led_strip_state(led_strip_id):
-    logger.info(f'updating led strip state id {led_strip_id}', {"data", g.data})
+    logger.info(f'updating led strip state id {led_strip_id}', {"data", g.get('data')})
     return update_led_strip()
 
 

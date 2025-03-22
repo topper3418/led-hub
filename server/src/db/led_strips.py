@@ -135,7 +135,7 @@ def list_led_strips(cursor: Cursor, room_id: int | None = None) -> list[LedStrip
         where_clauses.append("devices.room_id = ?")
         args.append(room_id)
     try: 
-        query = query + " WHERE " + " AND ".join(where_clauses)
+        query = query + " WHERE " + " AND ".join(where_clauses) + ";" if where_clauses else query + ";"
         logger.debug('Executing query', {'query': query, 'args': args})
         cursor.execute(
             query,
