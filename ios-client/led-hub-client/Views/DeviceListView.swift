@@ -10,24 +10,26 @@ import SwiftUI
 
 struct DeviceListView: View {
     let roomId: Int
-    @StateObject private var roomService = RoomService()
+    let roomName: String
     @StateObject private var deviceService = DeviceService()
     @State private var room: Room?
-    @State private var deviceIds: [Int] = []
-    @State private var errorMessage: String?
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
-            if room == nil {
+            if deviceService.devices.isEmpty {
                 Text("Loading...")
                     .foregroundColor(.primary)
-            } else if let devices = room?.devices, !devices.isEmpty {
+            } else if !deviceService.devices.isEmpty {
                 List {
-                    ForEach(deviceIds, id: \.self) {
-                        deviceId in
-                        NavigationLink(destination: LedStripControlView(deviceId: deviceId)) {
-                            DeviceCardView(deviceId: deviceId, deviceService: deviceService)
+                    ForEach(deviceService.devices) {
+                        device in
+                        NavigationLink(destination: LedStripControlView(deviceId: device.identifiableId)) {
+                            DeviceCardView(
+                                deviceId: device.identifiableId,
+                                givenName: device.name ?? device.mac ?? "Device \(device.identifiableId)",
+                                deviceService: deviceService
+                            )
                         }
                     }
                 }
@@ -43,21 +45,11 @@ struct DeviceListView: View {
             }
         }
         .task {
-            await loadRoom()
-        }
-    }
-    
-    private func loadRoom() async {
-        do {
-            room = try await roomService.fetchOne(id: roomId)
-            deviceIds = room?.devices?.map((\.identifiableId)) ?? []
-            print("got room \(roomId): \(String(describing: room))")
-        } catch {
-            print("Error loading room \(roomId): \(error)")
+            _ = await deviceService.fetchDevices(roomId: roomId)
         }
     }
 }
 
 #Preview {
-    DeviceListView(roomId: 1)
+    DeviceListView(roomId: 1, roomName: "Preview Room")
 }

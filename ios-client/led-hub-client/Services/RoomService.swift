@@ -17,31 +17,44 @@ struct RoomsResponse: Codable {
 
 class RoomService: ObservableObject {
     private let baseURL = "http://opperudHome.local/api/"
+    @Published var rooms: [Room] = []
+    @Published var error: Error? = nil
     
-    func fetchAll() async throws -> [Room] {
-        let urlString = "\(baseURL)rooms"
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL: \(urlString)")
-            throw URLError(.badURL)
+    func fetchAll() async -> [Room] {
+        do {
+            let urlString = "\(baseURL)rooms"
+            guard let url = URL(string: urlString) else {
+                print("Invalid URL: \(urlString)")
+                throw URLError(.badURL)
+            }
+            print("Fetching rooms from: \(url)")
+            
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Invalid response")
+                throw URLError(.badServerResponse)
+            }
+            print("Response status code: \(httpResponse.statusCode)")
+            
+            if httpResponse.statusCode != 200 {
+                print("Error: Server returned status code \(httpResponse.statusCode)")
+                throw URLError(.badServerResponse)
+            }
+            if false {
+                print("Raw data: \(String(data: data, encoding: .utf8) ?? "Unable to decode data")")
+            }
+            let roomsResponse = try JSONDecoder().decode(RoomsResponse.self, from: data)
+            await MainActor.run {
+                self.rooms = roomsResponse.data.rooms
+                self.error = nil
+            }
+            return rooms
+        } catch {
+            await MainActor.run {
+                self.error = error
+            }
+            return []
         }
-        print("Fetching rooms from: \(url)")
-        
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            print("Invalid response")
-            throw URLError(.badServerResponse)
-        }
-        print("Response status code: \(httpResponse.statusCode)")
-        
-        if httpResponse.statusCode != 200 {
-            print("Error: Server returned status code \(httpResponse.statusCode)")
-            throw URLError(.badServerResponse)
-        }
-        if false {
-            print("Raw data: \(String(data: data, encoding: .utf8) ?? "Unable to decode data")")
-        }
-        let roomsResponse = try JSONDecoder().decode(RoomsResponse.self, from: data)
-        return roomsResponse.data.rooms
     }
 
     func fetchOne(id: Int) async throws -> Room {

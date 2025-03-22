@@ -9,30 +9,26 @@ import SwiftUI
 
 struct RoomListView: View {
     @StateObject private var roomService = RoomService()
-    @State private var roomIds: [Int] = [] // Store only IDs
     @State private var miscRoomId: Int? = 0 // Misc room is always ID 0
-    @State private var errorMessage: String?
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {
             VStack {
-                if let error = errorMessage {
+                if let error = roomService.error?.localizedDescription {
                     Text("Error: \(error)")
                         .foregroundColor(.red)
-                } else if roomIds.isEmpty && miscRoomId == nil {
+                } else if roomService.rooms.isEmpty && miscRoomId == nil {
                     Text("Loading...")
                         .foregroundColor(.primary)
                 } else {
                     List {
-                        ForEach(roomIds, id: \.self) { roomId in
-                            NavigationLink(destination: DeviceListView(roomId: roomId)) {
-                                RoomCardView(roomId: roomId, apiService: roomService)
+                        ForEach(roomService.rooms) { room in
+                            NavigationLink(destination: DeviceListView(roomId: room.identifiableId, roomName: room.name)) {
+                                RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
                             }
                         }
-                        if let miscId = miscRoomId {
-                            RoomCardView(roomId: miscId, apiService: roomService)
-                        }
+                    RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
                     }
                 }
             }
@@ -45,34 +41,18 @@ struct RoomListView: View {
                 }
             }
             .task {
-                await loadData()
+                _ = await roomService.fetchAll()
             }
         }
         .background(Color(.systemBackground))
-    }
-    
-    private func loadData() async {
-        do {
-            let allRooms = try await roomService.fetchAll()
-            roomIds = allRooms.filter { $0.id != 0 }.compactMap { $0.id }
-            miscRoomId = 0 // Always include Misc room
-            errorMessage = nil
-        } catch {
-            print("Error loading data: \(error)")
-            errorMessage = error.localizedDescription
-        }
     }
     
     private func addRoom() {
         Task {
             do {
                 let newRoom = try await roomService.add()
-                if let newId = newRoom.id {
-                    roomIds.append(newId)
-                }
             } catch {
                 print("Error adding room: \(error)")
-                errorMessage = error.localizedDescription
             }
         }
     }

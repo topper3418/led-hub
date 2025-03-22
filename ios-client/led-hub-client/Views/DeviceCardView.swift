@@ -11,6 +11,7 @@ import SwiftUI
 
 struct DeviceCardView: View {
     let deviceId: Int // Changed to only take deviceId
+    let givenName: String?
     @ObservedObject var deviceService: DeviceService// Fetch data itself
     @State private var device: Device? // Store fetched device
     @State private var isOn: Bool = false // Initial state until fetched
@@ -22,7 +23,7 @@ struct DeviceCardView: View {
             if let device = device {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(device.name ?? device.mac ?? "Device \(deviceId)")
+                        Text(device.name ?? device.mac ?? givenName ?? "Device \(deviceId)")
                             .foregroundColor(.primary)
                             .font(.headline)
                         Text(connectionStatus)

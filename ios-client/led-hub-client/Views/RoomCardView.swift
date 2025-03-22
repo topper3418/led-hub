@@ -10,7 +10,8 @@ import SwiftUI
 
 struct RoomCardView: View {
     let roomId: Int?
-    @ObservedObject var apiService: RoomService
+    let roomName: String?
+    @ObservedObject var roomService: RoomService
     @State private var room: Room?
     @State private var isOn: Bool = false
     @State private var numLedStrips: Int = 0
@@ -23,7 +24,7 @@ struct RoomCardView: View {
             if shouldShowCard {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(room?.name ?? "Loading...")
+                        Text(room?.name ?? roomName ?? "Loading...")
                             .foregroundColor(.primary)
                             .font(.headline)
                         Text("lights: \(numLedStrips)")
@@ -70,7 +71,7 @@ struct RoomCardView: View {
             return
         }
         do {
-            let fetchedRoom = try await apiService.fetchOne(id: id)
+            let fetchedRoom = try await roomService.fetchOne(id: id)
             room = fetchedRoom
             if let devices = fetchedRoom.devices {
                 numLedStrips = devices.count
@@ -90,7 +91,7 @@ struct RoomCardView: View {
         Task {
             stopPolling()  // Stop polling before update
             do {
-                try await apiService.setRoom(roomId: id, on: newValue)
+                try await roomService.setRoom(roomId: id, on: newValue)
                 startPolling()  // Restart polling after update
             } catch {
                 print("Error toggling room \(id): \(error)")

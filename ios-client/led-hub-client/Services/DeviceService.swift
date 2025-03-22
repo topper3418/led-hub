@@ -9,6 +9,47 @@ import Foundation
 
 class DeviceService: ObservableObject {
     private let baseURL = "http://opperudHome.local/api/"
+    @Published var devices: [Device] = []
+    @Published var error: Error? = nil
+    
+    func fetchDevices(roomId: Int? = nil) async -> [Device] {
+        do {
+            var urlString = "\(baseURL)devices"
+            if let roomId = roomId {
+                urlString += "?room_id=\(roomId)"
+            }
+            guard let url = URL(string: urlString) else {
+                print("Invalid URL: \(urlString)")
+                throw URLError(.badURL)
+            }
+            print("Fetching devices from: \(url)")
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Move error logging inside the guard's else block
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Error: Server returned status code \(httpResponse.statusCode)")
+                } else {
+                    print("Error: Invalid server response")
+                }
+                throw URLError(.badServerResponse)
+            }
+            // Assuming response like {"data": [Device]}
+            struct DeviceResponse: Codable {
+                let data: [Device]
+            }
+            let deviceResponse = try JSONDecoder().decode(DeviceResponse.self, from: data)
+            await MainActor.run {
+                self.devices = deviceResponse.data
+                self.error = nil
+            }
+            return deviceResponse.data
+        } catch {
+            await MainActor.run {
+                self.error = error
+            }
+            return []
+        }
+    }
     
     func fetchOne(deviceId: Int) async throws -> Device {
         let urlString = "\(baseURL)devices/\(deviceId)"
@@ -96,31 +137,5 @@ class DeviceService: ObservableObject {
             print("Failed to update LED strip: \(String(data: data, encoding: .utf8) ?? "No response data")")
             throw URLError(.badServerResponse)
         }
-    }
-    
-    // Optional: Add fetchDevices if your backend has a /devices endpoint
-    func fetchDevices() async throws -> [Device] {
-        let urlString = "\(baseURL)devices"
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL: \(urlString)")
-            throw URLError(.badURL)
-        }
-        print("Fetching devices from: \(url)")
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            // Move error logging inside the guard's else block
-            if let httpResponse = response as? HTTPURLResponse {
-                print("Error: Server returned status code \(httpResponse.statusCode)")
-            } else {
-                print("Error: Invalid server response")
-            }
-            throw URLError(.badServerResponse)
-        }
-        // Assuming response like {"data": [Device]}
-        struct DeviceResponse: Codable {
-            let data: [Device]
-        }
-        let deviceResponse = try JSONDecoder().decode(DeviceResponse.self, from: data)
-        return deviceResponse.data
     }
 }
