@@ -7,6 +7,14 @@
 
 import Foundation
 
+struct RoomsResponse: Codable {
+    let data: RoomsData
+    
+    struct RoomsData: Codable {
+        let rooms: [Room]
+    }
+}
+
 class RoomService: ObservableObject {
     private let baseURL = "http://opperudHome.local/api/"
     
