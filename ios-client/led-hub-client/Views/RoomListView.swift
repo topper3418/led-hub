@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RoomListView: View {
     @StateObject private var roomService = RoomService()
-    @State private var miscRoomId: Int? = 0 // Misc room is always ID 0
+    @StateObject private var speechService = SpeechService()
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -18,7 +18,7 @@ struct RoomListView: View {
                 if let error = roomService.error?.localizedDescription {
                     Text("Error: \(error)")
                         .foregroundColor(.red)
-                } else if roomService.rooms.isEmpty && miscRoomId == nil {
+                } else if roomService.rooms.isEmpty {
                     Text("Loading...")
                         .foregroundColor(.primary)
                 } else {
@@ -28,9 +28,27 @@ struct RoomListView: View {
                                 RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
                             }
                         }
-                    RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
+                        RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
                     }
                 }
+                Spacer()
+                // Voice Command Button at Bottom
+                Button(speechService.isListening ? "Stop Listening" : "Voice Command") {
+                    if speechService.isListening {
+                        let buffers = speechService.stopListening()
+                        Task {
+                            await speechService.sendAudioToEndpoint(buffers: buffers)
+                        }
+                    } else {
+                        speechService.startListening()
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(speechService.isListening ? Color.red : Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .frame(width: 250)
             }
             .background(Color(.secondarySystemBackground))
             .navigationTitle("LED Hub")
@@ -50,7 +68,7 @@ struct RoomListView: View {
     private func addRoom() {
         Task {
             do {
-                let newRoom = try await roomService.add()
+                _ = try await roomService.add()
             } catch {
                 print("Error adding room: \(error)")
             }

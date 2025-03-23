@@ -27,14 +27,12 @@ class RoomService: ObservableObject {
                 print("Invalid URL: \(urlString)")
                 throw URLError(.badURL)
             }
-            print("Fetching rooms from: \(url)")
             
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("Invalid response")
                 throw URLError(.badServerResponse)
             }
-            print("Response status code: \(httpResponse.statusCode)")
             
             if httpResponse.statusCode != 200 {
                 print("Error: Server returned status code \(httpResponse.statusCode)")
@@ -63,7 +61,6 @@ class RoomService: ObservableObject {
             print("Invalid URL: \(urlString)")
             throw URLError(.badURL)
         }
-        print("Fetching room \(id) from: \(url)")
         
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let httpResponse = response as? HTTPURLResponse else {

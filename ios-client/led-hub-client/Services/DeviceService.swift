@@ -33,16 +33,20 @@ class DeviceService: ObservableObject {
                 }
                 throw URLError(.badServerResponse)
             }
+            print("raw data: \(String(data: data, encoding: .utf8) ?? "No data")")
             // Assuming response like {"data": [Device]}
+            struct DeviceDataPacket: Codable {
+                let devices: [Device]
+            }
             struct DeviceResponse: Codable {
-                let data: [Device]
+                let data: DeviceDataPacket
             }
             let deviceResponse = try JSONDecoder().decode(DeviceResponse.self, from: data)
             await MainActor.run {
-                self.devices = deviceResponse.data
+                self.devices = deviceResponse.data.devices
                 self.error = nil
             }
-            return deviceResponse.data
+            return deviceResponse.data.devices
         } catch {
             await MainActor.run {
                 self.error = error
@@ -57,7 +61,6 @@ class DeviceService: ObservableObject {
             print("Invalid URL: \(urlString)")
             throw URLError(.badURL)
         }
-        print("Fetching device \(deviceId) from: \(url)")
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             if let httpResponse = response as? HTTPURLResponse {
@@ -129,8 +132,10 @@ class DeviceService: ObservableObject {
             let data: LedStripUpdateData
         }
         let payload = LedStripUpdate(data: LedStripUpdateData(on: on, red: red, green: green, blue: blue, brightness: brightness))
-        print("Submitting PUT request with payload: \(payload)")
-        request.httpBody = try JSONEncoder().encode(payload)
+        let rawPayload = try JSONEncoder().encode(payload)
+        print("Raw payload: \(String(data: rawPayload, encoding: .utf8) ?? "No data")")
+        print("url: \(url)")
+        request.httpBody = rawPayload
         
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {

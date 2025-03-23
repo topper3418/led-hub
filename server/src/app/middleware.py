@@ -52,7 +52,7 @@ def data_has(item_name, optional = False):
             if item is None and not optional:
                 error_message = f"{item_name} is missing from data"
                 logger.error(error_message)
-                return jsonify({"error": error_message}), 401
+                return jsonify({"error": error_message}), 400
             setattr(g, item_name, item)
             return f(*args, **kwargs)
         return decorated_function

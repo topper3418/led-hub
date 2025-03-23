@@ -12,12 +12,13 @@ struct DeviceListView: View {
     let roomId: Int
     let roomName: String
     @StateObject private var deviceService = DeviceService()
-    @State private var room: Room?
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
-            if deviceService.devices.isEmpty {
+            if let error = deviceService.error?.localizedDescription {
+                Text("Error: \(error)")
+                    .foregroundColor(.red)
+            } else if $deviceService.devices.isEmpty {
                 Text("Loading...")
                     .foregroundColor(.primary)
             } else if !deviceService.devices.isEmpty {
@@ -38,7 +39,7 @@ struct DeviceListView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .navigationTitle(room?.name ?? "Unnamed Room")
+        .navigationTitle(roomName)
         .toolbar {
             NavigationLink(destination: RoomConfiguratorView(roomId: roomId)) {
                 Image(systemName: "gear")
