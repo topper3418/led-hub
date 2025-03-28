@@ -15,10 +15,14 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+# Install Gunicorn for production
+RUN pip install gunicorn
 
 # Copy the rest of the application code
 COPY . .
 
-# Specify the command to run the application
-# Replace 'app.py' with your main Python file name
-CMD ["python", "main.py"]
+# Expose the port the app runs on
+EXPOSE 2000
+
+# Run the app
+CMD ["gunicorn", "--bind", "0.0.0.0:2000", "app:app"]
