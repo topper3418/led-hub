@@ -1,8 +1,11 @@
 from enum import Enum
-import requests
-from pprint import pprint
+import logging
+from logging.handlers import RotatingFileHandler
+from pprint import pprint, pformat
 
-from .config import LOGGING_SERVICE_ENDPOINT
+import requests
+
+from .config import LOGGING_SERVICE_ENDPOINT, BYPASS_LOGGING_SERVICE
 
 
 class LoggingLevel(Enum):
@@ -10,6 +13,7 @@ class LoggingLevel(Enum):
     INFO = 'info'
     WARN = 'warn'
     ERROR = 'error'
+
 
 class Logger:
 
@@ -62,6 +66,63 @@ class Logger:
             print(f'Failed to send log: {e}\n\t - {fmtMessage}\n')
 
 
-def get_logger(loggerName) -> Logger:
+def get_logger(loggerName) -> Logger | logging.Logger:
+    if BYPASS_LOGGING_SERVICE:
+        # Create logger
+        logger = logging.getLogger(loggerName)
+        logger.setLevel(logging.DEBUG)  # Set to lowest level to catch all messages
+
+        # Clear any existing handlers to avoid duplicates
+        if logger.hasHandlers():
+            logger.handlers.clear()
+
+        # Custom formatter to handle pretty-printing of extra argument
+        class PrettyFormatter(logging.Formatter):
+            def format(self, record):
+                msg = super().format(record)
+                # Check if there's an extra argument (stored in record.extra_arg)
+                if hasattr(record, "extra_arg") and record.extra_arg is not None:
+                    pretty_output = pformat(record.extra_arg)
+                    return f"{msg}\n{pretty_output}"
+                return msg
+
+        # Console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        console_formatter = PrettyFormatter("[%(levelname)s] %(asctime)s - %(message)s")
+        console_handler.setFormatter(console_formatter)
+        logger.addHandler(console_handler)
+
+        # File handler with rotation
+        file_handler = RotatingFileHandler(
+            "logs.txt", maxBytes=10 * 1024 * 1024, backupCount=5  # 10MB, 5 backups
+        )
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter = PrettyFormatter("[%(levelname)s] %(asctime)s - %(message)s")
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
+
+        # Wrapper to handle the extra argument explicitly
+        class LoggerWrapper:
+            def __init__(self, logger):
+                self.logger = logger
+
+            def debug(self, msg, extra_arg=None, *args, **kwargs):
+                self.logger.debug(msg, extra={"extra_arg": extra_arg}, *args, **kwargs)
+
+            def info(self, msg, extra_arg=None, *args, **kwargs):
+                self.logger.info(msg, extra={"extra_arg": extra_arg}, *args, **kwargs)
+
+            def warning(self, msg, extra_arg=None, *args, **kwargs):
+                self.logger.warning(msg, extra={"extra_arg": extra_arg}, *args, **kwargs)
+
+            def error(self, msg, extra_arg=None, *args, **kwargs):
+                self.logger.error(msg, extra={"extra_arg": extra_arg}, *args, **kwargs)
+
+            def critical(self, msg, extra_arg=None, *args, **kwargs):
+                self.logger.critical(msg, extra={"extra_arg": extra_arg}, *args, **kwargs)
+
+        return LoggerWrapper(logger)
+
     return Logger(loggerName)
 
