@@ -1,0 +1,45 @@
+[DEBUG] 2025-03-27 22:23:50,636 - Connecting to database
+{'connection_path': 'data/database.db'}
+[DEBUG] 2025-03-27 22:23:50,636 - Connecting to database
+{'connection_path': 'data/database.db'}
+[INFO] 2025-03-27 22:23:50,637 - Initializing rooms table
+[INFO] 2025-03-27 22:23:50,637 - Initializing rooms table
+[INFO] 2025-03-27 22:23:50,637 - Initializing devices table
+[INFO] 2025-03-27 22:23:50,637 - Initializing devices table
+[INFO] 2025-03-27 22:23:50,638 - Initializing led_strips table
+[INFO] 2025-03-27 22:23:50,638 - Initializing led_strips table
+[DEBUG] 2025-03-27 22:24:53,764 - Connecting to database
+{'connection_path': 'data/database.db'}
+[DEBUG] 2025-03-27 22:24:53,771 - Connecting to database
+{'connection_path': 'data/database.db'}
+[DEBUG] 2025-03-27 22:24:53,772 - loading device
+[DEBUG] 2025-03-27 22:24:53,772 - loading device
+[INFO] 2025-03-27 22:24:53,774 - processing request to list devices
+[INFO] 2025-03-27 22:24:53,774 - processing request to list devices
+[DEBUG] 2025-03-27 22:24:53,777 - Listing devices
+{'connected': None, 'room': None}
+[DEBUG] 2025-03-27 22:24:53,779 - Devices listed
+{'devices': [{'id': 2,
+              'ip': '192.168.68.64',
+              'last_ping': '2025-03-22 03:47:50',
+              'mac': '28:cd:c1:06:8b:8c',
+              'name': 'Fireplace',
+              'room_id': 2},
+             {'id': 3,
+              'ip': '192.168.68.63',
+              'last_ping': '2025-03-22 03:46:47',
+              'mac': '28:cd:c1:05:d5:e5',
+              'name': 'Couch Bar',
+              'room_id': 1},
+             {'id': 4,
+              'ip': '192.168.68.52',
+              'last_ping': '2025-03-22 03:48:22',
+              'mac': '28:cd:c1:06:8b:9d',
+              'name': 'Bar',
+              'room_id': 2},
+             {'id': 5,
+              'ip': '192.168.68.59',
+              'last_ping': '2025-03-22 03:47:15',
+              'mac': '28:cd:c1:11:95:47',
+              'name': 'Kitchen Overhead',
+              'room_id': 1}]}

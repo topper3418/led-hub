@@ -6,7 +6,18 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		150D87B12D99D47500F37F26 /* LEDControlIntent.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 150D87A82D99D47500F37F26 /* LEDControlIntent.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		150D87AF2D99D47500F37F26 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1579B5642D87A740004E829C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 150D87A72D99D47500F37F26;
+			remoteInfo = LEDControlIntent;
+		};
 		1579B57D2D87A741004E829C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1579B5642D87A740004E829C /* Project object */;
@@ -23,15 +34,66 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		150D87B62D99D47500F37F26 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				150D87B12D99D47500F37F26 /* LEDControlIntent.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		150D87A82D99D47500F37F26 /* LEDControlIntent.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = LEDControlIntent.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1579B56C2D87A740004E829C /* led-hub-client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "led-hub-client.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1579B57C2D87A741004E829C /* led-hub-clientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "led-hub-clientTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1579B5862D87A741004E829C /* led-hub-clientUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "led-hub-clientUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		150D87B52D99D47500F37F26 /* Exceptions for "LEDControlIntent" folder in "LEDControlIntent" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 150D87A72D99D47500F37F26 /* LEDControlIntent */;
+		};
+		150D87B82D99D61F00F37F26 /* Exceptions for "led-hub-client" folder in "LEDControlIntent" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Services/SpeechService.swift,
+			);
+			target = 150D87A72D99D47500F37F26 /* LEDControlIntent */;
+		};
+		158A7BF02D93A58A006B17CC /* Exceptions for "led-hub-client" folder in "led-hub-client" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1579B56B2D87A740004E829C /* led-hub-client */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		150D87A92D99D47500F37F26 /* LEDControlIntent */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				150D87B52D99D47500F37F26 /* Exceptions for "LEDControlIntent" folder in "LEDControlIntent" target */,
+			);
+			path = LEDControlIntent;
+			sourceTree = "<group>";
+		};
 		1579B56E2D87A740004E829C /* led-hub-client */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				158A7BF02D93A58A006B17CC /* Exceptions for "led-hub-client" folder in "led-hub-client" target */,
+				150D87B82D99D61F00F37F26 /* Exceptions for "led-hub-client" folder in "LEDControlIntent" target */,
+			);
 			path = "led-hub-client";
 			sourceTree = "<group>";
 		};
@@ -48,6 +110,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		150D87A52D99D47500F37F26 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1579B5692D87A740004E829C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -78,6 +147,7 @@
 				1579B56E2D87A740004E829C /* led-hub-client */,
 				1579B57F2D87A741004E829C /* led-hub-clientTests */,
 				1579B5892D87A741004E829C /* led-hub-clientUITests */,
+				150D87A92D99D47500F37F26 /* LEDControlIntent */,
 				1579B56D2D87A740004E829C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +158,7 @@
 				1579B56C2D87A740004E829C /* led-hub-client.app */,
 				1579B57C2D87A741004E829C /* led-hub-clientTests.xctest */,
 				1579B5862D87A741004E829C /* led-hub-clientUITests.xctest */,
+				150D87A82D99D47500F37F26 /* LEDControlIntent.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +166,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		150D87A72D99D47500F37F26 /* LEDControlIntent */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 150D87B22D99D47500F37F26 /* Build configuration list for PBXNativeTarget "LEDControlIntent" */;
+			buildPhases = (
+				150D87A42D99D47500F37F26 /* Sources */,
+				150D87A52D99D47500F37F26 /* Frameworks */,
+				150D87A62D99D47500F37F26 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				150D87A92D99D47500F37F26 /* LEDControlIntent */,
+			);
+			name = LEDControlIntent;
+			packageProductDependencies = (
+			);
+			productName = LEDControlIntent;
+			productReference = 150D87A82D99D47500F37F26 /* LEDControlIntent.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
 		1579B56B2D87A740004E829C /* led-hub-client */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1579B5902D87A741004E829C /* Build configuration list for PBXNativeTarget "led-hub-client" */;
@@ -102,10 +195,12 @@
 				1579B5682D87A740004E829C /* Sources */,
 				1579B5692D87A740004E829C /* Frameworks */,
 				1579B56A2D87A740004E829C /* Resources */,
+				150D87B62D99D47500F37F26 /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				150D87B02D99D47500F37F26 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1579B56E2D87A740004E829C /* led-hub-client */,
@@ -173,6 +268,9 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					150D87A72D99D47500F37F26 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					1579B56B2D87A740004E829C = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -203,11 +301,19 @@
 				1579B56B2D87A740004E829C /* led-hub-client */,
 				1579B57B2D87A741004E829C /* led-hub-clientTests */,
 				1579B5852D87A741004E829C /* led-hub-clientUITests */,
+				150D87A72D99D47500F37F26 /* LEDControlIntent */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		150D87A62D99D47500F37F26 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1579B56A2D87A740004E829C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -232,6 +338,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		150D87A42D99D47500F37F26 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1579B5682D87A740004E829C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +369,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		150D87B02D99D47500F37F26 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 150D87A72D99D47500F37F26 /* LEDControlIntent */;
+			targetProxy = 150D87AF2D99D47500F37F26 /* PBXContainerItemProxy */;
+		};
 		1579B57E2D87A741004E829C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1579B56B2D87A740004E829C /* led-hub-client */;
@@ -269,6 +387,56 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		150D87B32D99D47500F37F26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q2LN8PLB5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LEDControlIntent/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LEDControlIntent;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "opperudhome.led-hub-client.LEDControlIntent";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		150D87B42D99D47500F37F26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q2LN8PLB5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LEDControlIntent/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LEDControlIntent;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "opperudhome.led-hub-client.LEDControlIntent";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		1579B58E2D87A741004E829C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -399,6 +567,10 @@
 				DEVELOPMENT_TEAM = Q2LN8PLB5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "led-hub-client/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow app to use microphone to record voice commands?";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Allow app to transcribe your voice to send voice commands?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +600,10 @@
 				DEVELOPMENT_TEAM = Q2LN8PLB5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "led-hub-client/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow app to use microphone to record voice commands?";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Allow app to transcribe your voice to send voice commands?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -517,6 +693,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		150D87B22D99D47500F37F26 /* Build configuration list for PBXNativeTarget "LEDControlIntent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				150D87B32D99D47500F37F26 /* Debug */,
+				150D87B42D99D47500F37F26 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1579B5672D87A740004E829C /* Build configuration list for PBXProject "led-hub-client" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

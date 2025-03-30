@@ -14,48 +14,64 @@ struct RoomListView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                if let error = roomService.error?.localizedDescription {
-                    Text("Error: \(error)")
-                        .foregroundColor(.red)
-                } else if roomService.rooms.isEmpty {
-                    Text("Loading...")
-                        .foregroundColor(.primary)
-                } else {
-                    List {
-                        ForEach(roomService.rooms) { room in
-                            NavigationLink(destination: DeviceListView(roomId: room.identifiableId, roomName: room.name)) {
-                                RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
-                            }
-                        }
-                        RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
-                    }
-                }
-                Spacer()
-                // Voice Command Button at Bottom
-                Button(speechService.isListening ? "Stop Listening" : "Voice Command") {
-                    if speechService.isListening {
-                        let buffers = speechService.stopListening()
-                        Task {
-                            await speechService.sendAudioToEndpoint(buffers: buffers)
-                        }
+            ZStack(alignment: .bottomTrailing) {
+                VStack {
+                    if let error = roomService.error?.localizedDescription {
+                        Text("Error: \(error)")
+                            .foregroundColor(.red)
+                    } else if roomService.rooms.isEmpty {
+                        Text("Loading...")
+                            .foregroundColor(.primary)
                     } else {
-                        speechService.startListening()
+                        List {
+                            ForEach(roomService.rooms) { room in
+                                NavigationLink(destination: DeviceListView(roomId: room.identifiableId, roomName: room.name)) {
+                                    RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
+                                }
+                            }
+                            RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
+                        }
                     }
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(speechService.isListening ? Color.red : Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-                .frame(width: 250)
-            }
-            .background(Color(.secondarySystemBackground))
-            .navigationTitle("LED Hub")
-            .toolbar {
-                Button(action: addRoom) {
-                    Image(systemName: "plus")
-                        .font(.title)
+                .background(Color(.secondarySystemBackground))
+                VStack {
+                    // Voice Command Button at Bottom
+                    if !speechService.message.isEmpty {
+                        Text(speechService.message)
+                            .foregroundColor(speechService.error == nil ? .green : .red)
+                            .transition(.opacity)
+                    } else if !speechService.recognizedText.isEmpty {
+                        Text(speechService.recognizedText)
+                            .foregroundColor(.gray)
+                    }
+                    Button(action: {
+                        if speechService.isListening {
+                            let _ = speechService.stopListening()
+                            Task {
+                                await speechService.sendAudioToEndpoint()
+                            }
+                        } else {
+                            speechService.startListening()
+                        }
+                    }) {
+                        Image(systemName: speechService.isListening ? "mic.slash.fill" : "mic.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .frame(width: 75, height: 75)
+                            .background(speechService.isListening ? Color.red : Color.blue)
+                            .clipShape(Circle())
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 16)
+                }
+                .background(Color(.secondarySystemBackground))
+                .navigationTitle("LED Hub")
+                .toolbar {
+                    Button(action: addRoom) {
+                        Image(systemName: "plus")
+                            .font(.title)
+                    }
                 }
             }
             .task {

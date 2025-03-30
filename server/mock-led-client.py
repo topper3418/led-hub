@@ -2,11 +2,22 @@ import time
 import requests
 import random
 from pprint import pprint
+import argparse
 
 from src import config, models
 
 
-SERVER_ENDPOINT = f'http://localhost:{config.APP_PORT}/'
+DEFAULT_SERVER_ENDPOINT = f'http://led-hub.local:8000/'
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="LED Strip Client")
+parser.add_argument(
+    "-s", "--server",
+    default=DEFAULT_SERVER_ENDPOINT,
+    help=f"Server endpoint (default: {DEFAULT_SERVER_ENDPOINT})"
+)
+args = parser.parse_args()
+SERVER_ENDPOINT = args.server
 
 
 def get_mac_address():
@@ -97,11 +108,15 @@ def get_update(device: models.Device):
         print('an exception was raise dwhile trying to write to device')
 
 
-if __name__ == '__main__':
+def main():
     # first do a handshake with the server to register the device
     device = do_handshake()
     # Then just keep getting updates
     while True:
         get_update(device)
         time.sleep(.25)
+
+
+if __name__ == '__main__':
+    main()
 

@@ -67,7 +67,6 @@ class RoomService: ObservableObject {
             print("Invalid response")
             throw URLError(.badServerResponse)
         }
-        print("Response status code: \(httpResponse.statusCode)")
         
         if httpResponse.statusCode != 200 {
             print("Error: Server returned status code \(httpResponse.statusCode)")

@@ -18,6 +18,7 @@ class SpeechService: ObservableObject {
     @Published var recognizedText: String = ""
     @Published var isListening: Bool = false
     @Published var error: Error?
+    @Published var message: String = ""
 
     func requestPermissions() {
         SFSpeechRecognizer.requestAuthorization { authStatus in
@@ -39,9 +40,11 @@ class SpeechService: ObservableObject {
     }
 
     func startListening() {
+        print("starting to listen")
         guard !isListening, speechRecognizer?.isAvailable ?? false else { return }
         
         let audioSession = AVAudioSession.sharedInstance()
+        print("audio session created")
         do {
             try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
@@ -51,6 +54,7 @@ class SpeechService: ObservableObject {
         }
 
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+        print("recognition request created")
         guard let recognitionRequest = recognitionRequest else { return }
         recognitionRequest.shouldReportPartialResults = true
 
@@ -60,6 +64,7 @@ class SpeechService: ObservableObject {
             recognitionRequest.append(buffer)
             self.audioBuffers.append(buffer)  // Store audio packets
         }
+        print("tap installed")
 
         audioEngine.prepare()
         do {
@@ -109,35 +114,62 @@ class SpeechService: ObservableObject {
         return audioBuffers  // Return captured audio packets
     }
 
-    func sendAudioToEndpoint(buffers: [AVAudioPCMBuffer]) async {
+    func sendAudioToEndpoint() async {
+        print("sending command")
         let url = URL(string: "http://opperudHome.local/api/command")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Convert buffers to raw data (simplified example)
-        let audioData = buffers.compactMap { buffer in
-            guard let floatChannelData = buffer.floatChannelData else { return nil }
-            let frameLength = Int(buffer.frameLength)
-            let channelCount = Int(buffer.format.channelCount)
-            let dataSize = frameLength * channelCount * MemoryLayout<Float>.size
-            return Data(bytes: floatChannelData[0], count: dataSize)
-        }.reduce(Data(), +)
+        let commandData: [String: [String: String]] = [
+            "data": [
+                "command": recognizedText
+            ]
+        ]
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: commandData) else {
+            Task { @MainActor in
+                self.error = NSError(domain: "JSON", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to encode command"])
+                self.message = "Error encoding command"
+            }
+            return
+        }
+        print("Command payload: \(String(data: jsonData, encoding: .utf8) ?? "Invalid JSON")")
 
         do {
-            let (_, response) = try await URLSession.shared.upload(for: request, from: audioData)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                DispatchQueue.main.async {
+            print("Starting upload to \(url)")
+            let (_, response) = try await URLSession.shared.upload(for: request, from: jsonData)
+            print("Response received: \(response)")
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Not an HTTP response")
+                Task { @MainActor in
                     self.error = URLError(.badServerResponse)
+                    self.message = "Error: Invalid server response"
                 }
                 return
             }
-            DispatchQueue.main.async {
+            print("Status code: \(httpResponse.statusCode)")
+            guard httpResponse.statusCode == 200 else {
+                print("Server error: \(httpResponse.statusCode)")
+                Task { @MainActor in
+                    self.error = URLError(.badServerResponse)
+                    self.message = "Error: Server returned \(httpResponse.statusCode)"
+                }
+                return
+            }
+            Task { @MainActor in
                 self.error = nil
+                self.recognizedText = ""
+                self.message = "Command sent successfully: \(self.recognizedText)"
+                try await Task.sleep(nanoseconds: 2_000_000_000)
+                await MainActor.run {
+                    self.message = ""
+                }
             }
         } catch {
-            DispatchQueue.main.async {
+            print("Upload failed with error: \(error.localizedDescription)")
+            Task { @MainActor in
                 self.error = error
+                self.message = "Error sending command: \(error.localizedDescription)"
             }
         }
     }
