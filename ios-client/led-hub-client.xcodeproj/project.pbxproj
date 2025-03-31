@@ -568,6 +568,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "led-hub-client/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "LED hub";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow app to use microphone to record voice commands?";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Allow app to transcribe your voice to send voice commands?";
@@ -601,6 +602,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "led-hub-client/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "LED hub";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow app to use microphone to record voice commands?";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Allow app to transcribe your voice to send voice commands?";

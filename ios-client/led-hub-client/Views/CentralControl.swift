@@ -31,6 +31,11 @@ struct RoomListView: View {
                             }
                             RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
                         }
+                        Button(action: addRoom) {
+                            Text("Add Room")
+                            Image(systemName: "plus")
+                                .font(.title)
+                        }
                     }
                     Spacer()
                 }
@@ -68,14 +73,14 @@ struct RoomListView: View {
                 .background(Color(.secondarySystemBackground))
                 .navigationTitle("LED Hub")
                 .toolbar {
-                    Button(action: addRoom) {
-                        Image(systemName: "plus")
-                            .font(.title)
+                    NavigationLink(destination: MainConfiguratorView()) {
+                        Image(systemName: "gear")
                     }
                 }
             }
             .task {
                 _ = await roomService.fetchAll()
+                roomService.startPolling()
             }
         }
         .background(Color(.systemBackground))

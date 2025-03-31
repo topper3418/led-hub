@@ -16,9 +16,18 @@ struct RoomsResponse: Codable {
 }
 
 class RoomService: ObservableObject {
+    
     private let baseURL = "http://opperudHome.local/api/"
+    
     @Published var rooms: [Room] = []
+    
     @Published var error: Error? = nil
+    
+    private var pollingTimer: Timer?
+    
+    deinit {
+        stopPolling()
+    }
     
     func fetchAll() async -> [Room] {
         do {
@@ -53,6 +62,19 @@ class RoomService: ObservableObject {
             }
             return []
         }
+    }
+    
+    func startPolling() {
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            Task {
+                await self.fetchAll()
+            }
+        }
+    }
+    
+    func stopPolling() {
+        pollingTimer?.invalidate()
     }
 
     func fetchOne(id: Int) async throws -> Room {
