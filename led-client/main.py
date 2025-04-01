@@ -1,7 +1,6 @@
 # module imports
 import machine
 import time
-import requests
 
 # custom module imports
 from networkConnection import NetworkConnection
