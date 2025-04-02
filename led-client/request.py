@@ -45,6 +45,7 @@ def fetch_data(relative_url: str, method="GET", data=None, redirect_count=0, max
         request = f"{method.upper()} {path} HTTP/1.1\r\n{headers}\r\n\r\n"
         if body:
             request += body
+        s.settimeout(0.25)
         s.send(request.encode("utf-8"))
         
         # Receive response
