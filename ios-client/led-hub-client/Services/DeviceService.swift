@@ -8,7 +8,8 @@
 import Foundation
 
 class DeviceService: ObservableObject {
-    private let baseURL = "http://opperudHome.local/api/"
+    
+    private let baseURL = getServerUrl()
     @Published var devices: [Device] = []
     @Published var error: Error? = nil
     

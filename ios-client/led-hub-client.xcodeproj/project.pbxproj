@@ -67,6 +67,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Services/SpeechService.swift,
+				Util/Settings.swift,
 			);
 			target = 150D87A72D99D47500F37F26 /* LEDControlIntent */;
 		};

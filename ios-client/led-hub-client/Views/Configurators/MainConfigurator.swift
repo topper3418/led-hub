@@ -17,7 +17,6 @@ struct MainConfiguratorView: View {
             Text("Configure Server")
                 .font(.title)
                 .foregroundColor(.primary)
-            Text("This currently does nothing, just so you know")
             TextField("Server address", text: $url)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .foregroundColor(.primary)

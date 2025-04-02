@@ -116,7 +116,7 @@ class SpeechService: ObservableObject {
 
     func sendAudioToEndpoint() async {
         print("sending command")
-        let url = URL(string: "http://opperudHome.local/api/command")!
+        let url = URL(string: getServerUrl() + "command")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

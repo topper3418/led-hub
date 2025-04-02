@@ -12,6 +12,8 @@ struct RoomListView: View {
     @StateObject private var speechService = SpeechService()
     @Environment(\.colorScheme) var colorScheme
     
+    @State private var isInitialLoad = true
+    
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottomTrailing) {
@@ -19,15 +21,13 @@ struct RoomListView: View {
                     if let error = roomService.error?.localizedDescription {
                         Text("Error: \(error)")
                             .foregroundColor(.red)
-                    } else if roomService.rooms.isEmpty {
+                    } else if roomService.rooms.isEmpty && isInitialLoad && roomService.rooms.count == 0 {
                         Text("Loading...")
                             .foregroundColor(.primary)
                     } else {
                         List {
                             ForEach(roomService.rooms) { room in
-                                NavigationLink(destination: DeviceListView(roomId: room.identifiableId, roomName: room.name)) {
-                                    RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
-                                }
+                                RoomCardView(roomId: room.identifiableId, roomName: room.name, roomService: roomService)
                             }
                             RoomCardView(roomId: 0, roomName: "Misc", roomService: roomService)
                         }
@@ -80,6 +80,7 @@ struct RoomListView: View {
             }
             .task {
                 _ = await roomService.fetchAll()
+                isInitialLoad = false
                 roomService.startPolling()
             }
         }
