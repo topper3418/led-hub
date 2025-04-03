@@ -3,7 +3,7 @@ import Banner from "../../components/banner";
 import { useNavigate } from "react-router-dom";
 import { useAddRoom, useRoomHooks, useWriteToRoom } from "./hooks";
 import { Device, Room } from "../../types";
-import { RoomCard, RoomCardElement } from "./roomCard";
+import { RoomCard, RoomCardElement } from "./roomcard";
 
 
 const Rooms: React.FC = () => {

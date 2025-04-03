@@ -1,3 +1,8 @@
+# schema:
+# /
+#   POST - process_voice_command - process a plain text command
+
+
 from flask import Blueprint, jsonify, g
 
 from src.dispatcher.contextCommandProcessor import ContextCommandProcessor, get_full_led_strip_context

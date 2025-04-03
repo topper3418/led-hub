@@ -26,21 +26,30 @@ def update_led_strip():
     # if g.on is not None:
     #     logger.debug(f"Setting on to {g.on}")
     #     led_strip.on = g.on
+    # helper function
+    def global_fallback(attr_name: str):
+        value = g.get(attr_name)
+        if value is None:
+            value = getattr(led_strip, attr_name)
+        return value
+
     try:
+        print('led strip', led_strip)
+        print('g.get brightness', g.get('brightness') or led_strip.brightness)
         led_strip_update = LedStrip(
             id=led_strip.id,
             device_id=led_strip.device_id,
             num_leds=led_strip.num_leds,
             led_pin=led_strip.led_pin,
-            red=g.get('red', led_strip.red),
-            green=g.get('green', led_strip.green),
-            blue=g.get('blue', led_strip.blue),
-            brightness=g.get('brightness', led_strip.brightness),
-            on=g.get('on', led_strip.on)
+            red=global_fallback('red'),
+            green=global_fallback('green'),
+            blue=global_fallback('blue'),
+            brightness=global_fallback('brightness'),
+            on=global_fallback('on')
         )
     except ValidationError as e:
         logger.error('Validation error', {'error': e.errors()})
-        return jsonify({"error": e.errors()})
+        return jsonify({"error": e.errors()}), 400
     db: Database = g.db
     db.led_strips.update(led_strip_update)
     return jsonify({"data": {"led_strip": led_strip.model_dump()}})

@@ -43,13 +43,7 @@ struct LedStripControlView: View {
                             updateLedStrip()
                         }
                 }
-                
-                Spacer()
-                
-                Button("Back") {
-                    dismiss()
-                }
-                .buttonStyle(.bordered)
+               
             } else {
                 Text("Loading...")
                     .foregroundColor(.primary)

@@ -84,7 +84,7 @@ struct LedStripConfiguratorView: View {
             numLeds = String(fetchedDevice.ledStrip?.numLeds ?? 0)
             ledPin = String(fetchedDevice.ledStrip?.ledPin ?? 16)
             
-            let fetchedRooms = try await roomService.fetchAll()
+            let fetchedRooms = await roomService.fetchAll()
             rooms = fetchedRooms
         } catch {
             print("Error loading data for device \(deviceId): \(error)")

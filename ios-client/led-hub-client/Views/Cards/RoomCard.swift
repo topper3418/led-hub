@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct RoomCardView: View {
-    let roomId: Int?
-    @ObservedObject var apiService: RoomService
+    let roomId: Int
+    let roomName: String
+    @ObservedObject var roomService: RoomService
     @State private var room: Room?
     @State private var isOn: Bool = false
     @State private var numLedStrips: Int = 0
@@ -21,28 +22,30 @@ struct RoomCardView: View {
     var body: some View {
         Group {
             if shouldShowCard {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(room?.name ?? "Loading...")
-                            .foregroundColor(.primary)
-                            .font(.headline)
-                        Text("lights: \(numLedStrips)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle("", isOn: $isOn)
-                        .onChange(of: isOn) { oldValue, newValue in
-                            if !isServerToggle {
-                                toggleRoom(newValue)
-                            }
-                            isServerToggle = false
+                NavigationLink(destination: DeviceListView(roomId: roomId, roomName: roomName)) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(room?.name ?? roomName)
+                                .foregroundColor(.primary)
+                                .font(.headline)
+                            Text("lights: \(numLedStrips)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
-                        .disabled(room == nil)
+                        Spacer()
+                        Toggle("", isOn: $isOn)
+                            .onChange(of: isOn) { oldValue, newValue in
+                                if !isServerToggle {
+                                    toggleRoom(newValue)
+                                }
+                                isServerToggle = false
+                            }
+                            .disabled(room == nil)
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
                 }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(8)
             } else {
                 EmptyView()  // Hide the card if no lights
             }
@@ -65,12 +68,8 @@ struct RoomCardView: View {
     }
 
     private func updateState() async {
-        guard let id = roomId else {
-            print("Room ID is nil, cannot fetch data")
-            return
-        }
         do {
-            let fetchedRoom = try await apiService.fetchOne(id: id)
+            let fetchedRoom = try await roomService.fetchOne(id: roomId)
             room = fetchedRoom
             if let devices = fetchedRoom.devices {
                 numLedStrips = devices.count
@@ -81,19 +80,18 @@ struct RoomCardView: View {
                 }
             }
         } catch {
-            print("Error fetching room \(id): \(error)")
+            print("Error fetching room \(roomId): \(error)")
         }
     }
 
     private func toggleRoom(_ newValue: Bool) {
-        guard let id = roomId else { return }
         Task {
             stopPolling()  // Stop polling before update
             do {
-                try await apiService.setRoom(roomId: id, on: newValue)
+                try await roomService.setRoom(roomId: roomId, on: newValue)
                 startPolling()  // Restart polling after update
             } catch {
-                print("Error toggling room \(id): \(error)")
+                print("Error toggling room \(roomId): \(error)")
                 startPolling()  // Restart even on error to keep UI alive
             }
         }

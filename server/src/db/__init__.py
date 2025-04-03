@@ -192,7 +192,6 @@ class Database:
 
     def commit(self):
         if self.connection:
-            print('committing changes')
             self.connection.commit()
         else:
             raise RuntimeError("Connection is not open")

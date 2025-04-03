@@ -1,3 +1,14 @@
+# schema: 
+# / 
+#   GET  - list_rooms - list off all rooms
+#   POST - create_room - create a new room
+# /<room_id>
+#   GET  - get_room - get data for one room
+#   PUT  - update_room - update room data
+#   DELETE - delete_room - delete room from server
+# /<room_id>/led_strips
+#   PUT  - update_led_strips - update led strips in room
+
 import json
 
 from flask import Blueprint, jsonify, g, request

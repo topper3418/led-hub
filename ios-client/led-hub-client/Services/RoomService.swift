@@ -7,33 +7,83 @@
 
 import Foundation
 
-class RoomService: ObservableObject {
-    private let baseURL = "http://opperudHome.local/api/"
+struct RoomsResponse: Codable {
+    let data: RoomsData
     
-    func fetchAll() async throws -> [Room] {
-        let urlString = "\(baseURL)rooms"
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL: \(urlString)")
-            throw URLError(.badURL)
+    struct RoomsData: Codable {
+        let rooms: [Room]
+    }
+}
+
+/// Service for getting data for rooms.
+/// Saves the full list of rooms resulting from fetchall, is meant to be passed to children views to use the other methods as well as the list of rooms as context
+class RoomService: ObservableObject {
+    
+    private let baseURL = getServerUrl()
+    
+    @Published var rooms: [Room] = []
+    
+    @Published var loading: Bool = false
+    
+    @Published var error: Error? = nil
+    
+    private var pollingTimer: Timer?
+    
+    deinit {
+        stopPolling()
+    }
+    
+    func fetchAll() async -> [Room] {
+        loading = true
+        print("fetching all")
+        do {
+            let urlString = "\(baseURL)rooms"
+            guard let url = URL(string: urlString) else {
+                print("Invalid URL: \(urlString)")
+                throw URLError(.badURL)
+            }
+            
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Invalid response")
+                throw URLError(.badServerResponse)
+            }
+            
+            if httpResponse.statusCode != 200 {
+                print("Error: Server returned status code \(httpResponse.statusCode)")
+                throw URLError(.badServerResponse)
+            }
+            if false {
+                print("Raw data: \(String(data: data, encoding: .utf8) ?? "Unable to decode data")")
+            }
+            let roomsResponse = try JSONDecoder().decode(RoomsResponse.self, from: data)
+            print("decoded response: \(roomsResponse)")
+            await MainActor.run {
+                self.loading = false
+                self.rooms = roomsResponse.data.rooms
+                self.error = nil
+            }
+            return rooms
+        } catch {
+            await MainActor.run {
+                self.loading = false
+                self.error = error
+            }
+            return []
         }
-        print("Fetching rooms from: \(url)")
-        
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            print("Invalid response")
-            throw URLError(.badServerResponse)
+    }
+    
+    func startPolling() {
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            Task {
+                await self.fetchAll()
+            }
         }
-        print("Response status code: \(httpResponse.statusCode)")
-        
-        if httpResponse.statusCode != 200 {
-            print("Error: Server returned status code \(httpResponse.statusCode)")
-            throw URLError(.badServerResponse)
-        }
-        if false {
-            print("Raw data: \(String(data: data, encoding: .utf8) ?? "Unable to decode data")")
-        }
-        let roomsResponse = try JSONDecoder().decode(RoomsResponse.self, from: data)
-        return roomsResponse.data.rooms
+    }
+    
+    func stopPolling() {
+        pollingTimer?.invalidate()
     }
 
     func fetchOne(id: Int) async throws -> Room {
@@ -42,14 +92,12 @@ class RoomService: ObservableObject {
             print("Invalid URL: \(urlString)")
             throw URLError(.badURL)
         }
-        print("Fetching room \(id) from: \(url)")
         
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let httpResponse = response as? HTTPURLResponse else {
             print("Invalid response")
             throw URLError(.badServerResponse)
         }
-        print("Response status code: \(httpResponse.statusCode)")
         
         if httpResponse.statusCode != 200 {
             print("Error: Server returned status code \(httpResponse.statusCode)")
