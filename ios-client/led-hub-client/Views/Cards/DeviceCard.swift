@@ -61,7 +61,22 @@ struct DeviceCardView: View {
     }
     
     private var connectionStatus: String {
-        guard let lastPing = device?.lastPing, let pingDate = ISO8601DateFormatter().date(from: lastPing) else {
+        guard let lastPing = device?.lastPing else {
+            print("failed during first one")
+            return "Connection: Unknown"
+        }
+        print("lastPing: \(lastPing)")
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [
+            .withYear,
+            .withMonth,
+            .withDay,
+            .withTime,
+            .withDashSeparatorInDate,
+            .withColonSeparatorInTime
+        ]
+        guard let pingDate = formatter.date(from: lastPing) else {
+            print("failed during last one")
             return "Connection: Unknown"
         }
         let dwell = Date().timeIntervalSince(pingDate)
@@ -134,7 +149,6 @@ struct DeviceCardView: View {
                 isOn = newIsOn
             }
             device = fetchedDevice // Update device for connection status
-            print("Device updated: \(deviceId)")
         } catch {
             print("Error updating device \(deviceId): \(error)")
         }
