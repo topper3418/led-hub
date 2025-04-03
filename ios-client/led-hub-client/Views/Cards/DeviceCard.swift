@@ -141,3 +141,11 @@ struct DeviceCardView: View {
     }
 }
 
+#Preview {
+    DeviceCardView(
+        deviceId: 2,
+        givenName: "Fireplace",
+        deviceService: DeviceService()
+    )
+}
+
