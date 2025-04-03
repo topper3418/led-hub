@@ -1,3 +1,16 @@
+# schema: 
+# /
+#   GET  - get_devices - list off all devics
+#   POST - handshake - initialize device in server on device boot
+# /<device_id>
+#   GET  - read_device - get data for one device
+#   PUT  - update_device - update device data
+#   DELETE - delete_device - delete device from server
+# /<device_id>/led_strip
+#     GET  - led_strip_ping - ping the led strip
+#     PUT  - update_led_strip_state - update the led strip state
+
+
 from flask import Blueprint, abort, request, jsonify, g
 from pydantic import ValidationError
 

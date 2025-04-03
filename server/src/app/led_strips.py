@@ -1,3 +1,12 @@
+# schema:
+# /
+#   GET  - get_led_strips - list off all led strips
+#   PUT  - update_many_led_strips - update led strips in room
+# /<led_strip_id>
+#   GET  - read_led_strip_state - get data for one led strip
+#   PUT  - update_led_strip_state - update led strip state
+
+
 from flask import Blueprint, request, jsonify, g, abort
 from pydantic import ValidationError
 
