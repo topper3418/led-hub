@@ -14,7 +14,7 @@ services:
       - led-hub-log-data:/app/data
 
   server:
-    build: ./server
+    build: ./server 
     container_name: led-hub-server
     restart: always
     ports:

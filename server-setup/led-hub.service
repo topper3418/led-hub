@@ -1,0 +1,15 @@
+# /etc/systemd/system/led-hub.service
+
+[Unit]
+Description=REST server for the led-hub app
+After=network.target  
+
+[Service]
+Type=simple
+WorkingDirectory={path/to/led/hub/root}/server/
+ExecStart=/bin/bash {path/to/led/hub/root}/led-hub-server.sh
+Restart=on-failure 
+User={led-hub-user} 
+
+[Install]
+WantedBy=multi-user.target
