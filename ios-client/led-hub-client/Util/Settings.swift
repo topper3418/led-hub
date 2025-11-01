@@ -17,7 +17,7 @@ func saveServerUrl(_ url: String) {
 // Retrieving the URL (e.g., when your app needs it)
 func getServerUrl() -> String {
     // Provide a default URL if none is set
-    var url: String = UserDefaults.standard.string(forKey: "serverUrl") ?? "http://led-hub.local/"
+    var url: String = UserDefaults.standard.string(forKey: "serverUrl") ?? "http://lights.local/"
     // make sure it ends with /
     if !url.hasSuffix("/") {
         url.append("/")
