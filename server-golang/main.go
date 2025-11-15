@@ -14,4 +14,9 @@ func main() {
 	api.RegisterDevices(v1, db_path)
 	api.RegisterLedStrips(v1, db_path)
 	r.Run(":8080")
+	// Serve React build
+	r.Static("/web", "./web/build")  // ← put your React `build` folder here
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./web/build/index.html")
+	})
 }
