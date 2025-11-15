@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/travisopperud/Code/led-hub/pico-client-c/build/_deps/picotool-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
